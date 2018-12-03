@@ -35,6 +35,10 @@ public:
             m_Lines.erase(m_Lines.begin() + index);
         }
     }
+    virtual void Clear() {
+        m_Lines.clear();
+    }
+
 private:
     using LineVector = std::vector<std::wstring>;
 

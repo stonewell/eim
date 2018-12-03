@@ -3,6 +3,7 @@ SET(core_src
     command.h
     file_buffer.h
     buffer.cxx
+    file_buffer.cxx
     )
 
 ADD_LIBRARY(core STATIC

@@ -18,6 +18,7 @@ public:
     virtual void Insert(size_t offset, const wchar_t * data, size_t len) = 0;
     virtual void Delete(size_t offset, size_t len) = 0;
     virtual void DeleteLine(size_t index) = 0;
+    virtual void Clear() = 0;
 
     virtual size_t GetLength() = 0;
 
