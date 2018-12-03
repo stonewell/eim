@@ -12,6 +12,8 @@ void print_lines(const eim::BufferPtr & buf) {
 
         std::wcout << i << ":" << rsize << "[" << data << "]" << std::endl;
     }
+
+    std::wcout << "---------------------------" << std::endl << std::endl;
 }
 
 int main() {
@@ -30,6 +32,18 @@ int main() {
     print_lines(buf);
 
     buf->Insert(buf->GetLength(), L"KKKK", 4);
+    print_lines(buf);
+
+    buf->Delete(3, 2);
+    print_lines(buf);
+
+    buf->Delete(6, 5);
+    print_lines(buf);
+
+    buf->Delete(9, 2);
+    print_lines(buf);
+
+    buf->Delete(13, 5);
     print_lines(buf);
     return pBuffer == nullptr ? 0 : 1;
 }

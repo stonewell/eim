@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <functional>
+#include <algorithm>
 #include <iostream>
 
 namespace eim {
@@ -29,6 +30,11 @@ public:
 
     virtual size_t LinePositionToDocPos(const LinePosition & line_pos);
     virtual LinePosition DocPosToLinePosition(size_t offset);
+    virtual void DeleteLine(size_t index) {
+        if (index < GetLineCount()) {
+            m_Lines.erase(m_Lines.begin() + index);
+        }
+    }
 private:
     using LineVector = std::vector<std::wstring>;
 
@@ -90,7 +96,17 @@ LinePosition BufferImpl::DocPosToLinePosition(size_t offset) {
         return {last_line - 1, GetLineLastPos(last_line - 1)};
     }
 
-    return {last_line - 1, offset - last_doc_pos };
+    LinePosition line_pos {last_line - 1, offset - last_doc_pos };
+
+    //make sure do not put line offset between '\r\n'.
+    if (m_Lines[line_pos.line].size() > 0
+        && line_pos.offset > 0
+        && m_Lines[line_pos.line][line_pos.offset] == L'\n'
+        && m_Lines[line_pos.line][line_pos.offset - 1] == L'\r') {
+        line_pos.offset -= 1;
+    }
+
+    return line_pos;
 }
 
 size_t BufferImpl::GetLengthToLine(size_t index) {
@@ -141,18 +157,55 @@ void BufferImpl::Insert(size_t offset, const wchar_t * data, size_t len) {
     }
 
     //check if last line end with \r\n, if so add new empty line without \r\n
-    if (it == m_Lines.end())
-        it--;
+    if (m_Lines.size() > 0) {
+        if (it == m_Lines.end())
+            it--;
 
-    if (it == m_Lines.end() - 1
-        && (it->back() == L'\r' || it->back() == L'\n')) {
-        m_Lines.push_back(std::wstring(L""));
+        if (it == m_Lines.end() - 1
+            && (it->back() == L'\r' || it->back() == L'\n')) {
+            m_Lines.push_back(std::wstring(L""));
+        }
     }
 }
 
 void BufferImpl::Delete(size_t offset, size_t len) {
-    (void)offset;
-    (void)len;
+    if (len == 0)
+        return;
+
+    auto line_pos = DocPosToLinePosition(offset);
+
+    while(line_pos.line < GetLineCount() && len > 0) {
+        size_t avaiable_len = m_Lines[line_pos.line].size() - line_pos.offset;
+        size_t line_step = 1;
+        size_t new_offset = 0;
+
+        if (avaiable_len > 0) {
+            size_t remove_len = std::min(avaiable_len, len);
+
+            m_Lines[line_pos.line].erase(line_pos.offset, remove_len);
+            len -= remove_len;
+
+            //clear empty line
+            if (m_Lines[line_pos.line].empty()) {
+                m_Lines.erase(m_Lines.begin() + line_pos.line);
+                line_step = 0;
+            } else if (!(m_Lines[line_pos.line].back() == L'\r'
+                         || m_Lines[line_pos.line].back() == L'\n')) {
+                //merge two lines
+                if (line_pos.line < GetLineCount() - 1) {
+                    new_offset = m_Lines[line_pos.line].size();
+
+                    m_Lines[line_pos.line].append(m_Lines[line_pos.line + 1]);
+                    m_Lines.erase(m_Lines.begin() + line_pos.line + 1);
+
+                    line_step = 0;
+                }
+            }
+        }
+
+        line_pos.line += line_step;
+        line_pos.offset = new_offset;
+    }
 }
 
 size_t BufferImpl::GetLength() {
