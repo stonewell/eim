@@ -104,12 +104,8 @@ void BufferImpl::Insert(size_t offset, const wchar_t * data, size_t len) {
     LineVector::iterator it = m_Lines.begin() + line_pos.line;
     bool first = true;
 
-    while(end < len) {
-        if (data[end] == L'\r' || data[end] == L'\n') {
-            if (data[end] == L'\r' && end + 1 < len && data[end + 1] == '\n') {
-                end++;
-            }
-
+    std::function<void(const wchar_t * str, size_t len)> f(
+        [this, first, &it, line_pos](const wchar_t * str, size_t len) {
             if (first && it != m_Lines.end()) {
                 if (line_pos.offset < it->size()) {
                     LineVector::iterator new_it = m_Lines.insert(it + 1, it->substr(line_pos.offset));
@@ -117,10 +113,19 @@ void BufferImpl::Insert(size_t offset, const wchar_t * data, size_t len) {
                     it = new_it;
                 }
 
-                it->append(&data[begin], end - begin + 1);
+                it->append(str, len);
             } else {
-                it = m_Lines.insert(it, std::wstring(&data[begin], end - begin + 1));
+                it = m_Lines.insert(it, std::wstring(str, len));
             }
+        });
+
+    while(end < len) {
+        if (data[end] == L'\r' || data[end] == L'\n') {
+            if (data[end] == L'\r' && end + 1 < len && data[end + 1] == '\n') {
+                end++;
+            }
+
+            f(&data[begin], end - begin + 1);
 
             first = false;
             it++;
@@ -131,17 +136,7 @@ void BufferImpl::Insert(size_t offset, const wchar_t * data, size_t len) {
     }
 
     if (begin < end) {
-        if (first && it != m_Lines.end()) {
-            if (line_pos.offset < it->size()) {
-                LineVector::iterator new_it = m_Lines.insert(it + 1, it->substr(line_pos.offset));
-                *it = it->substr(0, line_pos.offset);
-                it = new_it;
-            }
-
-            it->append(&data[begin], end - begin);
-        } else {
-            it = m_Lines.insert(it, std::wstring(&data[begin], end - begin));
-        }
+        f(&data[begin], end - begin);
     }
 
     //check if last line end with \r\n, if so add new empty line without \r\n
