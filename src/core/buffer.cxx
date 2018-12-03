@@ -2,6 +2,7 @@
 #include "file_buffer.h"
 
 #include <vector>
+#include <functional>
 #include <iostream>
 
 namespace eim {
