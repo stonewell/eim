@@ -4,6 +4,10 @@ SET(core_src
     file_buffer.h
     buffer.cxx
     file_buffer.cxx
+    eim_context.h
+    buffer_manager.h
+    buffer_session.h
+    command_manager.h
     )
 
 ADD_LIBRARY(core STATIC

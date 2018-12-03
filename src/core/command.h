@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <deque>
 
 namespace eim
 {
@@ -25,4 +26,5 @@ public:
 };
 
 using CommandPtr = std::shared_ptr<Command>;
+using CommandStack = std::deque<CommandPtr>;
 }; //namespace eim
