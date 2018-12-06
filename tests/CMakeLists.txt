@@ -34,5 +34,5 @@ TARGET_LINK_LIBRARIES(test_file_buffer
   )
 
 add_test(NAME test_file_buffer
-  COMMAND test_file_buffer
+  COMMAND test_file_buffer ${CMAKE_CURRENT_SOURCE_DIR}/test_file_buffer.cxx
   )

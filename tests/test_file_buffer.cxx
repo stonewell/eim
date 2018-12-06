@@ -16,14 +16,22 @@ void print_lines(const eim::BufferPtr & buf) {
     std::wcout << "---------------------------" << std::endl << std::endl;
 }
 
-int main() {
+int main(int argc, char ** argv) {
+    if (argc < 2) {
+        std::wcout << L"usage: test_file_buffer <file>" << std::endl;
+        return 1;
+    }
+
+    std::wcout << "loading... " << argv[1] << std::endl;
     eim::FileBufferPtr pBuffer = eim::CreateFileBuffer();
 
-    pBuffer->LoadFromFile("/home/stone/test.c");
+    if (!pBuffer->LoadFromFile(argv[1]))
+        return 2;
 
     print_lines(pBuffer);
 
-    pBuffer->SaveToFile("test_new.c");
+    if (!pBuffer->SaveToFile("test_new.c"))
+        return 3;
 
     return pBuffer == nullptr ? 1 : 0;
 }
