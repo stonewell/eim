@@ -32,6 +32,14 @@ public:
     }
 
 public:
+    virtual std::wstring GetName() {
+        return m_Buf->GetName();
+    }
+
+    virtual void SetName(const std::wstring & name) {
+        m_Buf->SetName(name);
+    }
+
     virtual void Insert(size_t offset, const wchar_t * data, size_t len) {
         m_Buf->Insert(offset, data, len);
     }
