@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include "eim_core.h"
 #include <string>
 #include <deque>
 
@@ -12,7 +12,7 @@ public:
     virtual ~Command() = default;
 
 public:
-    virtual void Execute() = 0;
+    virtual std::string Execute(EIMContextPtr context, const std::string & json_args) = 0;
     virtual const std::string & GetName() = 0;
 };
 

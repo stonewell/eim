@@ -15,6 +15,14 @@ public:
     virtual ~BufferImpl() {}
 
 public:
+    virtual std::wstring GetName() {
+        return m_Name;
+    }
+
+    virtual void SetName(const std::wstring & name) {
+        m_Name = name;
+    }
+
     virtual void Insert(size_t offset, const wchar_t * data, size_t len);
     virtual void Delete(size_t offset, size_t len);
 
@@ -46,6 +54,8 @@ private:
 
     size_t GetLengthToLine(size_t index);
     size_t GetLineLastPos(size_t index);
+
+    std::wstring m_Name;
 };
 
 size_t BufferImpl::GetLineLastPos(size_t index) {
