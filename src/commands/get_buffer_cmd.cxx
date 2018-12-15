@@ -3,8 +3,14 @@
 
 #include "tao/json.hpp"
 
+#include <locale>
+#include <codecvt>
+
 namespace eim
 {
+static
+std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wcharconv;
+
 class GetBufferCommand : public virtual CommandBase {
 public:
     GetBufferCommand()
@@ -21,9 +27,24 @@ public:
         auto file_path = v.optional<std::string>("path");
         auto create = v.optional<bool>("create");
 
-        context->GetBufferManager()->GetBuffer(L"", create.has_value() ? create.value() : true);
+        BufferPtr buf{};
 
-        return json_args;
+        std::string err;
+
+        if (buf_name.has_value() && !file_path.has_value()) {
+            buf = context->GetBufferManager()->GetBuffer(wcharconv.from_bytes(buf_name->c_str()), create.has_value() ? create.value() : true);
+        } else if (file_path.has_value()) {
+            buf = context->GetBufferManager()->GetFileBuffer(file_path.value(), create.has_value() ? create.value() : true);
+        } else {
+            err = "invalid parameter, must have one of name or path.";
+        }
+
+        const tao::json::value result = {
+            {"buf", wcharconv.to_bytes(buf->GetName())},
+            {"result", buf != nullptr},
+            {"error", err}
+        };
+        return tao::json::to_string(result);
     }
 };
 }; //namespace eim
