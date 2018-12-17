@@ -5,9 +5,17 @@
 #include <locale>
 #include <codecvt>
 #include <iostream>
+#include <filesystem>
 
 namespace eim {
 namespace impl {
+static
+std::locale old_locale;
+static
+std::locale utf8_locale(old_locale, new std::codecvt_utf8<wchar_t>);
+static
+std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wcharconv;
+
 class FileBufferImpl : public virtual FileBuffer {
 public:
     FileBufferImpl(const std::string & file_path, BufferPtr buf);
@@ -95,10 +103,14 @@ FileBufferImpl::FileBufferImpl(const std::string & file_path, BufferPtr buf)
         Load();
 }
 
-bool FileBufferImpl::LoadFromFile(const std::string & file_path) {
-    std::locale old_locale;
-    std::locale utf8_locale(old_locale,new std::codecvt_utf8<wchar_t>);
+static
+void SetBufferNameWithFilePath(BufferPtr buf, const std::string & file_path) {
+    std::filesystem::path p{file_path};
 
+    buf->SetName(wcharconv.from_bytes(p.filename().c_str()));
+}
+
+bool FileBufferImpl::LoadFromFile(const std::string & file_path) {
     std::wifstream fis(file_path);
     if (fis.fail()) return false;
 
@@ -125,13 +137,12 @@ bool FileBufferImpl::LoadFromFile(const std::string & file_path) {
 
     m_FilePath = file_path;
 
+    SetBufferNameWithFilePath(m_Buf, file_path);
+
     return true;
 }
 
 bool FileBufferImpl::SaveToFile(const std::string & file_path) {
-    std::locale old_locale;
-    std::locale utf8_locale(old_locale,new std::codecvt_utf8<wchar_t>);
-
     std::wofstream fos(file_path);
     if (fos.fail()) return false;
 
@@ -147,6 +158,8 @@ bool FileBufferImpl::SaveToFile(const std::string & file_path) {
     }
 
     m_FilePath = file_path;
+    SetBufferNameWithFilePath(m_Buf, file_path);
+
     return true;
 }
 

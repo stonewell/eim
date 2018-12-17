@@ -28,6 +28,9 @@ int main(int argc, char ** argv) {
     if (!pBuffer->LoadFromFile(argv[1]))
         return 2;
 
+    std::wcout << "buf name:" << pBuffer->GetName() << std::endl;
+    std::cout << "buf path:" << pBuffer->GetFilePath() << std::endl;
+
     print_lines(pBuffer);
 
     if (!pBuffer->SaveToFile("test_new.c"))

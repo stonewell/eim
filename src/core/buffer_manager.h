@@ -16,4 +16,6 @@ public:
 };
 
 using BufferManagerPtr = std::shared_ptr<BufferManager>;
+
+BufferManagerPtr CreateBufferManager();
 }; //namespace eim

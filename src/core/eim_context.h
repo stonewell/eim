@@ -19,4 +19,5 @@ public:
     virtual BufferSessionManagerPtr GetSessionManager() = 0;
 };
 
+EIMContextPtr CreateEIMContext();
 }; //namespace eim

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 namespace eim {
 
@@ -39,6 +40,7 @@ public:
 };
 
 using BufferPtr = std::shared_ptr<Buffer>;
+using BufferVector = std::vector<BufferPtr>;
 
 BufferPtr CreateBuffer();
 
