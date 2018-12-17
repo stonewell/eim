@@ -20,6 +20,10 @@ public:
     virtual ~GetBufferCommand() = default;
 
 public:
+    virtual CommandPtr NewInstance() {
+        return std::make_shared<GetBufferCommand>();
+    }
+
     virtual std::string Execute(EIMContextPtr context, const std::string & json_args) {
         const tao::json::value v = tao::json::from_string(json_args);
 
