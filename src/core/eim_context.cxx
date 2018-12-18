@@ -37,6 +37,7 @@ private:
 
 void EIMContextImpl::Initialize() {
     m_BufferManager = CreateBufferManager();
+    m_CommandManager = CreateCommandManager();
 }
 
 };
