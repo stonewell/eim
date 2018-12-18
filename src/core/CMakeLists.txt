@@ -1,6 +1,6 @@
 SET(core_src
     buffer.h buffer.cxx
-    command.h
+    command.h command_register.h
     file_buffer.h file_buffer.cxx
     eim_context.h eim_context.cxx
     buffer_manager.h buffer_manager.cxx
