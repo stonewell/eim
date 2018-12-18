@@ -1,5 +1,6 @@
 #include "eim_context.h"
 #include "cmd_base.h"
+#include "command_register.h"
 
 #include "tao/json.hpp"
 
@@ -8,10 +9,12 @@
 
 namespace eim
 {
+namespace cmd {
+
 static
 std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wcharconv;
 
-class GetBufferCommand : public virtual CommandBase {
+class GetBufferCommand : public virtual CommandBase<GetBufferCommand> {
 public:
     GetBufferCommand()
         : CommandBase("get_buffer") {
@@ -20,10 +23,6 @@ public:
     virtual ~GetBufferCommand() = default;
 
 public:
-    virtual CommandPtr NewInstance() {
-        return std::make_shared<GetBufferCommand>();
-    }
-
     virtual std::string Execute(EIMContextPtr context, const std::string & json_args) {
         const tao::json::value v = tao::json::from_string(json_args);
 
@@ -51,4 +50,8 @@ public:
         return tao::json::to_string(result);
     }
 };
+
+REG_CMD(GetBufferCommand);
+
+}; //namespace cmd
 }; //namespace eim

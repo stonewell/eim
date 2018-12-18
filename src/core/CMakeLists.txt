@@ -5,7 +5,7 @@ SET(core_src
     eim_context.h eim_context.cxx
     buffer_manager.h buffer_manager.cxx
     buffer_session.h
-    command_manager.h
+    command_manager.h command_manager.cxx
     buffer_session_manager.h
     )
 
@@ -20,10 +20,13 @@ ELSE()
 ENDIF()
 
 TARGET_COMPILE_DEFINITIONS(core PRIVATE
-  )
+)
 TARGET_INCLUDE_DIRECTORIES(core PRIVATE
-  )
+)
+TARGET_INCLUDE_DIRECTORIES(core INTERFACE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 TARGET_LINK_LIBRARIES(core
-  ${CMAKE_DL_LIBS}
-  ${addtion_libs}
-  )
+  PUBLIC ${addtion_libs}
+)
