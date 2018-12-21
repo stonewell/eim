@@ -6,7 +6,7 @@ SET(core_src
     buffer_manager.h buffer_manager.cxx
     buffer_session.h
     command_manager.h command_manager.cxx
-    buffer_session_manager.h buffer_session_manager.cxx
+    buffer_session_manager.h
     )
 
 ADD_LIBRARY(core STATIC

@@ -7,7 +7,7 @@
 #include "buffer_session_manager.h"
 
 namespace eim {
-class EIMContext {
+class EIMContext : public virtual BufferSessionManager {
 public:
     EIMContext() = default;
     virtual ~EIMContext() = default;
@@ -15,7 +15,6 @@ public:
 public:
     virtual BufferManagerPtr GetBufferManager() = 0;
     virtual CommandManagerPtr GetCommandManager() = 0;
-    virtual BufferSessionManagerPtr GetSessionManager() = 0;
 };
 
 EIMContextPtr CreateEIMContext();

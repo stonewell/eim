@@ -15,7 +15,4 @@ public:
     virtual void DestroySession(BufferPtr buf, BufferClientPtr client) = 0;
 };
 
-using BufferSessionManagerPtr = std::shared_ptr<BufferSessionManager>;
-
-BufferSessionManagerPtr CreateBufferSessionManager();
 }; //namespace eim

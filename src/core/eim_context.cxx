@@ -1,5 +1,9 @@
 #include "eim_context.h"
 
+#include <unordered_map>
+#include <algorithm>
+
+
 namespace eim {
 
 namespace impl {
@@ -17,25 +21,49 @@ public:
         return m_CommandManager;
     }
 
-    virtual BufferSessionManagerPtr GetSessionManager() {
-        return m_SessionManager;
-    }
-
 public:
     void Initialize();
 
+    virtual BufferSessionPtr CreateSession(BufferPtr buf, BufferClientPtr client);
+    virtual void DestroySession(BufferPtr buf, BufferClientPtr client);
+
 private:
+    using SessionMap = std::unordered_map<std::wstring, BufferSessionPtr>;
+
+    SessionMap m_SessionMap;
     BufferManagerPtr m_BufferManager;
     CommandManagerPtr m_CommandManager;
-    BufferSessionManagerPtr m_SessionManager;
 };
 
 void EIMContextImpl::Initialize() {
     m_BufferManager = CreateBufferManager();
     m_CommandManager = CreateCommandManager();
-    m_SessionManager = CreateBufferSessionManager();
 }
 
+BufferSessionPtr EIMContextImpl::CreateSession(BufferPtr buf, BufferClientPtr client) {
+    auto it = m_SessionMap.insert(std::make_pair(buf->GetName(), std::make_shared<BufferSession>()));
+
+    BufferSessionPtr & session = it.first->second;
+
+    auto find_client = std::find(session->clients.begin(), session->clients.end(), client);
+
+    if (find_client == session->clients.end()) {
+        session->clients.push_front(client);
+    }
+
+    return session;
+}
+
+void EIMContextImpl::DestroySession(BufferPtr buf, BufferClientPtr client) {
+    auto it = m_SessionMap.find(buf->GetName());
+
+    if (it == m_SessionMap.end())
+        return;
+
+    BufferSessionPtr & session = it->second;
+
+    session->clients.remove(client);
+}
 };
 
 EIMContextPtr CreateEIMContext() {
