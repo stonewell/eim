@@ -15,7 +15,6 @@ public:
 public:
     virtual BufferManagerPtr GetBufferManager() = 0;
     virtual CommandManagerPtr GetCommandManager() = 0;
-    virtual BufferSessionVector GetBufferSessions() = 0;
     virtual BufferSessionManagerPtr GetSessionManager() = 0;
 };
 

@@ -17,10 +17,6 @@ public:
         return m_CommandManager;
     }
 
-    virtual BufferSessionVector GetBufferSessions() {
-        return m_BufferSessions;
-    }
-
     virtual BufferSessionManagerPtr GetSessionManager() {
         return m_SessionManager;
     }
@@ -31,13 +27,13 @@ public:
 private:
     BufferManagerPtr m_BufferManager;
     CommandManagerPtr m_CommandManager;
-    BufferSessionVector m_BufferSessions;
     BufferSessionManagerPtr m_SessionManager;
 };
 
 void EIMContextImpl::Initialize() {
     m_BufferManager = CreateBufferManager();
     m_CommandManager = CreateCommandManager();
+    m_SessionManager = CreateBufferSessionManager();
 }
 
 };

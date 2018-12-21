@@ -2,12 +2,12 @@
 
 #include "buffer.h"
 #include <memory>
-#include <vector>
+#include <forward_list>
 
 namespace eim {
 class BufferClient {
 };
 
 using BufferClientPtr = std::shared_ptr<BufferClient>;
-using BufferClientVector = std::vector<BufferClientPtr>;
+using BufferClientList = std::forward_list<BufferClientPtr>;
 }; //namespace eim
