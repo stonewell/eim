@@ -60,16 +60,16 @@ bool IsDBCSLeadByte(int codePage, char ch) {
 	// Byte ranges found in Wikipedia articles with relevant search strings in each case
 	unsigned char uch = static_cast<unsigned char>(ch);
 	switch (codePage) {
-		case 932:
-			// Shift_jis
-			return ((uch >= 0x81) && (uch <= 0x9F)) ||
+    case 932:
+        // Shift_jis
+        return ((uch >= 0x81) && (uch <= 0x9F)) ||
 				((uch >= 0xE0) && (uch <= 0xEF));
-		case 936:
-			// GBK
-			return (uch >= 0x81) && (uch <= 0xFE);
-		case 950:
-			// Big5
-			return (uch >= 0x81) && (uch <= 0xFE);
+    case 936:
+        // GBK
+        return (uch >= 0x81) && (uch <= 0xFE);
+    case 950:
+        // Big5
+        return (uch >= 0x81) && (uch <= 0xFE);
 		// Korean EUC-KR may be code page 949.
 	}
 	return false;
@@ -129,4 +129,48 @@ std::string LowerCaseUTF8(std::string_view sv) {
 	return sLower;
 }
 
+void Window::Destroy() {
+	wid = 0;
+}
+
+bool Window::HasFocus() {
+	return true;
+}
+
+Rectangle Window::GetPosition() {
+	// Before any size allocated pretend its 1000 wide so not scrolled
+	Rectangle rc(0, 0, 1000, 1000);
+	return rc;
+}
+
+void Window::SetPosition(Rectangle rc) {
+}
+
+Rectangle Window::GetClientPosition() {
+	return GetPosition();
+}
+
+void Window::Show(bool show) {
+}
+
+void Window::InvalidateAll() {
+}
+
+void Window::SetTitle(const char *s) {
+}
+
+void Menu::CreatePopUp() {
+	Destroy();
+}
+
+void Menu::Destroy() {
+	mid = 0;
+}
+
+void Menu::Show(Point pt, Window &) {
+}
 };
+
+int main(int argc, char ** argv) {
+    return 0;
+}
