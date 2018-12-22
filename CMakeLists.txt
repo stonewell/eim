@@ -9,9 +9,7 @@ CMAKE_POLICY(
 
 PROJECT (eim
 	VERSION 1.0.0
-	)
-
-INCLUDE(ExternalProject)
+)
 
 OPTION(ENABLE_TESTS "Enable tests" OFF)
 if (${ENABLE_TESTS})
@@ -33,10 +31,10 @@ ENDIF()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(warnings "-Wall -Wextra -Werror -Wno-cast-function-type -Wno-ignored-qualifiers")
+  set(warnings "-Wall -Wextra -Werror -Wno-cast-function-type -Wno-ignored-qualifiers -Wno-missing-braces -Wno-sign-compare")
   set(no_undefined "-Wl,--no-undefined")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(warnings "-Wall -Wextra -Werror -Wno-inconsistent-missing-override")
+  set(warnings "-Wall -Wextra -Werror -Wno-inconsistent-missing-override -Wno-missing-braces -Wno-sign-compare")
   set(no_undefined "-Wl,-undefined,error")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     set(warnings "/W4 /WX /EHsc")
@@ -70,16 +68,8 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     endif()
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/third_party/json")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/third_party/scite")
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
-ADD_LIBRARY(json INTERFACE)
-TARGET_INCLUDE_DIRECTORIES(json INTERFACE
-  "third_party/json/include"
-  )
-# require C++17
-target_compile_features(json INTERFACE cxx_std_17)
-
 ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(tests)
