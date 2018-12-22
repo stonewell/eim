@@ -1,0 +1,6 @@
+[submodule "third_party/scintilla"]
+	path = third_party/scintilla
+	url = https://github.com/mirror/scintilla.git
+[submodule "third_party/scite"]
+	path = third_party/scite
+	url = https://github.com/mirror/scite.git
