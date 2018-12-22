@@ -138,5 +138,10 @@ TARGET_LINK_LIBRARIES(scite_objs PUBLIC
    scintilla_interface
 )
 
+IF (APPLE)
+ADD_SUBDIRECTORY(cocoa)
+
 TARGET_LINK_LIBRARIES(scite PRIVATE
+  scite_cocoa
 )
+ENDIF()
