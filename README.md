@@ -1,2 +1,2 @@
 # eim
-editor improved
+editor improved, based on scite and scintilla
