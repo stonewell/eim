@@ -25,7 +25,8 @@
 	int argc = [args count];
 	char ** argv = [self getArray:args];
 
-	scite_cocoa.Run(argc, argv);
+	NSBundle *main = [NSBundle mainBundle];
+	scite_cocoa.Run([[main executablePath] UTF8String], argc, argv);
 }
 
 

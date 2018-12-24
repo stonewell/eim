@@ -6,7 +6,7 @@ MultiplexExtension g_MultiExtender;
 SciTECocoa::SciTECocoa() {
 }
 
-void SciTECocoa::Run(int argc, char * argv[]) {
+void SciTECocoa::Run(const char * exe_path, int argc, char * argv[]) {
 #ifdef NO_EXTENSIONS
 	m_Extender = 0;
 #else
@@ -24,9 +24,8 @@ void SciTECocoa::Run(int argc, char * argv[]) {
 
 	// Find the SciTE executable, first trying to use argv[0] and converting
 	// to an absolute path and if that fails, searching the path.
-    FilePath sciteExecutable = FilePath(argv[0]).AbsolutePath();
-	if (!sciteExecutable.Exists()) {
-	}
+    m_SciteExecutable = FilePath(exe_path).AbsolutePath();
+    assert(m_SciteExecutable.Exists());
 
 	// Collect the argv into one string with each argument separated by '\n'
 	GUI::gui_string args;
