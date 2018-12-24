@@ -22,6 +22,8 @@
 
 #include "GUI.h"
 #include "ScintillaWindow.h"
+#include "MultiplexExtension.h"
+#include "LuaExtension.h"
 
 #include "StringList.h"
 #include "StringHelpers.h"
@@ -99,4 +101,6 @@ public:
 	virtual FilePath GetSciteUserHome()  { return FilePath {""}; }
 
     void Run(int argc, char * argv[]);
+
+    Extension * m_Extender;
 };

@@ -1,9 +1,22 @@
 #include "scite_cocoa.h"
 
+static
+MultiplexExtension g_MultiExtender;
+
 SciTECocoa::SciTECocoa() {
 }
 
 void SciTECocoa::Run(int argc, char * argv[]) {
+#ifdef NO_EXTENSIONS
+	m_Extender = 0;
+#else
+	m_Extender = &g_MultiExtender;
+
+#ifndef NO_LUA
+	g_MultiExtender.RegisterExtension(LuaExtension::Instance());
+#endif
+#endif
+
 	// Load the default session file
 	if (props.GetInt("save.session") || props.GetInt("save.position") || props.GetInt("save.recent")) {
 		LoadSessionFile("");
