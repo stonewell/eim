@@ -1,7 +1,7 @@
 SET(scite_cocoa_src gui_cocoa.cxx)
 
 SET(scite_cocoa_gui_src
-    AppDelegate.h AppDelegate.m
+    AppDelegate.h AppDelegate.mm
     main.m
     MainMenu.xib
     Info.plist.in)
