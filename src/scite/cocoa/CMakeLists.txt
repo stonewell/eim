@@ -15,14 +15,17 @@ ADD_LIBRARY(scite_cocoa OBJECT
 
 FIND_LIBRARY(CoreFoundation_LIBRARY CoreFoundation)
 FIND_LIBRARY(Cocoa_LIBRARY Cocoa)
+FIND_LIBRARY(CoreAnimation_LIBRARY QuartzCore)
 
 TARGET_LINK_LIBRARIES(scite_cocoa PUBLIC
    scintilla_interface
    ${CoreFoundation_LIBRARY}
    ${Cocoa_LIBRARY}
+   ${CoreAnimation_LIBRARY}
 )
 TARGET_INCLUDE_DIRECTORIES(scite_cocoa PRIVATE
    "../../../third_party/scite/src"
+   "../../../third_party/scintilla/cocoa"
 )
 
 SET_PROPERTY(TARGET scite_cocoa APPEND_STRING PROPERTY

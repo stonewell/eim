@@ -222,7 +222,13 @@ SET(scintilla_platform_src
 ../../third_party/scintilla/cocoa/ScintillaView.h
 ../../third_party/scintilla/cocoa/ScintillaView.mm
 ../../third_party/scintilla/cocoa/
+cocoa/scintilla_cocoa.h cocoa/scintilla_cocoa.mm
 )
+
+SET(platform_include_dirs
+    "cocoa"
+    "../../third_party/scintilla/cocoa/"
+    )
 ENDIF()
 
 ADD_LIBRARY(scintilla_objs OBJECT
@@ -258,6 +264,7 @@ SET(scintilla_include_dirs
   "../../third_party/scintilla/include"
   "../../third_party/scintilla/lexlib"
   "../../third_party/scintilla/src"
+  "${platform_include_dirs}"
 )
 
 TARGET_INCLUDE_DIRECTORIES(scintilla_objs PRIVATE

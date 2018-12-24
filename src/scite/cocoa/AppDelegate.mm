@@ -8,10 +8,13 @@
 
 #import "AppDelegate.h"
 #import "scite_cocoa.h"
+#import "ScintillaView.h"
+#import "scintilla_cocoa.h"
 
 @interface AppDelegate ()
 {
 	SciTECocoa scite_cocoa;
+  ScintillaView* mEditor;
 }
 @property (weak) IBOutlet NSWindow *window;
 - (char **)getArray:(NSArray *) args;
@@ -26,7 +29,14 @@
 	char ** argv = [self getArray:args];
 
 	NSBundle *main = [NSBundle mainBundle];
-	scite_cocoa.Run([[main executablePath] UTF8String], argc, argv);
+
+  NSRect newFrame = [[self window] frame];
+  newFrame.size.width -= 2 * newFrame.origin.x;
+  newFrame.size.height -= 3 * newFrame.origin.y;
+
+  mEditor = [[ScintillaView alloc] initWithFrame: newFrame];
+
+	scite_cocoa.Run([[main executablePath] UTF8String], get_backend(mEditor), argc, argv);
 }
 
 

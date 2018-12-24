@@ -6,7 +6,9 @@ MultiplexExtension g_MultiExtender;
 SciTECocoa::SciTECocoa() {
 }
 
-void SciTECocoa::Run(const char * exe_path, int argc, char * argv[]) {
+void SciTECocoa::Run(const char * exe_path, Scintilla::ScintillaBase* pEditor, int argc, char * argv[]) {
+    mEditor = pEditor;
+
 #ifdef NO_EXTENSIONS
 	m_Extender = 0;
 #else
@@ -16,6 +18,11 @@ void SciTECocoa::Run(const char * exe_path, int argc, char * argv[]) {
 	g_MultiExtender.RegisterExtension(LuaExtension::Instance());
 #endif
 #endif
+
+	CreateBuffers();
+
+    wEditor.SetScintilla(pEditor);
+    wOutput.SetScintilla(pEditor);
 
 	// Load the default session file
 	if (props.GetInt("save.session") || props.GetInt("save.position") || props.GetInt("save.recent")) {

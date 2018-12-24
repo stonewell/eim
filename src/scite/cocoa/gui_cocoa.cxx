@@ -3,11 +3,52 @@
 #include <string>
 #include <sstream>
 #include <mutex>
+#include <map>
+#include <vector>
 
 #include "Scintilla.h"
 
 #include "GUI.h"
 #include "Mutex.h"
+
+#include "Platform.h"
+#include "ILoader.h"
+#include "ILexer.h"
+
+#ifdef SCI_LEXER
+#include "SciLexer.h"
+#include "PropSetSimple.h"
+#endif
+
+#include "Position.h"
+#include "UniqueString.h"
+#include "SplitVector.h"
+#include "Partitioning.h"
+#include "RunStyles.h"
+#include "ContractionState.h"
+#include "CellBuffer.h"
+#include "CallTip.h"
+#include "KeyMap.h"
+#include "Indicator.h"
+#include "LineMarker.h"
+#include "Style.h"
+#include "ViewStyle.h"
+#include "CharClassify.h"
+#include "Decoration.h"
+#include "CaseFolder.h"
+#include "Document.h"
+#include "CaseConvert.h"
+#include "UniConversion.h"
+#include "DBCS.h"
+#include "Selection.h"
+#include "PositionCache.h"
+#include "EditModel.h"
+#include "MarginView.h"
+#include "EditView.h"
+#include "Editor.h"
+
+#include "AutoComplete.h"
+#include "ScintillaBase.h"
 
 extern "C"
 const GUI::gui_char appName[] = GUI_TEXT("SciTE");
@@ -53,7 +94,9 @@ double ElapsedTime::Duration(bool reset) {
 }
 
 sptr_t ScintillaPrimitive::Send(unsigned int msg, uptr_t wParam, sptr_t lParam) {
-	return 0;//scintilla_send_message(SCINTILLA(GetID()), msg, wParam, lParam);
+    Scintilla::ScintillaBase * base = reinterpret_cast<Scintilla::ScintillaBase *>(GetID());
+
+	return base->WndProc(msg, wParam, lParam);
 }
 
 bool IsDBCSLeadByte(int codePage, char ch) {

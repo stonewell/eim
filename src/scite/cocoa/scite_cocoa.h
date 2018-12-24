@@ -43,6 +43,44 @@
 #include "SciTEKeys.h"
 #include "StripDefinition.h"
 
+#include "Platform.h"
+#include "ILexer.h"
+
+#ifdef SCI_LEXER
+#include "SciLexer.h"
+#include "PropSetSimple.h"
+#endif
+
+#include "Position.h"
+#include "UniqueString.h"
+#include "SplitVector.h"
+#include "Partitioning.h"
+#include "RunStyles.h"
+#include "ContractionState.h"
+#include "CellBuffer.h"
+#include "CallTip.h"
+#include "KeyMap.h"
+#include "Indicator.h"
+#include "LineMarker.h"
+#include "Style.h"
+#include "ViewStyle.h"
+#include "CharClassify.h"
+#include "Decoration.h"
+#include "CaseFolder.h"
+#include "Document.h"
+#include "CaseConvert.h"
+#include "UniConversion.h"
+#include "DBCS.h"
+#include "Selection.h"
+#include "PositionCache.h"
+#include "EditModel.h"
+#include "MarginView.h"
+#include "EditView.h"
+#include "Editor.h"
+
+#include "AutoComplete.h"
+#include "ScintillaBase.h"
+
 class SciTECocoa : public SciTEBase {
 public:
     SciTECocoa();
@@ -100,8 +138,9 @@ public:
 	virtual FilePath GetSciteDefaultHome() { return FilePath {""}; }
 	virtual FilePath GetSciteUserHome()  { return FilePath {""}; }
 
-    void Run(const char * exe_path, int argc, char * argv[]);
+    void Run(const char * exe_path, Scintilla::ScintillaBase * pView, int argc, char * argv[]);
 
     Extension * m_Extender;
     FilePath m_SciteExecutable;
+    Scintilla::ScintillaBase* mEditor;
 };
