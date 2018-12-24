@@ -31,9 +31,10 @@
 
 	NSBundle *main = [NSBundle mainBundle];
 
-  NSRect newFrame = [[self window] frame];
-  newFrame.size.width -= 2 * newFrame.origin.x;
-  newFrame.size.height -= 3 * newFrame.origin.y;
+  NSRect newFrame = [self.window.contentView bounds];
+
+  [self.window.contentView setAutoresizesSubviews: YES];
+  [self.window.contentView setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
 
   mEditor = [[ScintillaView alloc] initWithFrame: newFrame];
   [mEditor setAutoresizesSubviews: YES];
