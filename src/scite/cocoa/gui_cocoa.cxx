@@ -170,7 +170,3 @@ void Menu::Destroy() {
 void Menu::Show(Point pt, Window &) {
 }
 };
-
-int main(int argc, char ** argv) {
-    return 0;
-}

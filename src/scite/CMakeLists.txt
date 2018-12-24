@@ -145,7 +145,40 @@ TARGET_LINK_LIBRARIES(scite PRIVATE
   scite_cocoa
 )
 
-SET_PROPERTY(TARGET scite
-  PROPERTY MACOSX_BUNDLE TRUE
-  )
+SET_TARGET_PROPERTIES(scite PROPERTIES
+  MACOSX_BUNDLE TRUE
+  MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cocoa/Info.plist.in"
+  RESOURCE "cocoa/MainMenu.xib"
+)
+
+# Set the OS X Bundle specific CMake variables which will be used to populate the plist for
+# the application bundle
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.angsto-tech.eim.SciteCocoa")
+set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+
+# These variables are specific to our plist and are NOT standard CMake variables
+set(MACOSX_BUNDLE_NSMAIN_NIB_FILE "MainMenu")
+set(MACOSX_BUNDLE_NSPRINCIPAL_CLASS "NSApplication")
+
+# Make sure we can find the 'ibtool' program. If we can NOT find it we
+# skip generation of this project
+find_program(IBTOOL ibtool HINTS "/usr/bin" "${OSX_DEVELOPER_ROOT}/usr/bin")
+if (${IBTOOL} STREQUAL "IBTOOL-NOTFOUND")
+  message(SEND_ERROR "ibtool can not be found and is needed to compile the .xib files. It should have been installed with the Apple developer tools. The default system paths were searched in addition to ${OSX_DEVELOPER_ROOT}/usr/bin")
+endif()
+
+# Make sure the 'Resources' Directory is correctly created before we build
+add_custom_command (TARGET scite PRE_BUILD
+                      COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/scite.app/Contents/Resources)
+
+SET(scite_XIBS
+   MainMenu
+   )
+# Compile the .xib files using the 'ibtool' program with the destination being the app package
+foreach(xib ${scite_XIBS})
+  add_custom_command (TARGET scite POST_BUILD
+                      COMMAND ${IBTOOL} --errors --warnings --notices --output-format human-readable-text --compile ${CMAKE_CURRENT_BINARY_DIR}/scite.app/Contents/Resources/${xib}.nib ${CMAKE_CURRENT_SOURCE_DIR}/cocoa/${xib}.xib
+                      COMMENT "Compiling ${CMAKE_CURRENT_SOURCE_DIR}/cocoa/${xib}.xib")
+
+endforeach()
 ENDIF()
