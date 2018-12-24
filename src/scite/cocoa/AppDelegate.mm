@@ -15,6 +15,7 @@
 {
 	SciTECocoa scite_cocoa;
   ScintillaView* mEditor;
+  ScintillaView* mOutput;
 }
 @property (weak) IBOutlet NSWindow *window;
 - (char **)getArray:(NSArray *) args;
@@ -35,8 +36,19 @@
   newFrame.size.height -= 3 * newFrame.origin.y;
 
   mEditor = [[ScintillaView alloc] initWithFrame: newFrame];
+  [mEditor setAutoresizesSubviews: YES];
+  [mEditor setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
 
-	scite_cocoa.Run([[main executablePath] UTF8String], get_backend(mEditor), argc, argv);
+  mOutput = [[ScintillaView alloc] initWithFrame: newFrame];
+  [mOutput setAutoresizesSubviews: YES];
+  [mOutput setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
+
+	[self.window.contentView addSubview:mEditor];
+
+	scite_cocoa.Run([[main executablePath] UTF8String],
+									get_backend(mEditor),
+									get_backend(mOutput),
+									argc, argv);
 }
 
 
