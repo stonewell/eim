@@ -1,4 +1,6 @@
-SET(scite_cocoa_src gui_cocoa.cxx)
+SET(scite_cocoa_src
+    gui_cocoa.cxx
+    scite_cocoa.cxx scite_cocoa.h)
 
 SET(scite_cocoa_gui_src
     AppDelegate.h AppDelegate.mm
