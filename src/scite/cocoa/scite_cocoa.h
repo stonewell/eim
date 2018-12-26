@@ -139,6 +139,7 @@ public:
 	virtual FilePath GetSciteUserHome()  { return FilePath {""}; }
 
     void Run(const char * exe_path, Scintilla::ScintillaBase * pEditor, Scintilla::ScintillaBase* pOutput, int argc, char * argv[]);
+    void Command(unsigned long wParam, long);
 
     Extension * m_Extender;
     FilePath m_SciteExecutable;

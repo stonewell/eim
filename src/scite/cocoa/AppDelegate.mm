@@ -32,6 +32,7 @@
 	NSBundle *main = [NSBundle mainBundle];
 
   NSRect newFrame = [self.window.contentView bounds];
+	newFrame.origin.x = 0;
 
   [self.window.contentView setAutoresizesSubviews: YES];
   [self.window.contentView setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
@@ -40,7 +41,7 @@
   [mEditor setAutoresizesSubviews: YES];
   [mEditor setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
 
-  mOutput = [[ScintillaView alloc] initWithFrame: newFrame];
+	mOutput = [[ScintillaView alloc] initWithFrame: NSMakeRect(0,0,0,0)];
   [mOutput setAutoresizesSubviews: YES];
   [mOutput setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
 
@@ -50,6 +51,15 @@
 									get_backend(mEditor),
 									get_backend(mOutput),
 									argc, argv);
+
+  [mEditor setGeneralProperty: SCI_SETLEXER parameter: SCLEX_CPP value: 1];
+	[mEditor setGeneralProperty: SCI_SETLEXERLANGUAGE parameter: 0 value: (sptr_t) "cpp"];
+  [mEditor setStringProperty: SCI_STYLESETFONT parameter: STYLE_DEFAULT value: @"Helvetica"];
+  [mEditor setGeneralProperty: SCI_STYLESETSIZE parameter: STYLE_DEFAULT value: 20];
+  [mEditor setColorProperty: SCI_STYLESETFORE parameter: STYLE_DEFAULT value: [NSColor blackColor]];
+
+	[mEditor becomeFirstResponder];
+	delete argv;
 }
 
 

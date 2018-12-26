@@ -60,3 +60,8 @@ void SciTECocoa::Run(const char * exe_path, Scintilla::ScintillaBase* pEditor, S
 	SizeSubWindows();
 	// SetFocus(wEditor);
 }
+
+void SciTECocoa::Command(unsigned long wParam, long) {
+	int cmdID = ControlIDOfCommand(wParam);
+    SciTEBase::MenuCommand(cmdID, 0);
+}
