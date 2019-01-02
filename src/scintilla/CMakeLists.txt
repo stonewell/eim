@@ -229,6 +229,36 @@ SET(platform_include_dirs
     "cocoa"
     "../../third_party/scintilla/cocoa/"
     )
+ELSEIF(UNIX)
+  FIND_PACKAGE(PkgConfig)
+  PKG_CHECK_MODULES(GLIB glib-2.0)
+  PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
+
+  SET(scintilla_platform_src
+    ../../third_party/scintilla/gtk/Converter.h
+    ../../third_party/scintilla/gtk/ScintillaGTKAccessible.cxx
+    ../../third_party/scintilla/gtk/ScintillaGTK.cxx
+    ../../third_party/scintilla/gtk/scintilla-marshal.c
+    ../../third_party/scintilla/gtk/PlatGTK.cxx
+    ../../third_party/scintilla/gtk/ScintillaGTKAccessible.h
+    ../../third_party/scintilla/gtk/ScintillaGTK.h
+    ../../third_party/scintilla/gtk/scintilla-marshal.h
+    )
+
+  SET(platform_include_dirs
+    "../../third_party/scintilla/gtk"
+    ${GTK3_INCLUDE_DIRS}
+    ${GLIB_INCLUDE_DIRS}
+    )
+
+  SET(platform_compile_definition
+    GTK
+    )
+
+  SET(platform_link_library
+    ${GLB_LIBRARIES}
+    ${GTK3_LIBRARIES}
+    )
 ENDIF()
 
 ADD_LIBRARY(scintilla_objs OBJECT
@@ -256,7 +286,11 @@ ADD_LIBRARY(scintilla STATIC
 
 IF (APPLE)
 SET_PROPERTY(TARGET scintilla_platform_objs APPEND_STRING PROPERTY
-              COMPILE_FLAGS "-fobjc-arc -Wno-unused-parameter -Wno-deprecated-declarations")
+  COMPILE_FLAGS "-fobjc-arc -Wno-unused-parameter -Wno-deprecated-declarations")
+ELSEIF (UNIX)
+SET_PROPERTY(TARGET scintilla_platform_objs APPEND_STRING PROPERTY
+  COMPILE_FLAGS "-Wno-unused-parameter -Wno-deprecated-declarations -Wno-missing-field-initializers"
+)
 ENDIF()
 
 
@@ -269,23 +303,42 @@ SET(scintilla_include_dirs
 
 TARGET_INCLUDE_DIRECTORIES(scintilla_objs PRIVATE
   ${scintilla_include_dirs}
-)
+  )
+TARGET_COMPILE_DEFINITIONS(scintilla_objs PUBLIC
+  ${platform_compile_definition}
+  )
+
 TARGET_INCLUDE_DIRECTORIES(scintilla_lexers_objs PRIVATE
   ${scintilla_include_dirs}
 )
+TARGET_COMPILE_DEFINITIONS(scintilla_lexers_objs PUBLIC
+  ${platform_compile_definition}
+  )
+
 TARGET_INCLUDE_DIRECTORIES(scintilla_lexlib_objs PRIVATE
   ${scintilla_include_dirs}
 )
+TARGET_COMPILE_DEFINITIONS(scintilla_lexlib_objs PUBLIC
+  ${platform_compile_definition}
+  )
+
 TARGET_INCLUDE_DIRECTORIES(scintilla_platform_objs PRIVATE
   ${scintilla_include_dirs}
 )
+TARGET_COMPILE_DEFINITIONS(scintilla_platform_objs PUBLIC
+  ${platform_compile_definition}
+  )
 
 ADD_LIBRARY(scintilla_interface INTERFACE)
 
 TARGET_INCLUDE_DIRECTORIES(scintilla_interface INTERFACE
   ${scintilla_include_dirs}
 )
+TARGET_COMPILE_DEFINITIONS(scintilla_interface INTERFACE
+  ${platform_compile_definition}
+  )
 
 TARGET_LINK_LIBRARIES(scintilla_interface INTERFACE
   scintilla
+  ${platform_link_library}
 )
