@@ -9,6 +9,7 @@
 #include <map>
 #include <set>
 #include <memory>
+#include <iostream>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -45,7 +46,10 @@ KeyBindingExtension &KeyBindingExtension::Instance() {
 
 bool KeyBindingExtension::Initialise(ExtensionAPI *host_) {
 	m_Host = host_;
-	return true;
+
+    m_BindingConfig = m_Host->Property("ext.keybinding.config");
+
+	return LoadBindingConfig(m_BindingConfig);
 }
 
 bool KeyBindingExtension::Finalise() {
@@ -66,5 +70,44 @@ bool KeyBindingExtension::OnKey(int keyval, int modifier) {
     (void)modifier;
 
     printf("OnKey:%c, m:%d\n", (char)(keyval&0xFF), modifier);
+    return false;
+}
+
+static
+bool Exists(const GUI::gui_char *dir, const GUI::gui_char *path, FilePath *resultPath) {
+	FilePath copy(path);
+	if (!copy.IsAbsolute() && dir) {
+		copy.SetDirectory(dir);
+	}
+	if (!copy.Exists())
+		return false;
+	if (resultPath) {
+		resultPath->Set(copy.AbsolutePath());
+	}
+	return true;
+}
+
+bool KeyBindingExtension::LoadBindingConfig(const std::string & config) {
+    if (config.length() == 0)
+        return false;
+
+    FilePath defaultDir(m_Host->Property("SciteDefaultHome"));
+    FilePath scriptPath;
+
+    std::cout << "default home:" << defaultDir.AsUTF8() << std::endl;
+
+    // find file in local directory
+	if (Exists(defaultDir.AsInternal(), config.c_str(), &scriptPath)) {
+    } else if (Exists(GUI_TEXT(""), config.c_str(), &scriptPath)) {
+    } else {
+        return false;
+    }
+
+    return LoadFile(scriptPath.AsUTF8());
+}
+
+bool KeyBindingExtension::LoadFile(const std::string & file_path) {
+    (void)file_path;
+    std::cout << "load keybinding file:" << file_path << std::endl;
     return false;
 }

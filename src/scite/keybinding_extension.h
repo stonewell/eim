@@ -20,4 +20,8 @@ public:
 	virtual bool OnKey(int, int) override;
 private:
 	ExtensionAPI * m_Host;
+    std::string m_BindingConfig;
+
+    bool LoadBindingConfig(const std::string & config);
+    bool LoadFile(const std::string & file_path);
 };
