@@ -116,6 +116,8 @@ SET(lua_src
 
 ADD_LIBRARY(scite_objs OBJECT
   ${scite_src}
+  keybinding_extension.cxx keybinding_extension.h
+  scite_init.cxx
   )
 
 ADD_LIBRARY(lua_objs OBJECT
@@ -132,6 +134,7 @@ TARGET_COMPILE_DEFINITIONS(scite_objs PRIVATE
   )
 TARGET_INCLUDE_DIRECTORIES(scite_objs PRIVATE
   "../../third_party/scite/lua/src"
+  "../../third_party/scite/src"
   )
 
 TARGET_LINK_LIBRARIES(scite_objs PUBLIC
