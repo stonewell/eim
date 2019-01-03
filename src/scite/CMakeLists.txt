@@ -144,7 +144,7 @@ TARGET_LINK_LIBRARIES(scite_objs PUBLIC
 IF (APPLE)
   ADD_SUBDIRECTORY(cocoa)
 
-  TARGET_LINK_LIBRARIES(scite PRIVATE
+  SET(platform_libs
     scite_cocoa
     )
 
@@ -187,8 +187,12 @@ IF (APPLE)
 
 ELSEIF (UNIX)
   ADD_SUBDIRECTORY(gtk)
-
-  TARGET_LINK_LIBRARIES(scite PRIVATE
+  SET(platform_libs
     scite_gtk
     )
 ENDIF()
+
+TARGET_LINK_LIBRARIES(scite PRIVATE
+  ${platform_libs}
+  ${CMAKE_DL_LIBS}
+  )
