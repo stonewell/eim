@@ -134,9 +134,9 @@ public:
 	virtual void PostOnMainThread(int, Worker *) {}
 	virtual void GetWindowPosition(int *, int *, int *, int *, int *) {}
     virtual bool PreOpenCheck(const GUI::gui_char *) {return false;}
-	virtual FilePath GetDefaultDirectory() { return FilePath {""}; }
-	virtual FilePath GetSciteDefaultHome() { return FilePath {""}; }
-	virtual FilePath GetSciteUserHome()  { return FilePath {""}; }
+	virtual FilePath GetDefaultDirectory();
+	virtual FilePath GetSciteDefaultHome();
+	virtual FilePath GetSciteUserHome();
 
     void Run(const char * exe_path, Scintilla::ScintillaBase * pEditor, Scintilla::ScintillaBase* pOutput, int argc, char * argv[]);
     void Command(unsigned long wParam, long);

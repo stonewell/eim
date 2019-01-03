@@ -52,13 +52,14 @@
 									get_backend(mOutput),
 									argc, argv);
 
-  [mEditor setGeneralProperty: SCI_SETLEXER parameter: SCLEX_CPP value: 1];
+  [mEditor setGeneralProperty: SCI_SETLEXER parameter: SCLEX_CPP value: 0];
 	[mEditor setGeneralProperty: SCI_SETLEXERLANGUAGE parameter: 0 value: (sptr_t) "cpp"];
   [mEditor setStringProperty: SCI_STYLESETFONT parameter: STYLE_DEFAULT value: @"Helvetica"];
   [mEditor setGeneralProperty: SCI_STYLESETSIZE parameter: STYLE_DEFAULT value: 20];
   [mEditor setColorProperty: SCI_STYLESETFORE parameter: STYLE_DEFAULT value: [NSColor blackColor]];
 
 	[mEditor becomeFirstResponder];
+	[mEditor setString:@"#include \"string.h\""];
 	delete argv;
 }
 

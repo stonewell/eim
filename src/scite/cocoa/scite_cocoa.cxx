@@ -59,9 +59,63 @@ void SciTECocoa::Run(const char * exe_path, Scintilla::ScintillaBase* pEditor, S
 	CheckMenus();
 	SizeSubWindows();
 	// SetFocus(wEditor);
+    ReloadProperties();
 }
 
 void SciTECocoa::Command(unsigned long wParam, long) {
 	int cmdID = ControlIDOfCommand(wParam);
     SciTEBase::MenuCommand(cmdID, 0);
+}
+
+FilePath SciTECocoa::GetDefaultDirectory() {
+	const char *where = getenv("SciTE_HOME");
+#ifdef SYSCONF_PATH
+	if (!where) {
+		where = SYSCONF_PATH;
+	}
+#else
+	if (!where) {
+		where = getenv("HOME");
+	}
+#endif
+
+    printf("where:%s\n", where);
+	if (where) {
+		return FilePath(where);
+	}
+
+	return FilePath("");
+}
+
+FilePath SciTECocoa::GetSciteDefaultHome() {
+	const char *where = getenv("SciTE_HOME");
+#ifdef SYSCONF_PATH
+	if (!where) {
+		where = SYSCONF_PATH;
+	}
+#else
+	if (!where) {
+		where = getenv("HOME");
+	}
+#endif
+	if (where) {
+		return FilePath(where);
+
+	}
+	return FilePath("");
+}
+
+FilePath SciTECocoa::GetSciteUserHome() {
+	// First looking for environment variable $SciTE_USERHOME
+	// to set SciteUserHome. If not present we look for $SciTE_HOME
+	// then defaulting to $HOME
+	char *where = getenv("SciTE_USERHOME");
+	if (!where) {
+		where = getenv("SciTE_HOME");
+		if (!where) {
+			where = getenv("HOME");
+		}
+	}
+
+	return FilePath(where);
 }
