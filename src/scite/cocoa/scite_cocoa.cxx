@@ -58,8 +58,9 @@ void SciTECocoa::Run(const char * exe_path, Scintilla::ScintillaBase* pEditor, S
 
 	CheckMenus();
 	SizeSubWindows();
-	// SetFocus(wEditor);
     ReloadProperties();
+
+    pEditor->WndProc(SCI_GRABFOCUS, 1, 0);
 }
 
 void SciTECocoa::Command(unsigned long wParam, long) {
@@ -79,7 +80,6 @@ FilePath SciTECocoa::GetDefaultDirectory() {
 	}
 #endif
 
-    printf("where:%s\n", where);
 	if (where) {
 		return FilePath(where);
 	}

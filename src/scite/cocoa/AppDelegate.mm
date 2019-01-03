@@ -19,6 +19,7 @@
 }
 @property (weak) IBOutlet NSWindow *window;
 - (char **)getArray:(NSArray *) args;
+- (void)updateMenu;
 @end
 
 @implementation AppDelegate
@@ -58,9 +59,10 @@
   [mEditor setGeneralProperty: SCI_STYLESETSIZE parameter: STYLE_DEFAULT value: 20];
   [mEditor setColorProperty: SCI_STYLESETFORE parameter: STYLE_DEFAULT value: [NSColor blackColor]];
 
-	[mEditor becomeFirstResponder];
-	[mEditor setString:@"#include \"string.h\""];
+	[self.window makeKeyWindow];
 	delete argv;
+
+	[self updateMenu];
 }
 
 
@@ -72,12 +74,28 @@
 	int count = [a_array count];
 	char** array = new char *[count];
 
-	for(int i = 0; i < count; i++)
-	{
+	for(int i = 0; i < count; i++) {
 	array[i] = (char *)[[a_array objectAtIndex:i] UTF8String];
 	}
 	return array;
 }
 
+- (void)updateMenu {
+	NSMenu * mainMenu = [NSApp mainMenu];
+	NSMenu *appMenu = [[mainMenu itemAtIndex:0] submenu];
+	(void)appMenu;
+
+	NSMenuItem *mainItem = [mainMenu addItemWithTitle:@"Main Item"
+																						 action:@selector(foo:)
+																			keyEquivalent:@""];
+
+	NSMenu *submenu = [[NSMenu alloc] init];
+	[submenu addItemWithTitle:@"Sub item" action:nil keyEquivalent:@""];
+
+	[mainItem setSubmenu:submenu];
+
+	[mainMenu addItem:mainItem];
+	[[NSApplication sharedApplication] setMainMenu:submenu];
+}
 
 @end
