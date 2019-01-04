@@ -82,20 +82,21 @@
 
 - (void)updateMenu {
 	NSMenu * mainMenu = [NSApp mainMenu];
-	NSMenu *appMenu = [[mainMenu itemAtIndex:0] submenu];
+	NSMenuItem * item = [mainMenu itemAtIndex:0];
+	NSMenu *appMenu = [item submenu];
 	(void)appMenu;
 
-	NSMenuItem *mainItem = [mainMenu addItemWithTitle:@"Main Item"
-																						 action:@selector(foo:)
-																			keyEquivalent:@""];
+	// NSMenuItem *mainItem = [mainMenu addItemWithTitle:@"Main Item"
+	// 																					 action:@selector(foo:)
+	// 																		keyEquivalent:@""];
 
 	NSMenu *submenu = [[NSMenu alloc] init];
 	[submenu addItemWithTitle:@"Sub item" action:nil keyEquivalent:@""];
 
-	[mainItem setSubmenu:submenu];
+	//[mainItem setSubmenu:submenu];
 
-	[mainMenu addItem:mainItem];
-	[[NSApplication sharedApplication] setMainMenu:submenu];
+	//[[mainMenu itemAtIndex:1] setSubmenu:submenu];
+	//[mainMenu addItem:item];
 }
 
 @end

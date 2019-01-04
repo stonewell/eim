@@ -1,7 +1,10 @@
 #include "scite_cocoa.h"
+#include <dlfcn.h>
 
 static
 MultiplexExtension g_MultiExtender;
+typedef bool (*func_InitializeScite)(MultiplexExtension * extender,
+                     SciTEBase * scite);
 
 SciTECocoa::SciTECocoa() {
 }
@@ -11,14 +14,23 @@ void SciTECocoa::Run(const char * exe_path, Scintilla::ScintillaBase* pEditor, S
     mOutput = pOutput;
 
 #ifdef NO_EXTENSIONS
-	m_Extender = 0;
+	this->extender = 0;
 #else
-	m_Extender = &g_MultiExtender;
+	this->extender = &g_MultiExtender;
 
 #ifndef NO_LUA
 	g_MultiExtender.RegisterExtension(LuaExtension::Instance());
 #endif
 #endif
+
+    func_InitializeScite pfn = (func_InitializeScite)dlsym(RTLD_DEFAULT, "InitializeScite");
+
+    printf("function:%p\n", pfn);
+    if (pfn) {
+        if (!pfn(&g_MultiExtender, this)) {
+            exit(4);
+        }
+    }
 
 	CreateBuffers();
 
@@ -61,6 +73,8 @@ void SciTECocoa::Run(const char * exe_path, Scintilla::ScintillaBase* pEditor, S
     ReloadProperties();
 
     pEditor->WndProc(SCI_GRABFOCUS, 1, 0);
+
+	UIAvailable();
 }
 
 void SciTECocoa::Command(unsigned long wParam, long) {

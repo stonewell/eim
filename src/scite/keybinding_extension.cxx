@@ -16,8 +16,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <gtk/gtk.h>
-
 #include "ILexer.h"
 #include "Scintilla.h"
 
@@ -88,6 +86,8 @@ bool Exists(const GUI::gui_char *dir, const GUI::gui_char *path, FilePath *resul
 }
 
 bool KeyBindingExtension::LoadBindingConfig(const std::string & config) {
+    std::cout << "config:" << config << std::endl;
+
     if (config.length() == 0)
         return false;
 

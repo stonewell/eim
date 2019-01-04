@@ -141,7 +141,6 @@ public:
     void Run(const char * exe_path, Scintilla::ScintillaBase * pEditor, Scintilla::ScintillaBase* pOutput, int argc, char * argv[]);
     void Command(unsigned long wParam, long);
 
-    Extension * m_Extender;
     FilePath m_SciteExecutable;
     Scintilla::ScintillaBase* mEditor;
     Scintilla::ScintillaBase* mOutput;
