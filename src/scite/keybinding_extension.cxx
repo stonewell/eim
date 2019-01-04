@@ -36,6 +36,21 @@
 #include "SciTEBase.h"
 #include "keybinding_extension.h"
 
+#include "tao/json.hpp"
+
+static
+bool Exists(const GUI::gui_char *dir, const GUI::gui_char *path, FilePath *resultPath) {
+	FilePath copy(path);
+	if (!copy.IsAbsolute() && dir) {
+		copy.SetDirectory(dir);
+	}
+	if (!copy.Exists())
+		return false;
+	if (resultPath) {
+		resultPath->Set(copy.AbsolutePath());
+	}
+	return true;
+}
 
 KeyBindingExtension &KeyBindingExtension::Instance() {
 	static KeyBindingExtension singleton;
@@ -69,20 +84,6 @@ bool KeyBindingExtension::OnKey(int keyval, int modifier) {
 
     printf("OnKey:%c, m:%d\n", (char)(keyval&0xFF), modifier);
     return false;
-}
-
-static
-bool Exists(const GUI::gui_char *dir, const GUI::gui_char *path, FilePath *resultPath) {
-	FilePath copy(path);
-	if (!copy.IsAbsolute() && dir) {
-		copy.SetDirectory(dir);
-	}
-	if (!copy.Exists())
-		return false;
-	if (resultPath) {
-		resultPath->Set(copy.AbsolutePath());
-	}
-	return true;
 }
 
 bool KeyBindingExtension::LoadBindingConfig(const std::string & config) {

@@ -139,6 +139,7 @@ TARGET_INCLUDE_DIRECTORIES(scite_objs PRIVATE
 
 TARGET_LINK_LIBRARIES(scite_objs PUBLIC
   scintilla_interface
+  json
   )
 
 IF (APPLE)

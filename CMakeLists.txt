@@ -73,4 +73,9 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/third_party/scite")
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
+ADD_LIBRARY(json INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(json INTERFACE
+  "third_party/json/include"
+  )
+
 ADD_SUBDIRECTORY(src)
