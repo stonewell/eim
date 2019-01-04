@@ -140,6 +140,7 @@ public:
 
     void Run(const char * exe_path, Scintilla::ScintillaBase * pEditor, Scintilla::ScintillaBase* pOutput, int argc, char * argv[]);
     void Command(unsigned long wParam, long);
+    bool Key(int keyval, int modifier);
 
     FilePath m_SciteExecutable;
     Scintilla::ScintillaBase* mEditor;

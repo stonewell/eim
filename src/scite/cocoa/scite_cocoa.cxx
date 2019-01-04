@@ -25,7 +25,6 @@ void SciTECocoa::Run(const char * exe_path, Scintilla::ScintillaBase* pEditor, S
 
     func_InitializeScite pfn = (func_InitializeScite)dlsym(RTLD_DEFAULT, "InitializeScite");
 
-    printf("function:%p\n", pfn);
     if (pfn) {
         if (!pfn(&g_MultiExtender, this)) {
             exit(4);
@@ -132,4 +131,14 @@ FilePath SciTECocoa::GetSciteUserHome() {
 	}
 
 	return FilePath(where);
+}
+
+bool SciTECocoa::Key(int keyval, int modifier) {
+    (void)keyval;
+    (void)modifier;
+    printf("key val:%d, modi:%d\n", keyval, modifier);
+
+	if (extender && extender->OnKey(keyval, modifier))
+		return true;
+    return false;
 }

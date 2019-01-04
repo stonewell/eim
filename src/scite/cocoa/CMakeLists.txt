@@ -1,12 +1,14 @@
 SET(scite_cocoa_src
     gui_cocoa.cxx
-    scite_cocoa.cxx scite_cocoa.h)
+    scite_cocoa.cxx scite_cocoa.h
+    )
 
 SET(scite_cocoa_gui_src
     AppDelegate.h AppDelegate.mm
     main.m
     MainMenu.xib
-    Info.plist.in)
+    Info.plist.in
+    SciTEWindow.mm SciTEWindow.h)
 
 ADD_LIBRARY(scite_cocoa OBJECT
   ${scite_cocoa_src}

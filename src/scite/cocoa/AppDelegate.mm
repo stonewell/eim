@@ -11,11 +11,73 @@
 #import "ScintillaView.h"
 #import "scintilla_cocoa.h"
 
+static int TranslateModifierFlags(NSUInteger modifiers) {
+	// Signal Control as SCI_META
+	return
+		(((modifiers & NSEventModifierFlagShift) != 0) ? SCI_SHIFT : 0) |
+		(((modifiers & NSEventModifierFlagCommand) != 0) ? SCI_CTRL : 0) |
+		(((modifiers & NSEventModifierFlagOption) != 0) ? SCI_ALT : 0) |
+		(((modifiers & NSEventModifierFlagControl) != 0) ? SCI_META : 0);
+}
+
+static inline UniChar KeyTranslate(UniChar unicodeChar, NSEventModifierFlags modifierFlags) {
+	switch (unicodeChar) {
+	case NSDownArrowFunctionKey:
+		return SCK_DOWN;
+	case NSUpArrowFunctionKey:
+		return SCK_UP;
+	case NSLeftArrowFunctionKey:
+		return SCK_LEFT;
+	case NSRightArrowFunctionKey:
+		return SCK_RIGHT;
+	case NSHomeFunctionKey:
+		return SCK_HOME;
+	case NSEndFunctionKey:
+		return SCK_END;
+	case NSPageUpFunctionKey:
+		return SCK_PRIOR;
+	case NSPageDownFunctionKey:
+		return SCK_NEXT;
+	case NSDeleteFunctionKey:
+		return SCK_DELETE;
+	case NSInsertFunctionKey:
+		return SCK_INSERT;
+	case '\n':
+	case 3:
+		return SCK_RETURN;
+	case 27:
+		return SCK_ESCAPE;
+	case '+':
+		if (modifierFlags & NSEventModifierFlagNumericPad)
+			return SCK_ADD;
+		else
+			return unicodeChar;
+	case '-':
+		if (modifierFlags & NSEventModifierFlagNumericPad)
+			return SCK_SUBTRACT;
+		else
+			return unicodeChar;
+	case '/':
+		if (modifierFlags & NSEventModifierFlagNumericPad)
+			return SCK_DIVIDE;
+		else
+			return unicodeChar;
+	case 127:
+		return SCK_BACK;
+	case '\t':
+	case 25: // Shift tab, return to unmodified tab and handle that via modifiers.
+		return SCK_TAB;
+	default:
+		return unicodeChar;
+	}
+}
+
 @interface AppDelegate ()
 {
 	SciTECocoa scite_cocoa;
   ScintillaView* mEditor;
   ScintillaView* mOutput;
+	id _eventMonitor;
 }
 @property (weak) IBOutlet NSWindow *window;
 - (char **)getArray:(NSArray *) args;
@@ -53,21 +115,47 @@
 									get_backend(mOutput),
 									argc, argv);
 
-  [mEditor setGeneralProperty: SCI_SETLEXER parameter: SCLEX_CPP value: 0];
-	[mEditor setGeneralProperty: SCI_SETLEXERLANGUAGE parameter: 0 value: (sptr_t) "cpp"];
-  [mEditor setStringProperty: SCI_STYLESETFONT parameter: STYLE_DEFAULT value: @"Helvetica"];
-  [mEditor setGeneralProperty: SCI_STYLESETSIZE parameter: STYLE_DEFAULT value: 20];
-  [mEditor setColorProperty: SCI_STYLESETFORE parameter: STYLE_DEFAULT value: [NSColor blackColor]];
-
-	[self.window makeKeyWindow];
+ 	[self.window makeKeyWindow];
 	delete argv;
 
 	[self updateMenu];
+
+	_eventMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask
+																												handler:^(NSEvent *incomingEvent) {
+			NSEvent *result = incomingEvent;
+			NSWindow *targetWindowForEvent = [incomingEvent window];
+
+			if (targetWindowForEvent != _window) {
+			return result;
+			}
+
+			// For now filter out function keys.
+			NSString *input = incomingEvent.charactersIgnoringModifiers;
+
+			bool handled = false;
+			// Handle each entry individually. Usually we only have one entry anyway.
+			for (size_t i = 0; i < input.length; i++) {
+			const UniChar originalKey = [input characterAtIndex: i];
+			NSEventModifierFlags modifierFlags = incomingEvent.modifierFlags;
+
+			UniChar key = KeyTranslate(originalKey, modifierFlags);
+
+			if (scite_cocoa.Key(key, TranslateModifierFlags(modifierFlags)))
+				handled = true;
+			}
+
+			if (handled) {
+			result = nil;
+			}
+
+			return result;
+    }];
 }
 
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
 	// Insert code here to tear down your application
+	[NSEvent removeMonitor:_eventMonitor];
 }
 
 - (char**)getArray:(NSArray *)a_array {
