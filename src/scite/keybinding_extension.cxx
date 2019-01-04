@@ -34,8 +34,9 @@
 #include "Worker.h"
 #include "MatchMarker.h"
 #include "SciTEBase.h"
-#include "keybinding_extension.h"
+#include "KeyMap.h"
 
+#include "keybinding_extension.h"
 #include "tao/json.hpp"
 
 static
@@ -82,13 +83,38 @@ bool KeyBindingExtension::OnKey(int keyval, int modifier) {
     (void)keyval;
     (void)modifier;
 
-    printf("OnKey:%c, m:%d\n", (char)(keyval&0xFF), modifier);
-    return false;
+    key_binding_u kb = from(keyval, modifier);
+
+    auto km = &m_KeyMap;
+
+    if (m_CurKeyMap) {
+        km = &m_CurKeyMap->sub_key_map;
+    }
+
+    printf("OnKey:%c, m:%d", (char)(keyval&0xFF), modifier);
+    std::cout <<", kb:" << kb.v << ", " << kb.key_data.keyval << ", " << (int)kb.key_data.keyval << ", " << (int)kb.key_data.modifier.m;
+
+    auto it = km->find(kb.v);
+
+    bool cmd = false;
+    if (it != km->end()) {
+        printf(", found keymap");
+        if (it->second->command.length() > 0) {
+            printf(", Command:%s", it->second->command.c_str());
+            cmd = true;
+            m_CurKeyMap = nullptr;
+        } else {
+            m_CurKeyMap = it->second;
+            cmd = true;
+        }
+    }
+
+    printf("\n");
+
+    return cmd;
 }
 
 bool KeyBindingExtension::LoadBindingConfig(const std::string & config) {
-    std::cout << "config:" << config << std::endl;
-
     if (config.length() == 0)
         return false;
 
@@ -108,7 +134,45 @@ bool KeyBindingExtension::LoadBindingConfig(const std::string & config) {
 }
 
 bool KeyBindingExtension::LoadFile(const std::string & file_path) {
-    (void)file_path;
-    std::cout << "load keybinding file:" << file_path << std::endl;
+    try {
+        const tao::json::value v = tao::json::parse_file(file_path);
+
+        const auto & key_bindings = v.get_array();
+
+        auto kmap = &m_KeyMap;
+        key_map_ptr kp{};
+
+        for(const auto & key_binding : key_bindings) {
+            const auto & keys = key_binding.at("keys").get_array();
+            const auto & command = key_binding.at("command").get_string();
+
+            for(const auto & key : keys) {
+                const auto & data = key.get_string();
+                auto kb = from(data.c_str(), data.length());
+
+                std::cout << key_binding
+                          << ", key:" << key
+                          << ", cmd:" << command
+                          << ", kb:" << kb.v << ", " << kb.key_data.keyval << ", " << (int)kb.key_data.keyval << ", " << (int)kb.key_data.modifier.m
+                          << std::endl;
+
+                auto it = kmap->emplace(kb.v, std::make_shared<key_map_s>());
+
+                if (it.second) {
+                    kp = it.first->second;
+                    kmap = &kp->sub_key_map;
+                }
+            }
+
+            if (kp) {
+                kp->command = command;
+            }
+
+            kmap = &m_KeyMap;
+        }
+
+    } catch(const std::exception & e) {
+        std::cout << "load keybinding file:" << file_path << " failed!" << e.what() << std::endl;
+    }
     return false;
 }

@@ -114,6 +114,8 @@ SET(lua_src
   ../../third_party/scite/lua/src/lzio.h
   )
 
+ADD_SUBDIRECTORY(key_binding)
+
 ADD_LIBRARY(scite_objs OBJECT
   ${scite_src}
   keybinding_extension.cxx keybinding_extension.h
@@ -140,6 +142,7 @@ TARGET_INCLUDE_DIRECTORIES(scite_objs PRIVATE
 TARGET_LINK_LIBRARIES(scite_objs PUBLIC
   scintilla_interface
   json
+  key_binding
   )
 
 IF (APPLE)
@@ -196,4 +199,5 @@ ENDIF()
 TARGET_LINK_LIBRARIES(scite PRIVATE
   ${platform_libs}
   ${CMAKE_DL_LIBS}
-  )
+  key_binding
+ )
