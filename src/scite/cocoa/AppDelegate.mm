@@ -15,9 +15,9 @@ static int TranslateModifierFlags(NSUInteger modifiers) {
 	// Signal Control as SCI_META
 	return
 		(((modifiers & NSEventModifierFlagShift) != 0) ? SCI_SHIFT : 0) |
-		(((modifiers & NSEventModifierFlagCommand) != 0) ? SCI_CTRL : 0) |
+		(((modifiers & NSEventModifierFlagCommand) != 0) ? SCI_SUPER : 0) |
 		(((modifiers & NSEventModifierFlagOption) != 0) ? SCI_ALT : 0) |
-		(((modifiers & NSEventModifierFlagControl) != 0) ? SCI_META : 0);
+		(((modifiers & NSEventModifierFlagControl) != 0) ? SCI_CTRL : 0);
 }
 
 static inline UniChar KeyTranslate(UniChar unicodeChar, NSEventModifierFlags modifierFlags) {
