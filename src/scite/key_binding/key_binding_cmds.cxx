@@ -64,6 +64,8 @@ key_binding_cmd_map g_default_cmd_menu_map {
     {"revert_buffer", IDM_REVERT},
     {"quit", IDM_QUIT},
     {"goto_line", IDM_GOTO},
+    {"find_next", IDM_INCSEARCH},
+    {"find_prev", IDM_FINDNEXTBACK},
 };
 
 
