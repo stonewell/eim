@@ -37,6 +37,7 @@
 #include "KeyMap.h"
 
 #include "keybinding_extension.h"
+#include "key_binding_cmds.h"
 #include "tao/json.hpp"
 
 static
@@ -91,7 +92,7 @@ bool KeyBindingExtension::OnKey(int keyval, int modifier) {
         km = &m_CurKeyMap->sub_key_map;
     }
 
-    printf("OnKey:%c, m:%d", (char)(keyval&0xFF), modifier);
+    printf("OnKey:%c, m:%d, cur_key_map:%p, %zu", (char)(keyval&0xFF), modifier, km, km->size());
     std::cout <<", kb:" << kb.v << ", " << kb.key_data.keyval << ", " << (int)kb.key_data.keyval << ", " << (int)kb.key_data.modifier.m;
 
     auto it = km->find(kb.v);
@@ -99,14 +100,31 @@ bool KeyBindingExtension::OnKey(int keyval, int modifier) {
     bool cmd = false;
     if (it != km->end()) {
         printf(", found keymap");
+        cmd = true;
+
         if (it->second->command.length() > 0) {
             printf(", Command:%s", it->second->command.c_str());
-            cmd = true;
             m_CurKeyMap = nullptr;
+
+            uint32_t msg = 0;
+            KeyBindingCmdResultEnum result =
+                    key_binding_cmd_to_id(it->second->command, msg);
+
+            if (result == KeyBindingCmdResultEnum::MsgCommand) {
+                m_Host->Send(ExtensionAPI::Pane::paneEditor, msg, 0, 0);
+            } else if (result == KeyBindingCmdResultEnum::MenuCommand) {
+                m_Host->DoMenuCommand(msg);
+            } else {
+                printf(" is not found!!!");
+                //reset key binding tree
+                m_CurKeyMap = nullptr;
+            }
         } else {
             m_CurKeyMap = it->second;
-            cmd = true;
         }
+    } else {
+        //if no mapping found, reset key map tree
+        m_CurKeyMap = nullptr;
     }
 
     printf("\n");
@@ -158,10 +176,8 @@ bool KeyBindingExtension::LoadFile(const std::string & file_path) {
 
                 auto it = kmap->emplace(kb.v, std::make_shared<key_map_s>());
 
-                if (it.second) {
-                    kp = it.first->second;
-                    kmap = &kp->sub_key_map;
-                }
+                kp = it.first->second;
+                kmap = &kp->sub_key_map;
             }
 
             if (kp) {
