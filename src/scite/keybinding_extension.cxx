@@ -114,6 +114,8 @@ bool KeyBindingExtension::OnKey(int keyval, int modifier) {
                 m_Host->Send(ExtensionAPI::Pane::paneEditor, msg, 0, 0);
             } else if (result == KeyBindingCmdResultEnum::MenuCommand) {
                 m_Host->DoMenuCommand(msg);
+            } else if (it->second->command == "exec_command") {
+                m_Host->UserStripShow("execute command:");
             } else {
                 printf(" is not found!!!");
                 //reset key binding tree
