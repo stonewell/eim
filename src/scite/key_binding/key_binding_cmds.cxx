@@ -33,6 +33,7 @@
 #include "SciTE.h"
 
 using key_binding_cmd_map = std::unordered_map<std::string, uint32_t>;
+using key_binding_cmd_func_map = std::unordered_map<std::string, key_binding_func>;
 
 static
 key_binding_cmd_map g_default_cmd_msg_map {
@@ -68,6 +69,8 @@ key_binding_cmd_map g_default_cmd_menu_map {
     {"find_prev", IDM_FINDNEXTBACK},
 };
 
+static
+key_binding_cmd_func_map g_default_cmd_func_map {};
 
 KeyBindingCmdResultEnum key_binding_cmd_to_id(const std::string & cmd, uint32_t & msg) {
     auto it = g_default_cmd_msg_map.find(cmd);
@@ -87,4 +90,19 @@ KeyBindingCmdResultEnum key_binding_cmd_to_id(const std::string & cmd, uint32_t 
     msg = 0;
 
     return KeyBindingCmdResultEnum::NotFound;
+}
+
+bool key_binding_cmd_to_func(const std::string & cmd, key_binding_func & func) {
+    auto it = g_default_cmd_func_map.find(cmd);
+
+    if (it != g_default_cmd_func_map.end()) {
+        func = it->second;
+        return true;
+    }
+
+    return false;
+}
+
+bool assign_key_binding_cmd_func(const std::string & cmd, key_binding_func func) {
+    return g_default_cmd_func_map.emplace(cmd, func).second;
 }

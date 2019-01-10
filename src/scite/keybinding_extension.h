@@ -34,4 +34,5 @@ private:
 
     bool LoadBindingConfig(const std::string & config);
     bool LoadFile(const std::string & file_path);
+    void InitCommandFunc();
 };

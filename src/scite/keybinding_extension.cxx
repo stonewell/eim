@@ -64,6 +64,8 @@ bool KeyBindingExtension::Initialise(ExtensionAPI *host_) {
 
     m_BindingConfig = m_Host->Property("ext.keybinding.config");
 
+    InitCommandFunc();
+
 	return LoadBindingConfig(m_BindingConfig);
 }
 
@@ -106,20 +108,24 @@ bool KeyBindingExtension::OnKey(int keyval, int modifier) {
             printf(", Command:%s", it->second->command.c_str());
             m_CurKeyMap = nullptr;
 
-            uint32_t msg = 0;
-            KeyBindingCmdResultEnum result =
-                    key_binding_cmd_to_id(it->second->command, msg);
+            key_binding_func func;
 
-            if (result == KeyBindingCmdResultEnum::MsgCommand) {
-                m_Host->Send(ExtensionAPI::Pane::paneEditor, msg, 0, 0);
-            } else if (result == KeyBindingCmdResultEnum::MenuCommand) {
-                m_Host->DoMenuCommand(msg);
-            } else if (it->second->command == "exec_command") {
-                m_Host->UserStripShow("execute command:");
+            if (key_binding_cmd_to_func(it->second->command, func)) {
+                func(m_Host);
             } else {
-                printf(" is not found!!!");
-                //reset key binding tree
-                m_CurKeyMap = nullptr;
+                uint32_t msg = 0;
+                KeyBindingCmdResultEnum result =
+                        key_binding_cmd_to_id(it->second->command, msg);
+
+                if (result == KeyBindingCmdResultEnum::MsgCommand) {
+                    m_Host->Send(ExtensionAPI::Pane::paneEditor, msg, 0, 0);
+                } else if (result == KeyBindingCmdResultEnum::MenuCommand) {
+                    m_Host->DoMenuCommand(msg);
+                } else {
+                    printf(" is not found!!!");
+                    //reset key binding tree
+                    m_CurKeyMap = nullptr;
+                }
             }
         } else {
             m_CurKeyMap = it->second;
@@ -193,4 +199,28 @@ bool KeyBindingExtension::LoadFile(const std::string & file_path) {
         std::cout << "load keybinding file:" << file_path << " failed!" << e.what() << std::endl;
     }
     return false;
+}
+
+
+void KeyBindingExtension::InitCommandFunc() {
+    assign_key_binding_cmd_func("push_mark", [](ExtensionAPI * host) {
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_CANCEL, 0, 0);
+                                                 auto pos = host->Send(ExtensionAPI::Pane::paneEditor, SCI_GETCURRENTPOS, 0, 0);
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_SETEMPTYSELECTION, pos, 0);
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_SETSELECTIONMODE, SC_SEL_STREAM, 0);
+                                             });
+    assign_key_binding_cmd_func("exec_command", [](ExtensionAPI * host) {
+                                                    host->UserStripShow("execute command:");
+                                             });
+    assign_key_binding_cmd_func("cancel", [](ExtensionAPI * host) {
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_CANCEL, 0, 0);
+                                                 auto pos = host->Send(ExtensionAPI::Pane::paneEditor, SCI_GETCURRENTPOS, 0, 0);
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_SETEMPTYSELECTION, pos, 0);
+                                             });
+    assign_key_binding_cmd_func("copy_sel", [](ExtensionAPI * host) {
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_COPY, 0, 0);
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_CANCEL, 0, 0);
+                                                 auto pos = host->Send(ExtensionAPI::Pane::paneEditor, SCI_GETCURRENTPOS, 0, 0);
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_SETEMPTYSELECTION, pos, 0);
+                                             });
 }
