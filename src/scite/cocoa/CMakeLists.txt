@@ -1,6 +1,7 @@
 SET(scite_cocoa_src
     gui_cocoa.cxx
     scite_cocoa.cxx scite_cocoa.h
+    scite_cocoa.mm
     )
 
 SET(scite_cocoa_gui_src

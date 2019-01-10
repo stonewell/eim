@@ -81,6 +81,10 @@
 #include "AutoComplete.h"
 #include "ScintillaBase.h"
 
+extern "C" {
+    void quit_progam();
+}
+
 class SciTECocoa : public SciTEBase {
 public:
     SciTECocoa();
@@ -102,7 +106,9 @@ public:
 	virtual void StopExecute() {}
 	virtual void SetFileProperties(PropSetFile &) {}
 	virtual void AboutDialog() {}
-	virtual void QuitProgram() {}
+	virtual void QuitProgram() {
+        quit_progam();
+    }
 	virtual void SetStatusBarText(const char *) {}
 	virtual void ShowToolBar() {}
 	virtual void ShowTabBar() {}
