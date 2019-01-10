@@ -223,4 +223,10 @@ void KeyBindingExtension::InitCommandFunc() {
                                                  auto pos = host->Send(ExtensionAPI::Pane::paneEditor, SCI_GETCURRENTPOS, 0, 0);
                                                  host->Send(ExtensionAPI::Pane::paneEditor, SCI_SETEMPTYSELECTION, pos, 0);
                                              });
+   assign_key_binding_cmd_func("cut_sel", [](ExtensionAPI * host) {
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_CUT, 0, 0);
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_CANCEL, 0, 0);
+                                                 auto pos = host->Send(ExtensionAPI::Pane::paneEditor, SCI_GETCURRENTPOS, 0, 0);
+                                                 host->Send(ExtensionAPI::Pane::paneEditor, SCI_SETEMPTYSELECTION, pos, 0);
+                                             });
 }

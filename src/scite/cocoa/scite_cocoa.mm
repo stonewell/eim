@@ -2,5 +2,5 @@
 
 extern "C"
 void quit_progam() {
-	[NSApp terminal:nil];
+	[NSApp terminate:nil];
 }
