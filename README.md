@@ -6,3 +6,4 @@
 - [ ] Search Everything
 - [ ] Color Schema
 - [ ] KeyBinding
+- [ ] EditorConfig
