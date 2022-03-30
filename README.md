@@ -7,4 +7,4 @@
 - [ ] Color Schema
 - [ ] KeyBinding
 - [ ] EditorConfig
-- [ ] Flutter 
+- [ ] PySide6 
