@@ -1,12 +1,24 @@
 import sys
-from PySide6.QtWidgets import QApplication
-from ui.editor import Editor
 
-"""PySide6 port of the widgets/codeeditor example from Qt5"""
+from PySide6.QtWidgets import QApplication
+
+from ui.editor import Editor
+from ui.ui_helper import UIHelper
+
+from core.context import EditorContext
 
 if __name__ == "__main__":
-  app = QApplication([])
-  editor = Editor()
-  editor.setWindowTitle("Code Editor Example")
+  ctx = EditorContext()
+  ctx.ui_helper = UIHelper(ctx)
+
+  app = QApplication(sys.argv)
+
+  font = ctx.ui_helper.get_font()
+
+  if font:
+    app.setFont(font)
+
+  editor = Editor(ctx)
+  editor.setWindowTitle("EIM")
   editor.show()
   sys.exit(app.exec())
