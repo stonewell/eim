@@ -54,7 +54,7 @@ class EditorContext(object):
             logging.debug('load {} and merge'.format(config))
             self.config.update(load_config(config))
         else:
-            logging.debug('config file:{} is not exists'.format(config.resolve()))
+            logging.debug('config file:{} is not exists'.format(config.resolve() if config else 'None'))
 
     def __load_config(self):
         args = self.args
@@ -83,7 +83,7 @@ class EditorContext(object):
 
     def __load_plugin_dir(self, plugin_dir):
         if not plugin_dir or not plugin_dir.is_dir():
-            logging.debug('plugin directory:{} is not exists'.format(plugin_dir.resolve()))
+            logging.debug('plugin directory:{} is not exists'.format(plugin_dir.resolve() if plugin_dir else 'None'))
             return
 
         pm = PluginManager()

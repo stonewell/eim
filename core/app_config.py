@@ -53,4 +53,11 @@ def load_config_from_string(data):
     return DictQuery(json.loads(data))
 
 def default_config():
-    return DictQuery({})
+    return DictQuery({
+      "app": {
+        "font": {
+          "family": "Monospace",
+          "size": 14
+        }
+      }
+    })
