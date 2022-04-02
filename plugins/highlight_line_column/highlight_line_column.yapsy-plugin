@@ -1,0 +1,6 @@
+[Core]
+Name = HighLight Line Column
+Module = plugin.py
+
+[Documentation]
+Version = 0.1

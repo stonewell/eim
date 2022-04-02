@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QPlainTextEdit, QWidget, QTextEdit
 from yapsy.IPlugin import IPlugin
 
 
-class LineNumberAreaPlugin(IPlugin):
+class Plugin(IPlugin):
   def __init__(self):
     IPlugin.__init__(self)
 
