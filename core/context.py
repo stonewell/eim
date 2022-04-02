@@ -93,7 +93,10 @@ class EditorContext(object):
         pm.collectPlugins()
 
         for pluginInfo in pm.getAllPlugins():
+          if self.config.get('plugins/{}/enabled'.format(pluginInfo.name), True):
             self.plugins_[pluginInfo.name] = pluginInfo
+          else:
+            logging.debug('plugin:{} disabled'.format(pluginInfo.name))
 
     def __load_plugins(self):
         args = self.args
