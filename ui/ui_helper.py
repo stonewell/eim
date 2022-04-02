@@ -27,3 +27,8 @@ class UIHelper(object):
             f = QFont(family, ptSize, QFont.Bold if bold else -1, italic)
 
         return f
+
+    def set_current_window(self, editor):
+      self.editor_ = editor
+
+      self.ctx_.update_plugins_with_current_window(editor)

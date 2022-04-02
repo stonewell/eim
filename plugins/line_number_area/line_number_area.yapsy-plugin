@@ -1,0 +1,6 @@
+[Core]
+Name = Line Number Area
+Module = plugin.py
+
+[Documentation]
+Version = 0.1

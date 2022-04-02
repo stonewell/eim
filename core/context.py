@@ -120,4 +120,13 @@ class EditorContext(object):
         self.__activate_plugins()
 
     def __activate_plugins(self):
-        pass
+      for key in self.plugins_:
+        logging.debug('activate plugin:{}'.format(key))
+        self.plugins_[key].plugin_object.activate()
+
+    def update_plugins_with_current_window(self, editor):
+      for key in self.plugins_:
+        try:
+          self.plugins_[key].plugin_object.set_current_window(editor)
+        except:
+          pass

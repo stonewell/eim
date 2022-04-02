@@ -19,6 +19,8 @@ if __name__ == "__main__":
     app.setFont(font)
 
   editor = Editor(ctx)
+  ctx.ui_helper.set_current_window(editor)
+
   editor.setWindowTitle("EIM")
   editor.show()
   sys.exit(app.exec())
