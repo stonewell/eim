@@ -7,7 +7,12 @@ class Editor(QPlainTextEdit):
   def __init__(self, ctx):
     super().__init__()
 
+    self.setWindowTitle("EIM")
+
     self.ctx_ = ctx
 
   def resizeEvent(self, e):
     super().resizeEvent(e)
+
+  def sizeHint(self):
+    return QSize(1024, 768)
