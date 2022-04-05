@@ -5,8 +5,10 @@ import logging
 import pathlib
 
 from appdirs import AppDirs
-from .app_config import default_config, load_config
 from yapsy.PluginManager import PluginManager
+
+from .app_config import default_config, load_config
+from .behavior_context import BehaviorContext
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -25,6 +27,10 @@ class EditorContext(object):
             logging.getLogger('').setLevel(logging.INFO)
 
         logging.debug('debug level:{}'.format(args.debug))
+
+        self.content_window_ = None
+        self.global_behavior_context_ = BehaviorContext(self)
+        self.behavior_contexts_ = []
 
         self.validate_args(args)
 
@@ -133,3 +139,20 @@ class EditorContext(object):
           self.plugins_[key].plugin_object.set_current_window(editor)
         except:
           pass
+
+    def close_content_window(self):
+      if self.content_window_:
+        self.content_window_.close()
+        logging.debug('close previous content window')
+
+    def show_list_content_window(self):
+      self.close_content_window()
+
+      self.content_window_ = self.ui_helper.show_list_content_window()
+      logging.debug('show new list content window')
+
+    def bind_key(self, key_seq, cmd_or_callable, binding_context = None):
+      pass
+
+    def register_command(self, cmd_name, callable, cmd_context = None):
+      pass

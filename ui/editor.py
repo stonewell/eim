@@ -16,3 +16,8 @@ class Editor(QPlainTextEdit):
 
   def sizeHint(self):
     return QSize(1024, 768)
+
+  def focusInEvent(self, e):
+    super().focusInEvent(e)
+
+    self.ctx_.close_content_window()

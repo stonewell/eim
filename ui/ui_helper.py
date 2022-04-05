@@ -10,6 +10,7 @@ class UIHelper(object):
       super().__init__()
 
       self.ctx_ = ctx
+      self.short_cuts_ = []
 
     def get_font(self):
       fConfig = self.ctx_.config.get('app/font')
@@ -36,9 +37,15 @@ class UIHelper(object):
 
       self.ctx_.update_plugins_with_current_window(editor)
 
-    def bind_key(self, keyseq, callable):
-      self.msgSc = QShortcut(QKeySequence(keyseq), self.editor_)
-      self.msgSc.activated.connect(callable)
+    def bind_key(self, keyseq, callable, binding_widget = None):
+      sc = QShortcut(QKeySequence(keyseq),
+                     self.editor_ if binding_widget is None else binding_widget)
+      sc.activated.connect(callable)
+
+      self.short_cuts_.append(sc)
 
     def show_list_content_window(self):
-      ListContentWindow(self.editor_).show()
+      content_window = ListContentWindow(self.editor_)
+      content_window.show()
+
+      return content_window

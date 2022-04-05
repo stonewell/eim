@@ -23,7 +23,7 @@ if __name__ == "__main__":
   ctx.ui_helper.set_current_window(editor)
 
   ctx.ui_helper.bind_key('Alt+X',
-                         ctx.ui_helper.show_list_content_window)
+                         ctx.show_list_content_window)
 
   editor.show()
 
