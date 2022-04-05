@@ -168,7 +168,7 @@ class EditorContext(object):
 
       binding_context.register_command(cmd_name, cmd_callable)
 
-    def get_behavior_context(self, behavior_context):
+    def get_behavior_context(self, behavior_context = None):
       if behavior_context is None:
         return self.global_behavior_context_
 
@@ -191,10 +191,10 @@ class EditorContext(object):
       if key_seq in self.ui_key_bindings_:
         return
 
-      self.ui_key_bindings_[key_seq] = key_seq
-      self.ui_helper.bind_key(key_seq,
+      sc = self.ui_helper.bind_key(key_seq,
                               lambda : self.key_binding_func(key_seq),
                               self.ui_helper.editor_)
+      self.ui_key_bindings_[key_seq] = sc
 
     def key_binding_func(self, key_seq):
       c = self.current_behavior_context_.get_keybinding_callable(key_seq)

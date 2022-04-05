@@ -28,6 +28,8 @@ if __name__ == "__main__":
 
   ctx.bind_key('Alt+X',
                lambda c: c.show_list_content_window())
+  ctx.bind_key('Ctrl+Q',
+               lambda c: QCoreApplication.quit())
   ctx.bind_key('Alt+W',
                lambda c: c.close_content_window())
   ctx.register_command('close_content_window',
