@@ -7,4 +7,5 @@
 - [ ] Color Schema
 - [ ] KeyBinding
 - [ ] EditorConfig
-- [ ] PySide6 
+- [x] PySide6
+- [ ] Keybinding with prefix key
