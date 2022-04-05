@@ -30,7 +30,9 @@ class EditorContext(object):
 
         self.content_window_ = None
         self.global_behavior_context_ = BehaviorContext(self)
-        self.behavior_contexts_ = []
+        self.behavior_contexts_ = {}
+        self.ui_key_bindings_ = {}
+        self.current_behavior_context_ = self.global_behavior_context_
 
         self.validate_args(args)
 
@@ -145,6 +147,9 @@ class EditorContext(object):
         self.content_window_.close()
         logging.debug('close previous content window')
 
+      self.content_window_ = None
+      logging.debug('close previous content window done')
+
     def show_list_content_window(self):
       self.close_content_window()
 
@@ -152,7 +157,47 @@ class EditorContext(object):
       logging.debug('show new list content window')
 
     def bind_key(self, key_seq, cmd_or_callable, binding_context = None):
-      pass
+      binding_context = self.get_behavior_context(binding_context)
 
-    def register_command(self, cmd_name, callable, cmd_context = None):
-      pass
+      binding_context.bind_key(key_seq, cmd_or_callable)
+
+      self.ui_bind_key(key_seq)
+
+    def register_command(self, cmd_name, cmd_callable, cmd_context = None):
+      binding_context = self.get_behavior_context(cmd_context)
+
+      binding_context.register_command(cmd_name, cmd_callable)
+
+    def get_behavior_context(self, behavior_context):
+      if behavior_context is None:
+        return self.global_behavior_context_
+
+      try:
+        return self.behavior_contexts_[behavior_context]
+      except(KeyError):
+        bc = BehaviorContext(self, self.global_behavior_context_)
+        self.behavior_contexts_[behavior_context] = bc
+
+        return bc
+
+    def switch_behavior_context(self, behavior_context = None):
+      if behavior_context is None:
+        self.current_behavior_context_ = self.global_behavior_context_
+      else:
+        behavior_context = self.get_behavior_context(behavior_context)
+        self.current_behavior_context_ = behavior_context
+
+    def ui_bind_key(self, key_seq):
+      if key_seq in self.ui_key_bindings_:
+        return
+
+      self.ui_key_bindings_[key_seq] = key_seq
+      self.ui_helper.bind_key(key_seq,
+                              lambda : self.key_binding_func(key_seq),
+                              self.ui_helper.editor_)
+
+    def key_binding_func(self, key_seq):
+      c = self.current_behavior_context_.get_keybinding_callable(key_seq)
+
+      if callable(c):
+        c()

@@ -11,6 +11,8 @@ class Editor(QPlainTextEdit):
 
     self.ctx_ = ctx
 
+    ctx.switch_behavior_context('editor')
+
   def resizeEvent(self, e):
     super().resizeEvent(e)
 
@@ -21,3 +23,5 @@ class Editor(QPlainTextEdit):
     super().focusInEvent(e)
 
     self.ctx_.close_content_window()
+
+    self.ctx_.switch_behavior_context('editor')

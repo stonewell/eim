@@ -1,3 +1,6 @@
+import logging
+
+
 class BehaviorContext(object):
   def __init__(self, ctx, parent_context = None):
     super().__init__()
@@ -13,38 +16,33 @@ class BehaviorContext(object):
   def register_command(self, cmd_name, callable):
     self.cmds_[cmd_name] = callable
 
-  def apply_key_bindings(self, binding_widget = None):
-    for key_seq in self.keys_:
-      self.apply_key_binding(key_seq, binding_widget)
-
-  def revoke_key_bindings(self):
-    for key_seq in self.keys_:
-      self.revoke_key_binding(key_seq)
-
-  def apply_key_binding(self, key_seq, binding_widget = None):
-    if key_seq in self.keys_:
-      self.ctx_.ui_helper.bind_key(key_seq,
-                                   self.get_keybinding_callable(self.keys_[key_seq]),
-                                   binding_widget)
-
-  def revoke_key_binding(self, key_seq):
-    if self.parent_context_:
-      self.parent_context_.apply_key_binding(key_seq)
-
   def get_command(self, cmd_name):
     try:
       return self.cmds_[cmd_name]
     except(KeyError):
       return self.parent_context_.get_command(cmd_name) if self.parent_context_ else None
 
-  def get_keybinding_callable(self, cmd_or_callable):
+  def get_keybinding_callable(self, key_seq):
+    if not key_seq in self.keys_:
+      if self.parent_context_:
+        logging.debug('key seq:{} is not found, try parent'.format(key_seq))
+        return self.parent_context_.get_keybinding_callable(key_seq)
+      else:
+        logging.debug('key seq:{} is not found, no parent'.format(key_seq))
+        return None
+
+    cmd_or_callable = self.keys_[key_seq]
+
     if callable(cmd_or_callable):
-      return cmd_or_callable
+      return lambda: cmd_or_callable(self.ctx_)
 
     def run_command():
+      logging.debug('run command:{}'.format(cmd_or_callable))
       c = self.get_command(cmd_or_callable)
 
       if callable(c):
-        c()
+        c(self.ctx_)
+      else:
+        logging.error('cmd:{} is not map to a callable:{}'.format(cmd_or_callable, c))
 
     return run_command

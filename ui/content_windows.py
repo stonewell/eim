@@ -3,9 +3,10 @@ from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QListWidget
 
 
 class ContentWindow(QWidget):
-  def __init__(self, content_widget, parent=None):
+  def __init__(self, content_widget, ctx, parent=None):
     super().__init__(parent)
 
+    self.ctx_ = ctx
     self.content_widget_ = content_widget
 
     self.textEdit_ = QLineEdit()
@@ -17,6 +18,8 @@ class ContentWindow(QWidget):
 
     self.textEdit_.setFocus(Qt.ActiveWindowFocusReason)
     self.update_geometry()
+
+    ctx.switch_behavior_context('content_window')
 
   def update_geometry(self):
     cr = self.parentWidget().contentsRect()
@@ -31,7 +34,11 @@ class ContentWindow(QWidget):
 
     return QSize(cr.width(), cr.height() / 4)
 
-class ListContentWindow(ContentWindow):
-  def __init__(self, parent=None):
-    super().__init__(QListWidget(), parent)
+  def close(self):
+    super().close()
 
+    self.ctx_.switch_behavior_context()
+
+class ListContentWindow(ContentWindow):
+  def __init__(self, ctx, parent=None):
+    super().__init__(QListWidget(), ctx, parent)

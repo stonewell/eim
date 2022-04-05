@@ -2,10 +2,11 @@ import logging
 
 from PySide6.QtGui import QFont, QKeySequence, QShortcut
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QEvent, QObject, QCoreApplication
 
 from .content_windows import ListContentWindow
 
-class UIHelper(object):
+class UIHelper(QObject):
     def __init__(self, ctx):
       super().__init__()
 
@@ -41,11 +42,12 @@ class UIHelper(object):
       sc = QShortcut(QKeySequence(keyseq),
                      self.editor_ if binding_widget is None else binding_widget)
       sc.activated.connect(callable)
+      sc.activatedAmbiguously.connect(callable)
 
       self.short_cuts_.append(sc)
 
     def show_list_content_window(self):
-      content_window = ListContentWindow(self.editor_)
+      content_window = ListContentWindow(self.ctx_, self.editor_)
       content_window.show()
 
       return content_window
