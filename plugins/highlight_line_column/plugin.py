@@ -6,6 +6,7 @@ from yapsy.IPlugin import IPlugin
 
 
 class Plugin(IPlugin):
+
   def __init__(self):
     IPlugin.__init__(self)
 

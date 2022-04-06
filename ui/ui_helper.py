@@ -6,48 +6,58 @@ from PySide6.QtCore import QEvent, QObject, QCoreApplication
 
 from .content_windows import ListContentWindow
 
+
 class UIHelper(QObject):
-    def __init__(self, ctx):
-      super().__init__()
 
-      self.ctx_ = ctx
-      self.short_cuts_ = []
+  def __init__(self, ctx):
+    super().__init__()
 
-    def get_font(self):
-      fConfig = self.ctx_.config.get('app/font')
+    self.ctx_ = ctx
 
-      f = None
+  def init_commands_and_key_bindings(self):
+    self.register_commands()
+    self.bind_keys()
 
-      if isinstance(fConfig, str):
-        f = QFont()
-        f.fromString(fConfig)
-      else:
-        family = fConfig.get('family', QFont().defaultFamily())
-        ptSize = fConfig.get('size', 14)
-        bold = fConfig.get('bold', False)
-        italic = fConfig.get('italic', False)
+  def get_font(self):
+    fConfig = self.ctx_.config.get('app/font')
 
-        logging.debug('family:{}, ptSize:{}, bold:{}, italic:{}'.format(family, ptSize, bold, italic))
+    f = None
 
-        f = QFont(family, ptSize, QFont.Bold if bold else -1, italic)
+    if isinstance(fConfig, str):
+      f = QFont()
+      f.fromString(fConfig)
+    else:
+      family = fConfig.get('family', QFont().defaultFamily())
+      ptSize = fConfig.get('size', 14)
+      bold = fConfig.get('bold', False)
+      italic = fConfig.get('italic', False)
 
-      return f
+      logging.debug('family:{}, ptSize:{}, bold:{}, italic:{}'.format(
+          family, ptSize, bold, italic))
 
-    def set_current_window(self, editor):
-      self.editor_ = editor
+      f = QFont(family, ptSize, QFont.Bold if bold else -1, italic)
 
-      self.ctx_.update_plugins_with_current_window(editor)
+    return f
 
-    def bind_key(self, keyseq, callable, binding_widget = None):
-      sc = QShortcut(QKeySequence(keyseq),
-                     self.editor_ if binding_widget is None else binding_widget)
-      sc.activated.connect(callable)
-      sc.activatedAmbiguously.connect(callable)
+  def set_current_window(self, editor):
+    self.editor_ = editor
 
-      self.short_cuts_.append(sc)
+    self.ctx_.update_plugins_with_current_window(editor)
 
-    def show_list_content_window(self):
-      content_window = ListContentWindow(self.ctx_, self.editor_)
-      content_window.show()
+  def bind_key(self, keyseq, callable, binding_widget=None):
+    sc = QShortcut(QKeySequence(keyseq),
+                   self.editor_ if binding_widget is None else binding_widget)
+    sc.activated.connect(callable)
+    sc.activatedAmbiguously.connect(callable)
 
-      return content_window
+  def show_list_content_window(self):
+    content_window = ListContentWindow(self.ctx_, self.editor_)
+    content_window.show()
+
+    return content_window
+
+  def register_commands(self):
+    self.ctx_.register_command('quit', lambda c: QCoreApplication.quit())
+
+  def bind_keys(self):
+    self.ctx_.bind_key('Ctrl+Q', 'quit')

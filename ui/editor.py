@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QPlainTextEdit, QWidget, QTextEdit
 
 
 class Editor(QPlainTextEdit):
+
   def __init__(self, ctx):
     super().__init__()
 

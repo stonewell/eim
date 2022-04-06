@@ -6,6 +6,7 @@ from yapsy.IPlugin import IPlugin
 
 
 class Plugin(IPlugin):
+
   def __init__(self):
     IPlugin.__init__(self)
 
@@ -20,12 +21,16 @@ class Plugin(IPlugin):
     self.editor_ = editor
     self.line_number_area_ = LineNumberArea(self.editor_)
 
+
 class LineNumberArea(QWidget):
+
   def __init__(self, editor):
     super().__init__(editor)
     self.editor_ = editor
-    self.editor_.blockCountChanged[int].connect(self.update_line_number_area_width)
-    self.editor_.updateRequest[QRect, int].connect(self.update_line_number_area)
+    self.editor_.blockCountChanged[int].connect(
+        self.update_line_number_area_width)
+    self.editor_.updateRequest[QRect,
+                               int].connect(self.update_line_number_area)
 
   def sizeHint(self):
     return QSize(self.line_number_area_width(), 0)
@@ -85,7 +90,7 @@ class LineNumberArea(QWidget):
       self.update_line_number_area_width(0)
 
   def update_geometry(self):
-    current_geometry = self.geometry();
+    current_geometry = self.geometry()
     cr = self.editor_.contentsRect()
     width = self.line_number_area_width()
     rect = QRect(cr.left(), cr.top(), width, cr.height())

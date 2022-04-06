@@ -2,7 +2,8 @@ import logging
 
 
 class BehaviorContext(object):
-  def __init__(self, ctx, parent_context = None):
+
+  def __init__(self, ctx, parent_context=None):
     super().__init__()
 
     self.ctx_ = ctx
@@ -19,8 +20,9 @@ class BehaviorContext(object):
   def get_command(self, cmd_name):
     try:
       return self.cmds_[cmd_name]
-    except(KeyError):
-      return self.parent_context_.get_command(cmd_name) if self.parent_context_ else None
+    except (KeyError):
+      return self.parent_context_.get_command(
+          cmd_name) if self.parent_context_ else None
 
   def get_keybinding_callable(self, key_seq):
     if not key_seq in self.keys_:
@@ -43,6 +45,7 @@ class BehaviorContext(object):
       if callable(c):
         c(self.ctx_)
       else:
-        logging.error('cmd:{} is not map to a callable:{}'.format(cmd_or_callable, c))
+        logging.error('cmd:{} is not map to a callable:{}'.format(
+            cmd_or_callable, c))
 
     return run_command

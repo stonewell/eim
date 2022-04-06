@@ -8,9 +8,12 @@ from ui.ui_helper import UIHelper
 
 from core.context import EditorContext
 
+
 class EIMApplication(QApplication):
+
   def __init__(self, *args):
     super().__init__(*args)
+
 
 if __name__ == "__main__":
   ctx = EditorContext()
@@ -26,17 +29,7 @@ if __name__ == "__main__":
   editor = Editor(ctx)
   ctx.ui_helper.set_current_window(editor)
 
-  ctx.bind_key('Alt+X',
-               lambda c: c.show_list_content_window())
-  ctx.bind_key('Ctrl+Q',
-               lambda c: QCoreApplication.quit())
-  ctx.bind_key('Alt+W',
-               lambda c: c.close_content_window())
-  ctx.register_command('close_content_window',
-                       lambda c: c.close_content_window(),
-                       'content_window')
-  ctx.bind_key('Esc', 'close_content_window', 'content_window')
-  ctx.bind_key('Alt+X', 'close_content_window', 'content_window')
+  ctx.init_commands_and_key_bindings()
 
   ctx.switch_behavior_context()
 
