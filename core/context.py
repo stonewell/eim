@@ -34,6 +34,7 @@ class EditorContext(object):
     self.behavior_contexts_ = {}
     self.ui_key_bindings_ = {}
     self.current_behavior_context_ = self.global_behavior_context_
+    self.command_history_ = []
 
     self.validate_args(args)
 
@@ -152,6 +153,7 @@ class EditorContext(object):
     for key in self.plugins_:
       logging.debug('activate plugin:{}'.format(key))
       self.plugins_[key].plugin_object.activate()
+      self.plugins_[key].plugin_object.ctx = self
 
   def update_plugins_with_current_window(self, editor):
     for key in self.plugins_:
@@ -168,11 +170,12 @@ class EditorContext(object):
     self.content_window_ = None
     logging.debug('close previous content window done')
 
-  def show_list_content_window(self):
+  def create_list_content_window(self):
     self.close_content_window()
 
-    self.content_window_ = self.ui_helper.show_list_content_window()
-    logging.debug('show new list content window')
+    self.content_window_ = self.ui_helper.create_list_content_window()
+
+    return self.content_window_
 
   def bind_key(self, key_seq, cmd_or_callable, binding_context=None):
     binding_context = self.get_behavior_context(binding_context)
@@ -186,14 +189,16 @@ class EditorContext(object):
 
     binding_context.register_command(cmd_name, cmd_callable)
 
-  def get_behavior_context(self, behavior_context=None):
+  def get_behavior_context(self, behavior_context=None, parent_context = None):
     if behavior_context is None:
+      self.global_behavior_context_.name = 'global'
       return self.global_behavior_context_
 
     try:
       return self.behavior_contexts_[behavior_context]
     except (KeyError):
-      bc = BehaviorContext(self, self.global_behavior_context_)
+      bc = BehaviorContext(self, parent_context if parent_context else self.global_behavior_context_)
+      bc.name = behavior_context
       self.behavior_contexts_[behavior_context] = bc
 
     return bc
@@ -202,8 +207,11 @@ class EditorContext(object):
     if behavior_context is None:
       self.current_behavior_context_ = self.global_behavior_context_
     else:
-      behavior_context = self.get_behavior_context(behavior_context)
-      self.current_behavior_context_ = behavior_context
+      self.current_behavior_context_ = self.get_behavior_context(behavior_context)
+
+    logging.debug('switch behavior context:{}, now behavior context is:{}'.format(behavior_context,
+                                                                                  self.current_behavior_context_.name))
+
 
   def ui_bind_key(self, key_seq):
     if key_seq in self.ui_key_bindings_:
@@ -214,10 +222,11 @@ class EditorContext(object):
     self.ui_key_bindings_[key_seq] = sc
 
   def key_binding_func(self, key_seq):
+    logging.debug('call key binding on context:{}'.format(self.current_behavior_context_.name))
     c = self.current_behavior_context_.get_keybinding_callable(key_seq)
 
     if callable(c):
-      c()
+      c(self)
     else:
       logging.warn('key seq:{} binding function is not callable:{}'.format(
           key_seq, c))
@@ -233,3 +242,41 @@ class EditorContext(object):
 
   def bind_keys(self):
     self.bind_key('Esc', 'close_content_window', 'content_window')
+    self.bind_key('Ctrl+P', 'prev')
+    self.bind_key('Ctrl+N', 'next')
+
+  def run_command(self, cmd_name, cmd_callable = None):
+    logging.debug('running command:{}'.format(cmd_name))
+
+    if cmd_callable is None:
+      cmd_callable = self.current_behavior_context_.get_command_callable(cmd_name)
+
+    if not callable(cmd_callable):
+      logging.warning('cmd:{} is not found'.format(cmd_name))
+      return
+
+    cmd_callable(self)
+
+    try:
+      self.command_history_.remove(cmd_name)
+    except(ValueError):
+      pass
+
+    self.command_history_.append(cmd_name)
+
+  def get_commands(self):
+    commands = self.command_history_[:]
+
+    all_cmds = self.current_behavior_context_.get_commands()
+
+    all_cmds = [ cmd for cmd in all_cmds if cmd not in commands]
+
+    commands.extend(all_cmds)
+
+    return commands
+
+  def hook_command(self, cmd_name, cmd_or_callable, binding_context = None):
+    if binding_context is None:
+      self.current_behavior_context_.hook_command(cmd_name, cmd_or_callable)
+    else:
+      self.get_behavior_context(binding_context).hook_command(cmd_name, cmd_or_callable)

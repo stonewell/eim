@@ -50,9 +50,8 @@ class UIHelper(QObject):
     sc.activated.connect(callable)
     sc.activatedAmbiguously.connect(callable)
 
-  def show_list_content_window(self):
+  def create_list_content_window(self):
     content_window = ListContentWindow(self.ctx_, self.editor_)
-    content_window.show()
 
     return content_window
 
