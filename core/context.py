@@ -184,10 +184,14 @@ class EditorContext(object):
 
     self.ui_bind_key(key_seq)
 
-  def register_command(self, cmd_name, cmd_callable, cmd_context=None):
+  def register_command(self,
+                       cmd_name,
+                       cmd_callable,
+                       cmd_context=None,
+                       save_history=True):
     binding_context = self.get_behavior_context(cmd_context)
 
-    binding_context.register_command(cmd_name, cmd_callable)
+    binding_context.register_command(cmd_name, cmd_callable, save_history)
 
   def get_behavior_context(self, behavior_context=None, parent_context=None):
     if behavior_context is None:
@@ -249,12 +253,14 @@ class EditorContext(object):
     self.bind_key('Ctrl+P', 'prev')
     self.bind_key('Ctrl+N', 'next')
 
-  def run_command(self, cmd_name, cmd_callable=None, hooked_command = False):
+  def run_command(self, cmd_name, cmd_callable=None, save_history=True):
     logging.debug('running command:{}'.format(cmd_name))
 
     if cmd_callable is None:
       cmd_callable = self.current_behavior_context_.get_command_callable(
           cmd_name)
+      #command callable will handle save history
+      save_history = False
 
     if not callable(cmd_callable):
       logging.warning('cmd:{} is not found'.format(cmd_name))
@@ -262,13 +268,15 @@ class EditorContext(object):
 
     cmd_callable(self)
 
-    if not hooked_command:
+    if save_history:
       try:
         self.command_history_.remove(cmd_name)
       except (ValueError):
         pass
 
       self.command_history_.append(cmd_name)
+    else:
+      logging.debug('run cmd:{} skip history'.format(cmd_name))
 
   def get_commands(self):
     commands = self.command_history_[:]
@@ -281,9 +289,14 @@ class EditorContext(object):
 
     return commands
 
-  def hook_command(self, cmd_name, cmd_or_callable, binding_context=None):
+  def hook_command(self,
+                   cmd_name,
+                   cmd_or_callable,
+                   binding_context=None,
+                   save_history=True):
     if binding_context is None:
-      self.current_behavior_context_.hook_command(cmd_name, cmd_or_callable)
+      self.current_behavior_context_.hook_command(cmd_name, cmd_or_callable,
+                                                  save_history)
     else:
       self.get_behavior_context(binding_context).hook_command(
-          cmd_name, cmd_or_callable)
+          cmd_name, cmd_or_callable, save_history)

@@ -18,7 +18,8 @@ class Plugin(IPlugin):
   def set_current_window(self, editor):
     self.editor_ = editor
 
-    self.ctx.register_command('commands_list', self.show_commands_window)
+    self.ctx.register_command('commands_list', self.show_commands_window, None,
+                              False)
     self.ctx.bind_key('Alt+X', 'commands_list')
 
   def show_commands_window(self, ctx):

@@ -54,11 +54,14 @@ class ListContentWindow(ContentWindow):
 
     self.ctx_.switch_behavior_context('list_content_window')
 
-    self.content_widget_.itemSelectionChanged.connect(self.item_selection_changed)
+    self.content_widget_.itemSelectionChanged.connect(
+        self.item_selection_changed)
 
   def register_commands(self):
-    self.ctx_.hook_command('prev', self.prev_command, 'list_content_window')
-    self.ctx_.hook_command('next', self.next_command, 'list_content_window')
+    self.ctx_.hook_command('prev', self.prev_command, 'list_content_window',
+                           False)
+    self.ctx_.hook_command('next', self.next_command, 'list_content_window',
+                           False)
 
   def bind_keys(self):
     pass
