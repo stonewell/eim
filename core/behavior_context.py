@@ -18,16 +18,16 @@ class BehaviorContext(object):
   def register_command(self, cmd_name, callable):
     self.cmds_[cmd_name] = callable
 
-  def get_command(self, cmd_name):
+  def __get_command(self, cmd_name):
     if cmd_name in self.hooked_commands_:
       logging.debug('context:{}, return hooked cmd:{}'.format(self.name, cmd_name))
-      return self.hooked_commands_[cmd_name]
+      return (self.hooked_commands_[cmd_name], True)
 
     try:
-      return self.cmds_[cmd_name]
+      return (self.cmds_[cmd_name], False)
     except (KeyError):
       logging.debug('context:{}, cmd:{} is not registered locally, try parent'.format(self.name, cmd_name))
-      return self.parent_context_.get_command(
+      return self.parent_context_.__get_command(
           cmd_name) if self.parent_context_ else None
 
   def get_keybinding(self, key_seq):
@@ -51,12 +51,12 @@ class BehaviorContext(object):
 
   def get_command_callable(self, cmd_name):
 
-    def run_command(ctx):
+    def __run_command(ctx):
       c = cmd_name
       logging.debug('context:{}, run command:{}'.format(self.name, cmd_name))
 
       while True:
-        c = self.get_command(c)
+        c, hooked_command = self.__get_command(c)
 
         if c is None or callable(c):
           break
@@ -65,11 +65,11 @@ class BehaviorContext(object):
 
 
       if callable(c):
-        ctx.run_command(cmd_name, c)
+        ctx.run_command(cmd_name, c, hooked_command)
       else:
         logging.error('context:{}, cmd:{} is not map to a callable:{}'.format(self.name, cmd_name, c))
 
-    return run_command
+    return __run_command
 
   def get_commands(self):
     commands = set(self.cmds_.keys())
