@@ -37,6 +37,7 @@ if __name__ == "__main__":
 
   ctx.switch_behavior_context()
 
+  editor.bind_keys()
   editor.show()
 
   sys.exit(app.exec())

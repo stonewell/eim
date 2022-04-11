@@ -1,5 +1,5 @@
 from PySide6.QtCore import Slot, Qt, QRect, QSize
-from PySide6.QtGui import QColor, QPainter, QTextFormat
+from PySide6.QtGui import QKeySequence, QKeyEvent
 from PySide6.QtWidgets import QPlainTextEdit, QWidget, QTextEdit
 
 
@@ -26,3 +26,15 @@ class Editor(QPlainTextEdit):
     self.ctx_.close_content_window()
 
     self.ctx_.switch_behavior_context('editor')
+
+  def bind_keys(self):
+    pass
+
+  def keyPressEvent(self, evt):
+    key = evt.keyCombination().toCombined()
+    if key == Qt.Key_Return or key == Qt.Key_Enter:
+      self.insertPlainText('\n')
+      evt.accept()
+      return
+
+    super().keyPressEvent(evt)

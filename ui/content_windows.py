@@ -6,6 +6,19 @@ from PySide6.QtWidgets import QListWidget
 from fuzzywuzzy import fuzz
 
 
+class ContentWindowLineEdit(QLineEdit):
+  def __init__(self, *args):
+    super().__init__(*args)
+
+  def keyPressEvent(self, evt):
+    key = evt.keyCombination().toCombined()
+    if key == Qt.Key_Return or key == Qt.Key_Enter:
+      evt.accept()
+      self.returnPressed.emit()
+      return
+
+    super().keyPressEvent(evt)
+
 class ContentWindow(QWidget):
 
   def __init__(self, content_widget, ctx, parent=None):
@@ -15,7 +28,7 @@ class ContentWindow(QWidget):
     self.ctx_ = ctx
     self.content_widget_ = content_widget
 
-    self.text_edit_ = QLineEdit()
+    self.text_edit_ = ContentWindowLineEdit()
 
     layout = QVBoxLayout()
     layout.addWidget(self.content_widget_)
