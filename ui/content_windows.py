@@ -1,5 +1,9 @@
+import logging
+
 from PySide6.QtCore import Slot, Qt, QRect, QSize
-from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QListWidget
+from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout
+from PySide6.QtWidgets import QListWidget
+from fuzzywuzzy import fuzz
 
 
 class ContentWindow(QWidget):
@@ -57,6 +61,7 @@ class ListContentWindow(ContentWindow):
 
     self.content_widget_.itemSelectionChanged.connect(
         self.item_selection_changed)
+    self.text_edit_.textEdited[str].connect(self.on_text_edited)
 
   def register_commands(self):
     self.ctx_.hook_command('prev', self.prev_command, 'list_content_window',
@@ -83,3 +88,11 @@ class ListContentWindow(ContentWindow):
 
   def item_selection_changed(self):
     self.text_edit_.setText(self.content_widget_.currentItem().text())
+
+  def on_text_edited(self, txt):
+    for row in range(self.content_widget_.count()):
+      item = self.content_widget_.item(row)
+      ratio = fuzz.partial_ratio(txt, item.text())
+
+      logging.debug('ratio:{} for {} -> {}'.format(ratio, txt, item.text()))
+      item.setHidden(ratio <= 30 and len(txt) > 0)
