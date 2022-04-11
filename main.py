@@ -1,6 +1,11 @@
+import os
 import sys
 
+os.environ['QT_QPA_PLATFORMTHEME'] = 'eim'
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = os.path.join(os.path.dirname(__file__), 'plugins', 'qpa')
+
 from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtGui import QGuiApplication
 
 from ui.editor import Editor
 from ui.ui_helper import UIHelper
@@ -18,7 +23,7 @@ if __name__ == "__main__":
   ctx = EditorContext()
   ctx.ui_helper = UIHelper(ctx)
 
-  ctx.app = app = EIMApplication(sys.argv[1:])
+  ctx.app = app = EIMApplication()
 
   font = ctx.ui_helper.get_font()
 
