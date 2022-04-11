@@ -166,6 +166,7 @@ class EditorContext(object):
     if self.content_window_:
       self.content_window_.close()
       logging.debug('close previous content window')
+      self.ui_helper.focus_editor()
 
     self.content_window_ = None
     logging.debug('close previous content window done')

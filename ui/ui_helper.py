@@ -2,7 +2,7 @@ import logging
 
 from PySide6.QtGui import QFont, QKeySequence, QShortcut
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QEvent, QObject, QCoreApplication
+from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt
 
 from .content_windows import ListContentWindow
 
@@ -62,3 +62,6 @@ class UIHelper(QObject):
 
   def bind_keys(self):
     self.ctx_.bind_key('Ctrl+Q', 'quit')
+
+  def focus_editor(self):
+    self.editor_.setFocus(Qt.ActiveWindowFocusReason)

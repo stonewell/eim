@@ -7,6 +7,7 @@ class ContentWindow(QWidget):
   def __init__(self, content_widget, ctx, parent=None):
     super().__init__(parent)
 
+    self.parent_widget_ = parent
     self.ctx_ = ctx
     self.content_widget_ = content_widget
 
@@ -23,7 +24,7 @@ class ContentWindow(QWidget):
     ctx.switch_behavior_context('content_window')
 
   def update_geometry(self):
-    cr = self.parentWidget().contentsRect()
+    cr = self.parent_widget_.contentsRect()
 
     self.setGeometry(
         QRect(cr.left(),
@@ -31,7 +32,7 @@ class ContentWindow(QWidget):
               cr.height() / 4))
 
   def sizeHint(self):
-    cr = self.parentWidget().contentsRect()
+    cr = self.parent_widget_.contentsRect()
 
     return QSize(cr.width(), cr.height() / 4)
 
