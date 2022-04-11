@@ -1,7 +1,6 @@
 import sys
 
 from PySide6.QtWidgets import QApplication, QMessageBox
-from PySide6.QtCore import QEvent, QObject, QCoreApplication
 
 from ui.editor import Editor
 from ui.ui_helper import UIHelper

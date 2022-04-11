@@ -45,7 +45,9 @@ class UIHelper(QObject):
     self.ctx_.update_plugins_with_current_window(editor)
 
   def bind_key(self, keyseq, callable, binding_widget=None):
-    sc = QShortcut(QKeySequence(keyseq),
+    logging.debug('bind keyseq:{}'.format(keyseq))
+    seq = QKeySequence(keyseq)
+    sc = QShortcut(seq,
                    self.editor_ if binding_widget is None else binding_widget)
     sc.activated.connect(callable)
     sc.activatedAmbiguously.connect(callable)
