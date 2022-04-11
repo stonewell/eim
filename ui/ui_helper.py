@@ -1,3 +1,4 @@
+import os
 import logging
 
 from PySide6.QtGui import QFont, QKeySequence, QShortcut
@@ -13,6 +14,9 @@ class UIHelper(QObject):
     super().__init__()
 
     self.ctx_ = ctx
+
+    if self.ctx_.args.debug > 2:
+        os.environ['QT_DEBUG_PLUGINS'] = '1'
 
   def init_commands_and_key_bindings(self):
     self.register_commands()
