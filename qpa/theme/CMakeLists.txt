@@ -7,6 +7,7 @@ set(theme_SRCS
 add_library(qeimplatformtheme MODULE ${theme_SRCS})
 target_link_libraries(qeimplatformtheme
     Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::GuiPrivate
   )
 target_include_directories(qeimplatformtheme
     PRIVATE

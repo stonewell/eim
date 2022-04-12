@@ -12,6 +12,7 @@
 *.out
 
 build/
+build-6.2.4/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
