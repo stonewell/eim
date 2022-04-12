@@ -31,10 +31,4 @@ class Editor(QPlainTextEdit):
     pass
 
   def keyPressEvent(self, evt):
-    key = evt.keyCombination().toCombined()
-    if key == Qt.Key_Return or key == Qt.Key_Enter:
-      self.insertPlainText('\n')
-      evt.accept()
-      return
-
     super().keyPressEvent(evt)
