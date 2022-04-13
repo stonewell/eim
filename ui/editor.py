@@ -1,9 +1,11 @@
-from PySide6.QtCore import Slot, Qt, QRect, QSize
-from PySide6.QtGui import QKeySequence, QKeyEvent
-from PySide6.QtWidgets import QPlainTextEdit, QWidget, QTextEdit
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QTextCursor
+from PySide6.QtWidgets import QPlainTextEdit
 
+from core.builtin_commands import BuiltinCommands
+from .textedit_mixin import TextEditMixin
 
-class Editor(QPlainTextEdit):
+class Editor(QPlainTextEdit, TextEditMixin):
 
   def __init__(self, ctx):
     super().__init__()
@@ -11,8 +13,12 @@ class Editor(QPlainTextEdit):
     self.setWindowTitle("EIM")
 
     self.ctx_ = ctx
+    ctx.ui_helper.set_current_window(self)
 
     ctx.switch_behavior_context('editor')
+
+    self.register_commands()
+    self.bind_keys()
 
   def resizeEvent(self, e):
     super().resizeEvent(e)
@@ -26,9 +32,6 @@ class Editor(QPlainTextEdit):
     self.ctx_.close_content_window()
 
     self.ctx_.switch_behavior_context('editor')
-
-  def bind_keys(self):
-    pass
 
   def keyPressEvent(self, evt):
     super().keyPressEvent(evt)

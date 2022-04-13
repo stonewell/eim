@@ -31,7 +31,6 @@ if __name__ == "__main__":
     app.setFont(font)
 
   editor = Editor(ctx)
-  ctx.ui_helper.set_current_window(editor)
 
   ctx.init_commands_and_key_bindings()
 

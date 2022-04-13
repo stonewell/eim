@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt
 
 from .content_windows import ListContentWindow
+from core.builtin_commands import BuiltinCommands
 
 
 class UIHelper(QObject):
@@ -62,10 +63,10 @@ class UIHelper(QObject):
     return content_window
 
   def register_commands(self):
-    self.ctx_.register_command('quit', lambda c: QCoreApplication.quit())
+    self.ctx_.register_command(BuiltinCommands.QUIT, lambda c: QCoreApplication.quit())
 
   def bind_keys(self):
-    self.ctx_.bind_key('Ctrl+Q', 'quit')
+    self.ctx_.bind_key('Ctrl+Q', BuiltinCommands.QUIT)
 
   def focus_editor(self):
     self.editor_.setFocus(Qt.ActiveWindowFocusReason)

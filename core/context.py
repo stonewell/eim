@@ -9,6 +9,7 @@ from yapsy.PluginManager import PluginManager
 
 from .app_config import default_config, load_config
 from .behavior_context import BehaviorContext
+from core.builtin_commands import BuiltinCommands
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -247,12 +248,14 @@ class EditorContext(object):
 
   def register_commands(self):
     self.register_command('close_content_window',
-                          lambda c: c.close_content_window(), 'content_window')
+                          lambda c: c.close_content_window(), 'content_window', False)
 
   def bind_keys(self):
     self.bind_key('Esc', 'close_content_window', 'content_window')
-    self.bind_key('Ctrl+P', 'prev')
-    self.bind_key('Ctrl+N', 'next')
+    self.bind_key('Ctrl+P', BuiltinCommands.PREV_LINE)
+    self.bind_key('Ctrl+N', BuiltinCommands.NEXT_LINE)
+    self.bind_key('Ctrl+B', BuiltinCommands.PREV_CHAR)
+    self.bind_key('Ctrl+F', BuiltinCommands.NEXT_CHAR)
 
   def run_command(self, cmd_name, cmd_callable=None, save_history=True):
     logging.debug('running command:{}'.format(cmd_name))

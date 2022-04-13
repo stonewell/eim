@@ -5,9 +5,11 @@ from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout
 from PySide6.QtWidgets import QListWidget
 from fuzzywuzzy import fuzz
 
+from core.builtin_commands import BuiltinCommands
+
 
 class ContentWindowLineEdit(QLineEdit):
-  def __init__(self, *args):
+  def __init__(self, ctx, *args):
     super().__init__(*args)
 
   def keyPressEvent(self, evt):
@@ -28,7 +30,7 @@ class ContentWindow(QWidget):
     self.ctx_ = ctx
     self.content_widget_ = content_widget
 
-    self.text_edit_ = ContentWindowLineEdit()
+    self.text_edit_ = ContentWindowLineEdit(ctx)
 
     layout = QVBoxLayout()
     layout.addWidget(self.content_widget_)
@@ -39,6 +41,16 @@ class ContentWindow(QWidget):
     self.update_geometry()
 
     ctx.switch_behavior_context('content_window')
+
+  def register_commands(self):
+    self.ctx_.hook_command(BuiltinCommands.PREV_CHAR,
+                           lambda ctx: self.text_edit_.cursorBackward(False),
+                           None,
+                           False)
+    self.ctx_.hook_command(BuiltinCommands.NEXT_CHAR,
+                           lambda ctx: self.text_edit_.cursorForward(True),
+                           None,
+                           False)
 
   def update_geometry(self):
     cr = self.parent_widget_.contentsRect()
@@ -77,9 +89,11 @@ class ListContentWindow(ContentWindow):
     self.text_edit_.textEdited[str].connect(self.on_text_edited)
 
   def register_commands(self):
-    self.ctx_.hook_command('prev', self.prev_command, 'list_content_window',
+    super().register_commands()
+
+    self.ctx_.hook_command(BuiltinCommands.PREV_LINE, self.prev_command, 'list_content_window',
                            False)
-    self.ctx_.hook_command('next', self.next_command, 'list_content_window',
+    self.ctx_.hook_command(BuiltinCommands.NEXT_LINE, self.next_command, 'list_content_window',
                            False)
 
   def bind_keys(self):

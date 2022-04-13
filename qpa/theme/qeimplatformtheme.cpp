@@ -81,9 +81,18 @@ QEimPlatformTheme::~QEimPlatformTheme()
 
 QList<QKeySequence> QEimPlatformTheme::keyBindings(QKeySequence::StandardKey key) const
 {
+  const char * env_key = QString("StandardKey_%1").arg(key).toUtf8();
+  QString env = qEnvironmentVariable(env_key, "");
+
   for (uint i = 0; i < numberOfFilteredKeys; i++) {
     if (filtered_Keys[i] == key) {
-      return QList<QKeySequence>();
+      QList <QKeySequence> list;
+
+      if (env != "") {
+        list.append(QKeySequence(env));
+      }
+
+      return list;
     }
   }
 
@@ -98,8 +107,13 @@ QList<QKeySequence> QEimPlatformTheme::keyBindings(QKeySequence::StandardKey key
     }
   }
 
-  if (forced)
+  if (forced) {
+    if (env != "") {
+      list.prepend(QKeySequence(env));
+    }
+
     return list;
+  }
 
   return QPlatformTheme::keyBindings(key);
 }
