@@ -18,4 +18,7 @@ class BuiltinCommands(object):
   POP_MARK = 'pop_mark'
   COPY = 'copy'
   PASTE = 'paste'
+  CUT = 'cut'
   COPY_PASTE_HISTORY = 'copy_paste_history'
+  KILL_CHAR = 'kill_char'
+  KILL_WORD = 'kill_word'

@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QListWidget
 from fuzzywuzzy import fuzz
 
 from core.builtin_commands import BuiltinCommands
-
+from .marker_mixin import MarkerMixin
 
 class ContentWindowLineEdit(QLineEdit):
   def __init__(self, ctx, *args):
@@ -21,10 +21,11 @@ class ContentWindowLineEdit(QLineEdit):
 
     super().keyPressEvent(evt)
 
-class ContentWindow(QWidget):
+class ContentWindow(QWidget, MarkerMixin):
 
   def __init__(self, content_widget, ctx, parent=None):
-    super().__init__(parent)
+    QWidget.__init__(self, parent)
+    MarkerMixin.__init__(self)
 
     self.parent_widget_ = parent
     self.ctx_ = ctx
@@ -42,13 +43,18 @@ class ContentWindow(QWidget):
 
     ctx.switch_behavior_context('content_window')
 
+  def cursor_position(self):
+    return self.text_edit_.cursorPosition()
+
   def register_commands(self):
+    super().register_commands()
+
     self.ctx_.hook_command(BuiltinCommands.PREV_CHAR,
-                           lambda ctx: self.text_edit_.cursorBackward(False),
+                           lambda ctx: self.text_edit_.cursorBackward(self.is_marker_active()),
                            None,
                            False)
     self.ctx_.hook_command(BuiltinCommands.NEXT_CHAR,
-                           lambda ctx: self.text_edit_.cursorForward(True),
+                           lambda ctx: self.text_edit_.cursorForward(self.is_marker_active()),
                            None,
                            False)
 

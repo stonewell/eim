@@ -8,7 +8,8 @@ from .textedit_mixin import TextEditMixin
 class Editor(QPlainTextEdit, TextEditMixin):
 
   def __init__(self, ctx):
-    super().__init__()
+    QPlainTextEdit.__init__(self)
+    TextEditMixin.__init__(self)
 
     self.setWindowTitle("EIM")
 
@@ -35,3 +36,6 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
   def keyPressEvent(self, evt):
     super().keyPressEvent(evt)
+
+  def cursor_position(self):
+    return self.textCursor().position
