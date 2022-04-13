@@ -66,7 +66,7 @@ class UIHelper(QObject):
     self.ctx_.register_command(BuiltinCommands.QUIT, lambda c: QCoreApplication.quit())
 
   def bind_keys(self):
-    self.ctx_.bind_key('Ctrl+Q', BuiltinCommands.QUIT)
+    pass
 
   def focus_editor(self):
     self.editor_.setFocus(Qt.ActiveWindowFocusReason)

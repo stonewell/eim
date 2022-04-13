@@ -1,5 +1,6 @@
 class BuiltinCommands(object):
   QUIT = 'quit'
+  CANCEL = 'cancel'
 
   PREV_LINE = 'prev_line'
   NEXT_LINE = 'next_line'

@@ -9,7 +9,7 @@ from yapsy.PluginManager import PluginManager
 
 from .app_config import default_config, load_config
 from .behavior_context import BehaviorContext
-from core.builtin_commands import BuiltinCommands
+from .builtin_commands import BuiltinCommands
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -75,10 +75,25 @@ class EditorContext(object):
   def validate_args(args):
     pass
 
+  def __merge_keys(self, old_keys, new_keys):
+    for key in old_keys:
+      if key in new_keys:
+        if isinstance(old_keys[key], dict) and isinstance(new_keys[key], dict):
+          old_keys[key].update(new_keys[key])
+          new_keys[key].update(old_keys[key])
+
+    old_keys.update(new_keys)
+    new_keys.update(old_keys)
+
   def __load_config_file(self, config):
     if config and config.is_file():
       logging.debug('load {} and merge'.format(config))
-      self.config.update(load_config(config))
+      new_config = load_config(config)
+
+      old_keys = self.config.get('/app/keys', {})
+      new_keys = new_config.get('/app/keys', {})
+      self.__merge_keys(old_keys, new_keys)
+      self.config.update(new_config)
     else:
       logging.debug('config file:{} is not exists'.format(
           config.resolve() if config else 'None'))
@@ -107,6 +122,7 @@ class EditorContext(object):
     self.__load_config_file(args.config)
 
     logging.debug('config:{}'.format(self.config.get('/app/font')))
+    logging.debug('config keys:{}'.format(self.config.get('/app/keys')))
 
   def __load_plugin_dir(self, plugin_dir):
     if not plugin_dir or not plugin_dir.is_dir():
@@ -247,15 +263,25 @@ class EditorContext(object):
     self.bind_keys()
 
   def register_commands(self):
-    self.register_command('close_content_window',
-                          lambda c: c.close_content_window(), 'content_window', False)
+    self.register_command(BuiltinCommands.CANCEL,
+                          lambda c: c.close_content_window(), 'content_window',
+                          False)
+
+  def __bind_config_keys(self, keys, binding_context=None):
+    for key in keys:
+      b = keys[key]
+
+      if isinstance(b, dict):
+        self.__bind_config_keys(b, key)
+      else:
+        logging.debug('binding key:{} to {} in context:{}'.format(
+            key, b, binding_context))
+        self.bind_key(key, b, binding_context)
 
   def bind_keys(self):
-    self.bind_key('Esc', 'close_content_window', 'content_window')
-    self.bind_key('Ctrl+P', BuiltinCommands.PREV_LINE)
-    self.bind_key('Ctrl+N', BuiltinCommands.NEXT_LINE)
-    self.bind_key('Ctrl+B', BuiltinCommands.PREV_CHAR)
-    self.bind_key('Ctrl+F', BuiltinCommands.NEXT_CHAR)
+    keys = self.config.get('/app/keys', {})
+
+    self.__bind_config_keys(keys)
 
   def run_command(self, cmd_name, cmd_callable=None, save_history=True):
     logging.debug('running command:{}'.format(cmd_name))

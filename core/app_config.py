@@ -2,6 +2,8 @@ import os
 import json
 import pathlib
 
+from .key_bindings import default_key_bindings
+
 
 class DictQuery(dict):
 
@@ -54,4 +56,12 @@ def load_config_from_string(data):
 
 
 def default_config():
-  return DictQuery({"app": {"font": {"family": "Monospace", "size": 14}}})
+  return DictQuery({
+      "app": {
+          "font": {
+              "family": "Monospace",
+              "size": 14
+          },
+          "keys": default_key_bindings()
+      }
+  })
