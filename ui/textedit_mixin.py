@@ -1,4 +1,7 @@
+import logging
+
 from PySide6.QtGui import QTextCursor
+from PySide6.QtWidgets import QAbstractSlider
 
 from core.builtin_commands import BuiltinCommands
 from .marker_mixin import MarkerMixin
@@ -75,4 +78,20 @@ class TextEditMixin(MarkerMixin):
     self.__page_up_down(ctx, False)
 
   def __page_up_down(self, ctx, pageDown):
-    pass
+    self.verticalScrollBar().triggerAction(
+        QAbstractSlider.SliderPageStepAdd if pageDown else QAbstractSlider.
+        SliderPageStepSub)
+    cursor = self.textCursor()
+    moved = cursor.movePosition(
+        QTextCursor.Down if pageDown else QTextCursor.Up,
+        QTextCursor.MoveAnchor
+        if not self.is_marker_active() else QTextCursor.KeepAnchor,
+        self.verticalScrollBar().pageStep())
+
+    logging.debug('cursor moved:{}, steps:{}'.format(
+        moved,
+        self.verticalScrollBar().pageStep()))
+
+    if moved:
+      self.setTextCursor(cursor)
+      self.ensureCursorVisible()
