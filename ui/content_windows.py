@@ -8,7 +8,9 @@ from fuzzywuzzy import fuzz
 from core.builtin_commands import BuiltinCommands
 from .marker_mixin import MarkerMixin
 
+
 class ContentWindowLineEdit(QLineEdit):
+
   def __init__(self, ctx, *args):
     super().__init__(*args)
 
@@ -20,6 +22,7 @@ class ContentWindowLineEdit(QLineEdit):
       return
 
     super().keyPressEvent(evt)
+
 
 class ContentWindow(QWidget, MarkerMixin):
 
@@ -49,14 +52,36 @@ class ContentWindow(QWidget, MarkerMixin):
   def register_commands(self):
     super().register_commands()
 
-    self.ctx_.hook_command(BuiltinCommands.PREV_CHAR,
-                           lambda ctx: self.text_edit_.cursorBackward(self.is_marker_active()),
-                           None,
+    self.ctx_.hook_command(
+        BuiltinCommands.PREV_CHAR,
+        lambda ctx: self.text_edit_.cursorBackward(self.is_marker_active()),
+        None, False)
+    self.ctx_.hook_command(
+        BuiltinCommands.NEXT_CHAR,
+        lambda ctx: self.text_edit_.cursorForward(self.is_marker_active()),
+        None, False)
+    self.ctx_.hook_command(
+        BuiltinCommands.END_OF_LINE,
+        lambda ctx: self.text_edit_.end(self.is_marker_active()), None, False)
+    self.ctx_.hook_command(
+        BuiltinCommands.START_OF_LINE,
+        lambda ctx: self.text_edit_.home(self.is_marker_active()), None, False)
+    self.ctx_.hook_command(
+        BuiltinCommands.PREV_WORD, lambda ctx: self.text_edit_.
+        cursorWordBackward(self.is_marker_active()), None, False)
+    self.ctx_.hook_command(
+        BuiltinCommands.NEXT_WORD,
+        lambda ctx: self.text_edit_.cursorWordForward(self.is_marker_active()),
+        None, False)
+    self.ctx_.hook_command(BuiltinCommands.SELECT_ALL,
+                           lambda ctx: self.text_edit_.selectAll(), None,
                            False)
-    self.ctx_.hook_command(BuiltinCommands.NEXT_CHAR,
-                           lambda ctx: self.text_edit_.cursorForward(self.is_marker_active()),
-                           None,
-                           False)
+    self.ctx_.hook_command(BuiltinCommands.PASTE,
+                           lambda ctx: self.text_edit_.paste(), None, False)
+    self.ctx_.hook_command(BuiltinCommands.COPY,
+                           lambda ctx: self.text_edit_.copy(), None, False)
+    self.ctx_.hook_command(BuiltinCommands.CUT,
+                           lambda ctx: self.text_edit_.cut(), None, False)
 
   def update_geometry(self):
     cr = self.parent_widget_.contentsRect()
@@ -97,10 +122,10 @@ class ListContentWindow(ContentWindow):
   def register_commands(self):
     super().register_commands()
 
-    self.ctx_.hook_command(BuiltinCommands.PREV_LINE, self.prev_command, 'list_content_window',
-                           False)
-    self.ctx_.hook_command(BuiltinCommands.NEXT_LINE, self.next_command, 'list_content_window',
-                           False)
+    self.ctx_.hook_command(BuiltinCommands.PREV_LINE, self.prev_command,
+                           'list_content_window', False)
+    self.ctx_.hook_command(BuiltinCommands.NEXT_LINE, self.next_command,
+                           'list_content_window', False)
 
   def bind_keys(self):
     pass
