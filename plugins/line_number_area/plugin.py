@@ -31,6 +31,7 @@ class LineNumberArea(QWidget):
         self.update_line_number_area_width)
     self.editor_.updateRequest[QRect,
                                int].connect(self.update_line_number_area)
+    self.update_line_number_area_width(0)
 
   def sizeHint(self):
     return QSize(self.line_number_area_width(), 0)
