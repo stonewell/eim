@@ -1,9 +1,12 @@
+import logging
+
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QTextCursor
 from PySide6.QtWidgets import QPlainTextEdit
 
 from core.builtin_commands import BuiltinCommands
 from .textedit_mixin import TextEditMixin
+
 
 class Editor(QPlainTextEdit, TextEditMixin):
 
@@ -39,3 +42,13 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
   def cursor_position(self):
     return self.textCursor().position
+
+  def move_cursor(self, op, mode):
+    self.moveCursor(op, mode)
+
+  def select_all(self):
+    self.selectAll()
+
+  def _page_up_down(self, ctx, pageDown):
+    logging.debug('editor page up down')
+    pass

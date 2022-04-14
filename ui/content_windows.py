@@ -3,10 +3,12 @@ import logging
 from PySide6.QtCore import Slot, Qt, QRect, QSize
 from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout
 from PySide6.QtWidgets import QListWidget
+from PySide6.QtGui import QTextCursor
+
 from fuzzywuzzy import fuzz
 
 from core.builtin_commands import BuiltinCommands
-from .marker_mixin import MarkerMixin
+from .textedit_mixin import TextEditMixin
 
 
 class ContentWindowLineEdit(QLineEdit):
@@ -24,11 +26,11 @@ class ContentWindowLineEdit(QLineEdit):
     super().keyPressEvent(evt)
 
 
-class ContentWindow(QWidget, MarkerMixin):
+class ContentWindow(QWidget, TextEditMixin):
 
   def __init__(self, content_widget, ctx, parent=None):
     QWidget.__init__(self, parent)
-    MarkerMixin.__init__(self)
+    TextEditMixin.__init__(self)
 
     self.parent_widget_ = parent
     self.ctx_ = ctx
@@ -49,39 +51,37 @@ class ContentWindow(QWidget, MarkerMixin):
   def cursor_position(self):
     return self.text_edit_.cursorPosition()
 
+  def move_cursor(self, op, mode):
+    if op == QTextCursor.Left:
+      self.text_edit_.cursorBackward(self.is_marker_active())
+    elif op == QTextCursor.Right:
+      self.text_edit_.cursorForward(self.is_marker_active())
+    elif op == QTextCursor.EndOfLine:
+      self.text_edit_.end(self.is_marker_active())
+    elif op == QTextCursor.StartOfLine:
+      self.text_edit_.home(self.is_marker_active())
+    elif op == QTextCursor.PreviousWord:
+      self.text_edit_.cursorWordBackward(self.is_marker_active())
+    elif op == QTextCursor.NextWord:
+      self.text_edit_.cursorWordForward(self.is_marker_active())
+    else:
+      logging.debug('content window ignore cursor op:{}, mode:{}'.format(
+          op, mode))
+
+  def select_all(self):
+    self.text_edit_.selectAll()
+
+  def paste(self):
+    self.text_edit_.paste()
+
+  def copy(self):
+    self.text_edit_.copy()
+
+  def cut(self):
+    self.text_edit_.cut()
+
   def register_commands(self):
     super().register_commands()
-
-    self.ctx_.hook_command(
-        BuiltinCommands.PREV_CHAR,
-        lambda ctx: self.text_edit_.cursorBackward(self.is_marker_active()),
-        None, False)
-    self.ctx_.hook_command(
-        BuiltinCommands.NEXT_CHAR,
-        lambda ctx: self.text_edit_.cursorForward(self.is_marker_active()),
-        None, False)
-    self.ctx_.hook_command(
-        BuiltinCommands.END_OF_LINE,
-        lambda ctx: self.text_edit_.end(self.is_marker_active()), None, False)
-    self.ctx_.hook_command(
-        BuiltinCommands.START_OF_LINE,
-        lambda ctx: self.text_edit_.home(self.is_marker_active()), None, False)
-    self.ctx_.hook_command(
-        BuiltinCommands.PREV_WORD, lambda ctx: self.text_edit_.
-        cursorWordBackward(self.is_marker_active()), None, False)
-    self.ctx_.hook_command(
-        BuiltinCommands.NEXT_WORD,
-        lambda ctx: self.text_edit_.cursorWordForward(self.is_marker_active()),
-        None, False)
-    self.ctx_.hook_command(BuiltinCommands.SELECT_ALL,
-                           lambda ctx: self.text_edit_.selectAll(), None,
-                           False)
-    self.ctx_.hook_command(BuiltinCommands.PASTE,
-                           lambda ctx: self.text_edit_.paste(), None, False)
-    self.ctx_.hook_command(BuiltinCommands.COPY,
-                           lambda ctx: self.text_edit_.copy(), None, False)
-    self.ctx_.hook_command(BuiltinCommands.CUT,
-                           lambda ctx: self.text_edit_.cut(), None, False)
 
   def update_geometry(self):
     cr = self.parent_widget_.contentsRect()
@@ -100,6 +100,9 @@ class ContentWindow(QWidget, MarkerMixin):
     super().close()
 
     self.ctx_.switch_behavior_context()
+
+  def _page_up_down(self, ctx, pageDown):
+    logging.debug('content window ignore page up down')
 
 
 class ListContentWindow(ContentWindow):
