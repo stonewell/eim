@@ -39,3 +39,4 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
   def cursor_position(self):
     return self.textCursor().position
+

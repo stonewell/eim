@@ -1,0 +1,35 @@
+import logging
+
+from pathlib import Path
+
+
+class EditorBuffer(object):
+
+  def __init__(self, ctx, name=None):
+    self.file_path_ = None
+    self.name_ = None
+    self.ctx_ = ctx
+    self.document_ = self.ctx_.create_document('')
+
+  def load_file(self, file_path):
+    if not isinstance(file_path, Path):
+      file_path = Path(file_path)
+
+    with file_path.open(encoding='utf-8') as f:
+      content = f.read()
+
+      self.file_path_ = file_path
+
+      self.document_ = self.ctx_.create_document(content)
+
+  def is_empty_buffer(self):
+    return self.file_path_ is None
+
+  def name(self):
+    if self.name_ is not None:
+       return self.name_
+
+    if self.is_empty_buffer():
+      return 'Untitiled'
+
+    return self.file_path_.name()

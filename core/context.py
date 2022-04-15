@@ -10,6 +10,7 @@ from yapsy.PluginManager import PluginManager
 from .app_config import default_config, load_config
 from .behavior_context import BehaviorContext
 from .builtin_commands import BuiltinCommands
+from .buffer import EditorBuffer
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -36,6 +37,8 @@ class EditorContext(object):
     self.ui_key_bindings_ = {}
     self.current_behavior_context_ = self.global_behavior_context_
     self.command_history_ = []
+    self.current_buffer_ = EditorBuffer(self)
+    self.buffers_ = [self.current_buffer_]
 
     self.validate_args(args)
 
@@ -330,3 +333,37 @@ class EditorContext(object):
     else:
       self.get_behavior_context(binding_context).hook_command(
           cmd_name, cmd_or_callable, save_history)
+
+  def create_document(self, content):
+    return self.ui_helper.load_document(content)
+
+  def load_buffer(self, file_path):
+    if not self.current_buffer_.is_empty_buffer():
+      buffer = EditorBuffer(self)
+    else:
+      buffer = self.current_buffer_
+
+    buffer.load_file(file_path)
+
+    self.__set_current_buffer(buffer)
+
+  def __set_current_buffer(self, buffer):
+    self.buffers_.insert(0, buffer)
+    self.current_buffer_ = buffer
+
+    self.ui_helepr.update_document(self.current_buffer_, True)
+
+  def switch_to_buffer(self, buf_name):
+    for buf in self.buffers_:
+      if buf_name == buf.name():
+        self.ui_helepr.update_document(self.current_buffer_, False)
+        self.current_buffer_ = buf
+        self.ui_helepr.update_document(self.current_buffer_, True)
+        return
+
+    buf = EditorBuffer(self, buf_name)
+
+    self.__set_current_buffer(buf)
+
+  def buffer_names(self):
+    return [buf.name() for buf in self.buffers_]
