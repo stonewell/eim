@@ -113,6 +113,8 @@ class ListContentWindow(ContentWindow):
     cc = self.ctx_.get_behavior_context('content_window')
     lc = self.ctx_.get_behavior_context('list_content_window', cc)
 
+    self.need_update_text_ = False
+
     self.register_commands()
     self.bind_keys()
 
@@ -125,22 +127,26 @@ class ListContentWindow(ContentWindow):
   def register_commands(self):
     super().register_commands()
 
-    self.ctx_.hook_command(BuiltinCommands.PREV_LINE, self.prev_command,
+    self.ctx_.hook_command(BuiltinCommands.PREV_LINE, self.prev_item,
                            'list_content_window', False)
-    self.ctx_.hook_command(BuiltinCommands.NEXT_LINE, self.next_command,
+    self.ctx_.hook_command(BuiltinCommands.NEXT_LINE, self.next_item,
                            'list_content_window', False)
 
   def bind_keys(self):
     pass
 
-  def prev_command(self, ctx):
+  def prev_item(self, ctx):
+    self.need_update_text_ = True
+
     count = self.content_widget_.count()
     cur_row = self.content_widget_.currentRow()
 
     if cur_row - 1 >= 0:
       self.content_widget_.setCurrentRow(cur_row - 1)
 
-  def next_command(self, ctx):
+  def next_item(self, ctx):
+    self.need_update_text_ = True
+
     count = self.content_widget_.count()
     cur_row = self.content_widget_.currentRow()
 
@@ -148,12 +154,45 @@ class ListContentWindow(ContentWindow):
       self.content_widget_.setCurrentRow(cur_row + 1)
 
   def item_selection_changed(self):
-    self.text_edit_.setText(self.content_widget_.currentItem().text())
+    if self.need_update_text_:
+      self.text_edit_.setText(self.content_widget_.currentItem().text())
+
+  def __get_new_lt(self, item):
+
+    def new_lt(other):
+      if item.ratio_ == other.ratio_:
+        return item.old_lt_(other)
+
+      return item.ratio_ > other.ratio_
+
+    return new_lt
 
   def on_text_edited(self, txt):
     for row in range(self.content_widget_.count()):
       item = self.content_widget_.item(row)
-      ratio = fuzz.partial_ratio(txt, item.text())
+      ratio = fuzz.ratio(txt, item.text())
+
+      item.ratio_ = ratio if len(txt) > 0 else 0
+      if not hasattr(item, 'old_lt_'):
+        item.old_lt_ = item.__lt__
+
+      item.__lt__ = self.__get_new_lt(item)
 
       logging.debug('ratio:{} for {} -> {}'.format(ratio, txt, item.text()))
-      item.setHidden(ratio <= 30 and len(txt) > 0)
+      item.setHidden(ratio == 0 and len(txt) > 0)
+
+    self.content_widget_.sortItems()
+    self.need_update_text_ = False
+
+    self.select_first_visible_item()
+
+  def select_first_visible_item(self):
+    try:
+      for row in range(self.content_widget_.count()):
+        item = self.content_widget_.item(row)
+
+        if not item.isHidden():
+          self.content_widget_.setCurrentItem(item)
+          break
+    except:
+      logging.exception('set current item failed')

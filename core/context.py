@@ -330,3 +330,6 @@ class EditorContext(object):
     else:
       self.get_behavior_context(binding_context).hook_command(
           cmd_name, cmd_or_callable, save_history)
+
+  def get_current_buffer_dir(self):
+    return pathlib.Path('.')

@@ -35,17 +35,15 @@ class Plugin(IPlugin):
     for cmd in self.commands_:
       self.list_items_.append(QListWidgetItem(cmd, l))
 
-    if len(self.commands_) > 0:
-      l.setCurrentItem(self.list_items_[0])
-
     t.returnPressed.connect(self.execute_command)
     l.itemDoubleClicked[QListWidgetItem].connect(self.execute_command)
+
+    self.content_window_.select_first_visible_item()
+
     cw.show()
 
   def execute_command(self):
-    cmd = self.list_widget_.currentItem().text()
-
-    self.ctx.run_command(cmd)
+    self.item_double_clicked(self.list_widget_.currentItem())
 
   def item_double_clicked(self, item):
     self.ctx.run_command(item.text())
