@@ -59,7 +59,6 @@ def default_config():
   return DictQuery({
       "app": {
           "font": {
-              "family": "Monospace",
               "size": 14
           },
           "keys": default_key_bindings()
