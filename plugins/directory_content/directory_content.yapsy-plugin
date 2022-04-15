@@ -1,0 +1,6 @@
+[Core]
+Name = Directory Content
+Module = plugin.py
+
+[Documentation]
+Version = 0.1
