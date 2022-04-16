@@ -1,8 +1,8 @@
 import os
 import logging
 
-from PySide6.QtGui import QFont, QKeySequence, QShortcut
-from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument
+from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
 from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt
 
 from .content_windows import ListContentWindow
@@ -70,3 +70,15 @@ class UIHelper(QObject):
 
   def focus_editor(self):
     self.editor_.setFocus(Qt.ActiveWindowFocusReason)
+
+  def create_document(self, content):
+    doc = QTextDocument(content)
+    layout = QPlainTextDocumentLayout(doc)
+
+    return doc
+
+  def update_document(self, buffer, load_doc):
+    if load_doc:
+      self.editor_.setDocument(buffer.document_)
+    else:
+      buffer.document_ = self.editor_.document()
