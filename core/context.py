@@ -341,6 +341,11 @@ class EditorContext(object):
     return self.ui_helper.create_document(content)
 
   def load_buffer(self, file_path):
+    for buf in self.buffers_:
+      if file_path == buf.file_path_:
+        self.__set_current_buffer(buf)
+        return
+
     buffer = EditorBuffer(self)
 
     buffer.load_file(file_path)
