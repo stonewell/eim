@@ -335,7 +335,10 @@ class EditorContext(object):
           cmd_name, cmd_or_callable, save_history)
 
   def get_current_buffer_dir(self):
-    return pathlib.Path('.')
+    if self.current_buffer_ is None or self.current_buffer_.file_path_ is None:
+      return pathlib.Path('.')
+
+    return self.current_buffer_.file_path_.parent
 
   def create_document(self, content):
     return self.ui_helper.create_document(content)
@@ -353,6 +356,11 @@ class EditorContext(object):
     self.__set_current_buffer(buffer)
 
   def __set_current_buffer(self, buffer):
+    try:
+      self.buffers_.remove(buffer)
+    except:
+      pass
+
     self.buffers_.insert(0, buffer)
     self.current_buffer_ = buffer
 
@@ -360,8 +368,9 @@ class EditorContext(object):
 
   def switch_to_buffer(self, buf_name):
     for buf in self.buffers_:
+      logging.debug('switch buf:{} -> {}'.format(buf_name, buf.name()))
+
       if buf_name == buf.name():
-        self.ui_helper.update_document(self.current_buffer_, False)
         self.current_buffer_ = buf
         self.ui_helper.update_document(self.current_buffer_, True)
         return

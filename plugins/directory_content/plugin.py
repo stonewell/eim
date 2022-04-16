@@ -33,34 +33,39 @@ class Plugin(IPlugin):
 
     self.ctx.register_command(BuiltinCommands.OPEN, self.show, None, False)
 
-  def show(self, ctx, dir=None):
+  def show(self, ctx):
     self.content_window_ = cw = ctx.create_list_content_window()
 
-    self.list_widget_ = l = cw.content_widget_
-    self.text_edit_ = t = cw.text_edit_
+    self.list_widget_ = cw.content_widget_
+    self.text_edit_ = cw.text_edit_
 
+    self.text_edit_.returnPressed.connect(self.execute_command)
+    self.list_widget_.itemDoubleClicked[QListWidgetItem].connect(self.execute_command)
+
+    self.__load_dir_content()
+
+    cw.show()
+
+  def __load_dir_content(self, dir=None):
     self.list_items_ = []
+    self.list_widget_.clear()
 
     if dir is None:
-      dir = ctx.get_current_buffer_dir()
+      dir = self.ctx.get_current_buffer_dir()
 
-    for item in self.list_directory(dir):
+    for item in self.__list_directory(dir):
       if item.is_dir():
         icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
       else:
         icon = self.content_window_.style().standardIcon(QStyle.SP_FileIcon)
 
-      self.list_items_.append(DirectoryContentItem(item, icon, item.name, l))
+      self.list_items_.append(DirectoryContentItem(item, icon, item.name, self.list_widget_))
 
-    t.returnPressed.connect(self.execute_command)
-    l.itemDoubleClicked[QListWidgetItem].connect(self.execute_command)
-    l.sortItems()
+    self.list_widget_.sortItems()
 
     self.content_window_.select_first_visible_item()
 
-    cw.show()
-
-  def list_directory(self, dir):
+  def __list_directory(self, dir):
     return dir.iterdir()
 
   def execute_command(self):
@@ -68,7 +73,8 @@ class Plugin(IPlugin):
 
   def item_double_clicked(self, item):
     if item.item_.is_dir():
-      pass
+      self.__load_dir_content(item.item_)
     else:
       #load file
-      pass
+      self.ctx.load_buffer(item.item_)
+      self.ctx.close_content_window()

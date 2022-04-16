@@ -29,4 +29,4 @@ class EditorBuffer(object):
     if self.file_path_ is None:
       return 'Untitiled'
 
-    return self.file_path_.name()
+    return self.file_path_.name
