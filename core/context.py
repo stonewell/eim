@@ -341,10 +341,7 @@ class EditorContext(object):
     return self.ui_helper.create_document(content)
 
   def load_buffer(self, file_path):
-    if not self.current_buffer_.is_empty_buffer():
-      buffer = EditorBuffer(self)
-    else:
-      buffer = self.current_buffer_
+    buffer = EditorBuffer(self)
 
     buffer.load_file(file_path)
 

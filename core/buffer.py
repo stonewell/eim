@@ -22,14 +22,11 @@ class EditorBuffer(object):
 
       self.document_ = self.ctx_.create_document(content)
 
-  def is_empty_buffer(self):
-    return self.file_path_ is None
-
   def name(self):
     if self.name_ is not None:
        return self.name_
 
-    if self.is_empty_buffer():
+    if self.file_path_ is None:
       return 'Untitiled'
 
     return self.file_path_.name()
