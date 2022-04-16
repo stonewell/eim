@@ -1,7 +1,6 @@
 import logging
 
 from PySide6.QtGui import QTextCursor
-from PySide6.QtWidgets import QAbstractSlider
 
 from core.builtin_commands import BuiltinCommands
 from .marker_mixin import MarkerMixin

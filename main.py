@@ -35,6 +35,7 @@ if __name__ == "__main__":
   ctx.init_commands_and_key_bindings()
 
   ctx.switch_behavior_context()
+  ctx.switch_to_buffer('Untitled')
 
   editor.bind_keys()
   editor.show()

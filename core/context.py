@@ -37,8 +37,8 @@ class EditorContext(object):
     self.ui_key_bindings_ = {}
     self.current_behavior_context_ = self.global_behavior_context_
     self.command_history_ = []
-    self.current_buffer_ = EditorBuffer(self)
-    self.buffers_ = [self.current_buffer_]
+    self.current_buffer_ = None
+    self.buffers_ = []
 
     self.validate_args(args)
 
@@ -338,7 +338,7 @@ class EditorContext(object):
     return pathlib.Path('.')
 
   def create_document(self, content):
-    return self.ui_helper.load_document(content)
+    return self.ui_helper.create_document(content)
 
   def load_buffer(self, file_path):
     if not self.current_buffer_.is_empty_buffer():
@@ -354,14 +354,14 @@ class EditorContext(object):
     self.buffers_.insert(0, buffer)
     self.current_buffer_ = buffer
 
-    self.ui_helepr.update_document(self.current_buffer_, True)
+    self.ui_helper.update_document(self.current_buffer_, True)
 
   def switch_to_buffer(self, buf_name):
     for buf in self.buffers_:
       if buf_name == buf.name():
-        self.ui_helepr.update_document(self.current_buffer_, False)
+        self.ui_helper.update_document(self.current_buffer_, False)
         self.current_buffer_ = buf
-        self.ui_helepr.update_document(self.current_buffer_, True)
+        self.ui_helper.update_document(self.current_buffer_, True)
         return
 
     buf = EditorBuffer(self, buf_name)

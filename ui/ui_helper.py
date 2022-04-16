@@ -74,6 +74,7 @@ class UIHelper(QObject):
   def create_document(self, content):
     doc = QTextDocument(content)
     layout = QPlainTextDocumentLayout(doc)
+    doc.setDocumentLayout(layout)
 
     return doc
 

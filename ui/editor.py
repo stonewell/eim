@@ -3,6 +3,7 @@ import logging
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QTextCursor
 from PySide6.QtWidgets import QPlainTextEdit
+from PySide6.QtWidgets import QAbstractSlider
 
 from core.builtin_commands import BuiltinCommands
 from .textedit_mixin import TextEditMixin
