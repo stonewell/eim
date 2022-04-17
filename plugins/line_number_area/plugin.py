@@ -98,3 +98,4 @@ class LineNumberArea(QWidget):
 
     if current_geometry != rect:
       self.setGeometry(rect)
+      self.update_line_number_area_width(0)

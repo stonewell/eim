@@ -167,10 +167,13 @@ class ListContentWindow(ContentWindow):
 
     return new_lt
 
+  def item_match_text_ratio(self, item, text):
+    return fuzz.ratio(text, item.text())
+
   def on_text_edited(self, txt):
     for row in range(self.content_widget_.count()):
       item = self.content_widget_.item(row)
-      ratio = fuzz.ratio(txt, item.text())
+      ratio = self.item_match_text_ratio(item, txt)
 
       item.ratio_ = ratio if len(txt) > 0 else 0
       if not hasattr(item, 'old_lt_'):

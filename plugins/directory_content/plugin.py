@@ -36,6 +36,13 @@ class Plugin(IPlugin):
   def show(self, ctx):
     self.content_window_ = cw = ctx.create_list_content_window()
 
+    def item_text_match(item, text):
+      if item.text().find(text) >= 0:
+        return 1
+      else:
+        return 0
+    self.content_window_.item_match_text_ratio = item_text_match
+
     self.list_widget_ = cw.content_widget_
     self.text_edit_ = cw.text_edit_
 
@@ -53,6 +60,17 @@ class Plugin(IPlugin):
     if dir is None:
       dir = self.ctx.get_current_buffer_dir()
 
+    self.current_list_dir_ = dir
+
+    # add special folder . and ..
+    for name, order in [('.', -2), ('..', -1)]:
+      item = dir / name
+      icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
+      l_item = DirectoryContentItem(item, icon, name, self.list_widget_)
+      l_item.order_ = order
+
+      self.list_items_.append(l_item)
+
     for item in self.__list_directory(dir):
       if item.is_dir():
         icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
@@ -69,12 +87,22 @@ class Plugin(IPlugin):
     return dir.iterdir()
 
   def execute_command(self):
-    self.item_double_clicked(self.list_widget_.currentItem())
+    if len(self.text_edit_.text()):
+      selectItem = self.current_list_dir_ / self.text_edit_.text()
+
+      if not selectItem.exists():
+        selectItem.write_text('')
+      self.__load_path(selectItem)
+    else:
+      self.item_double_clicked(self.list_widget_.currentItem())
 
   def item_double_clicked(self, item):
-    if item.item_.is_dir():
-      self.__load_dir_content(item.item_)
+    self.__load_path(item.item_)
+
+  def __load_path(self, path_item):
+    if path_item.is_dir():
+      self.__load_dir_content(path_item)
     else:
       #load file
-      self.ctx.load_buffer(item.item_)
+      self.ctx.load_buffer(path_item)
       self.ctx.close_content_window()
