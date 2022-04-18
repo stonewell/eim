@@ -1,7 +1,7 @@
 import logging
 
 from PySide6.QtCore import Slot, Qt, QRect, QSize
-from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QListWidgetItem
 from PySide6.QtWidgets import QListWidget
 from PySide6.QtGui import QTextCursor
 
@@ -120,9 +120,16 @@ class ListContentWindow(ContentWindow):
 
     self.ctx_.switch_behavior_context('list_content_window')
 
+    self.text_edit_delegate_ = None
+
     self.content_widget_.itemSelectionChanged.connect(
         self.item_selection_changed)
     self.text_edit_.textEdited[str].connect(self.on_text_edited)
+    self.text_edit_.returnPressed.connect(self.execute_command)
+    self.content_widget_.itemDoubleClicked[QListWidgetItem].connect(self.execute_command)
+
+  def execute_command(self):
+    self.need_update_text_ = True
 
   def register_commands(self):
     super().register_commands()
@@ -141,8 +148,17 @@ class ListContentWindow(ContentWindow):
     count = self.content_widget_.count()
     cur_row = self.content_widget_.currentRow()
 
-    if cur_row - 1 >= 0:
-      self.content_widget_.setCurrentRow(cur_row - 1)
+    for row in range(cur_row - 1, -1, -1):
+      item = self.content_widget_.item(row)
+      if not item.isHidden():
+        self.content_widget_.setCurrentRow(row)
+        break
+
+    for row in range(count - 1, cur_row - 1, -1):
+      item = self.content_widget_.item(row)
+      if not item.isHidden():
+        self.content_widget_.setCurrentRow(row)
+        break
 
   def next_item(self, ctx):
     self.need_update_text_ = True
@@ -150,12 +166,26 @@ class ListContentWindow(ContentWindow):
     count = self.content_widget_.count()
     cur_row = self.content_widget_.currentRow()
 
-    if cur_row + 1 < count:
-      self.content_widget_.setCurrentRow(cur_row + 1)
+    for row in range(cur_row + 1, count):
+      item = self.content_widget_.item(row)
+      if not item.isHidden():
+        self.content_widget_.setCurrentRow(row)
+        return
+
+    for row in range(0, cur_row + 1):
+      item = self.content_widget_.item(row)
+      if not item.isHidden():
+        self.content_widget_.setCurrentRow(row)
+        return
 
   def item_selection_changed(self):
     if self.need_update_text_:
-      self.text_edit_.setText(self.content_widget_.currentItem().text())
+      if self.text_edit_delegate_ is not None:
+        txt = self.text_edit_delegate_.get_item_text(self.content_widget_.currentItem())
+      else:
+        txt = self.content_widget_.currentItem().text()
+
+      self.text_edit_.setText(txt)
 
   def __get_new_lt(self, item):
 
@@ -188,6 +218,9 @@ class ListContentWindow(ContentWindow):
     self.need_update_text_ = False
 
     self.select_first_visible_item()
+
+    if self.text_edit_delegate_ is not None:
+      self.text_edit_delegate_.on_text_edited(txt)
 
   def select_first_visible_item(self):
     try:
