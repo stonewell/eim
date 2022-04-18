@@ -120,7 +120,7 @@ class ListContentWindow(ContentWindow):
 
     self.ctx_.switch_behavior_context('list_content_window')
 
-    self.text_edit_delegate_ = None
+    self.list_window_delegate_ = None
 
     self.content_widget_.itemSelectionChanged.connect(
         self.item_selection_changed)
@@ -152,13 +152,13 @@ class ListContentWindow(ContentWindow):
       item = self.content_widget_.item(row)
       if not item.isHidden():
         self.content_widget_.setCurrentRow(row)
-        break
+        return
 
     for row in range(count - 1, cur_row - 1, -1):
       item = self.content_widget_.item(row)
       if not item.isHidden():
         self.content_widget_.setCurrentRow(row)
-        break
+        return
 
   def next_item(self, ctx):
     self.need_update_text_ = True
@@ -180,8 +180,8 @@ class ListContentWindow(ContentWindow):
 
   def item_selection_changed(self):
     if self.need_update_text_:
-      if self.text_edit_delegate_ is not None:
-        txt = self.text_edit_delegate_.get_item_text(self.content_widget_.currentItem())
+      if self.list_window_delegate_ is not None:
+        txt = self.list_window_delegate_.get_item_text(self.content_widget_.currentItem())
       else:
         txt = self.content_widget_.currentItem().text()
 
@@ -201,6 +201,8 @@ class ListContentWindow(ContentWindow):
     return fuzz.ratio(text, item.text())
 
   def on_text_edited(self, txt):
+    self.__remove_mock_item()
+
     for row in range(self.content_widget_.count()):
       item = self.content_widget_.item(row)
       ratio = self.item_match_text_ratio(item, txt)
@@ -219,8 +221,12 @@ class ListContentWindow(ContentWindow):
 
     self.select_first_visible_item()
 
-    if self.text_edit_delegate_ is not None:
-      self.text_edit_delegate_.on_text_edited(txt)
+    if self.list_window_delegate_ is not None:
+      if not self.list_window_delegate_.should_add_mock_item(txt):
+        return
+
+      logging.debug('add mock item for:{}'.format(txt))
+      self.__add_mock_item(txt)
 
   def select_first_visible_item(self):
     try:
@@ -232,3 +238,43 @@ class ListContentWindow(ContentWindow):
           break
     except:
       logging.exception('set current item failed')
+
+  def __add_mock_item(self, txt):
+    try:
+      for row in range(self.content_widget_.count()):
+        item = self.content_widget_.item(row)
+
+        if txt == item.item_.name:
+          logging.debug('find {} in items, do nothing'.format(txt))
+          return
+
+      self.list_window_delegate_.create_mock_item(txt)
+
+      self.content_widget_.sortItems()
+
+      if not self.__has_non_mock_item_visible():
+        self.content_widget_.setCurrentItem(item)
+    except:
+      logging.exception('add mock item error')
+
+  def __remove_mock_item(self):
+    try:
+      for row in range(self.content_widget_.count()):
+        item = self.content_widget_.item(row)
+
+        if hasattr(item, 'mock_'):
+          self.content_widget_.takeItem(row)
+    except:
+      logging.exception('remove mock item failed')
+
+  def __has_non_mock_item_visible(self):
+    try:
+      for row in range(self.content_widget_.count()):
+        item = self.content_widget_.item(row)
+
+        if not hasattr(item, 'mock_') and not item.isHidden():
+          return True
+    except:
+      logging.exception('has_non_mock_item_visible failed')
+
+    return False
