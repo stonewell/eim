@@ -1,3 +1,4 @@
+import traceback
 import logging
 
 from PySide6.QtCore import Slot, Qt, QRect, QSize
@@ -178,43 +179,54 @@ class ListContentWindow(ContentWindow):
         self.content_widget_.setCurrentRow(row)
         return
 
+  def __get_item_text(self, item):
+    if self.list_window_delegate_ is not None:
+      txt = self.list_window_delegate_.get_item_text(item)
+    else:
+      txt = item.text()
+
+    return txt
+
   def item_selection_changed(self):
     if self.need_update_text_:
-      if self.list_window_delegate_ is not None:
-        txt = self.list_window_delegate_.get_item_text(self.content_widget_.currentItem())
-      else:
-        txt = self.content_widget_.currentItem().text()
-
+      txt = self.__get_item_text(self.content_widget_.currentItem())
       self.text_edit_.setText(txt)
 
   def __get_new_lt(self, item):
 
     def new_lt(other):
       if item.ratio_ == other.ratio_:
-        return item.old_lt_(other)
+        if hasattr(item, 'custom_lt'):
+          return item.custom_lt(other)
+        return self.__get_item_text(item) < self.__get_item_text(other)
 
       return item.ratio_ > other.ratio_
 
     return new_lt
 
   def item_match_text_ratio(self, item, text):
-    return fuzz.ratio(text, item.text())
+    if self.list_window_delegate_ is not None:
+      item_text = self.list_window_delegate_.get_item_text(item)
+    else:
+      item_text = item.text()
+
+    return fuzz.ratio(text, item_text)
+
+  def __update_match_ratio(self, item, txt):
+    ratio = self.item_match_text_ratio(item, txt)
+
+    item.ratio_ = ratio if len(txt) > 0 else 0
+    item.__lt__ = self.__get_new_lt(item)
+
+    logging.debug('ratio:{} for {} -> {}'.format(ratio, txt, item.text()))
+    item.setHidden(ratio == 0 and len(txt) > 0)
 
   def on_text_edited(self, txt):
     self.__remove_mock_item()
 
     for row in range(self.content_widget_.count()):
       item = self.content_widget_.item(row)
-      ratio = self.item_match_text_ratio(item, txt)
-
-      item.ratio_ = ratio if len(txt) > 0 else 0
-      if not hasattr(item, 'old_lt_'):
-        item.old_lt_ = item.__lt__
-
-      item.__lt__ = self.__get_new_lt(item)
-
-      logging.debug('ratio:{} for {} -> {}'.format(ratio, txt, item.text()))
-      item.setHidden(ratio == 0 and len(txt) > 0)
+      self.__update_match_ratio(item, txt)
 
     self.content_widget_.sortItems()
     self.need_update_text_ = False
@@ -244,16 +256,17 @@ class ListContentWindow(ContentWindow):
       for row in range(self.content_widget_.count()):
         item = self.content_widget_.item(row)
 
-        if txt == item.item_.name:
+        if txt == self.list_window_delegate_.get_item_text(item):
           logging.debug('find {} in items, do nothing'.format(txt))
           return
 
-      self.list_window_delegate_.create_mock_item(txt)
+      mock_item = self.list_window_delegate_.create_mock_item(txt)
+      self.__update_match_ratio(mock_item, txt)
 
       self.content_widget_.sortItems()
 
       if not self.__has_non_mock_item_visible():
-        self.content_widget_.setCurrentItem(item)
+        self.content_widget_.setCurrentItem(mock_item)
     except:
       logging.exception('add mock item error')
 

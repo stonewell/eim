@@ -15,11 +15,14 @@ class DirectoryContentItem(QListWidgetItem):
     except:
       pass
 
-  def __lt__(self, other):
+  def custom_lt(self, other):
     if self.order_ == other.order_:
       return self.item_.name < other.item_.name
 
     return self.order_ < other.order_
+
+  def __lt__(self, other):
+    return self.custom_lt(other)
 
 class Plugin(IPlugin):
 

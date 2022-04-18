@@ -7,7 +7,7 @@ class EditorBuffer(object):
 
   def __init__(self, ctx, name=None):
     self.file_path_ = None
-    self.name_ = None
+    self.name_ = name
     self.ctx_ = ctx
     self.document_ = self.ctx_.create_document('')
 

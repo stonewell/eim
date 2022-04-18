@@ -26,6 +26,7 @@ class Plugin(IPlugin):
     buf_names = ctx.buffer_names()
 
     self.content_window_ = cw = ctx.create_list_content_window()
+    self.content_window_.list_window_delegate_ = self
 
     self.list_widget_ = l = cw.content_widget_
     self.text_edit_ = t = cw.text_edit_
@@ -33,7 +34,9 @@ class Plugin(IPlugin):
     self.list_items_ = []
 
     for name in buf_names:
-      self.list_items_.append(QListWidgetItem(name, l))
+      item = QListWidgetItem(name, l)
+      item.custom_lt = self.__get_item_custom_lt(item)
+      self.list_items_.append(item)
 
     t.returnPressed.connect(self.execute_command)
     l.itemDoubleClicked[QListWidgetItem].connect(self.execute_command)
@@ -43,13 +46,38 @@ class Plugin(IPlugin):
     cw.show()
 
   def execute_command(self):
-    if len(self.text_edit_.text()) == 0:
-      self.item_double_clicked(self.list_widget_.currentItem())
-      return
-
-    self.ctx.switch_to_buffer(self.text_edit_.text())
-    self.ctx.close_content_window()
+    self.item_double_clicked(self.list_widget_.currentItem())
 
   def item_double_clicked(self, item):
-    self.ctx.switch_to_buffer(item.text())
+    if hasattr(item, 'mock_'):
+      newBuf = item.mock_name_
+    else:
+      newBuf = item.text()
+
+    self.ctx.switch_to_buffer(newBuf)
     self.ctx.close_content_window()
+
+  def on_text_edited(self, txt):
+    pass
+
+  def should_add_mock_item(self, txt):
+    return len(txt) > 0
+
+  def get_item_text(self, item):
+    if hasattr(item, 'mock_'):
+      return item.mock_name_
+
+    return item.text()
+
+  def create_mock_item(self, txt):
+    item = QListWidgetItem('[?] {}'.format(txt), self.list_widget_)
+    item.mock_ = True
+    item.mock_name_ = txt
+    item.custom_lt = self.__get_item_custom_lt(item)
+
+    self.list_items_.append(item)
+
+    return item
+
+  def __get_item_custom_lt(self, item):
+    return lambda other: self.get_item_text(item) < self.get_item_text(other)
