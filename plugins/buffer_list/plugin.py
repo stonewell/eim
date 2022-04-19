@@ -58,7 +58,7 @@ class Plugin(IPlugin):
     self.ctx.close_content_window()
 
   def on_text_edited(self, txt):
-    pass
+    return False
 
   def should_add_mock_item(self, txt):
     return len(txt) > 0

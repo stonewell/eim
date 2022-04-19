@@ -29,7 +29,7 @@ class EditorBuffer(object):
 
       self.document_ = self.ctx_.create_document(content)
 
-  def save_file(self, file_path = None):
+  def save_file(self, file_path=None):
     if file_path is None and self.file_path_ is None:
       file_path = self.ctx_.ask_for_file_path()
     elif file_path is None:
@@ -43,10 +43,9 @@ class EditorBuffer(object):
 
     file_path.write_text(self.ctx_.get_document_content(self.document_))
 
-
   def name(self):
     if self.name_ is not None:
-       return self.name_
+      return self.name_
 
     if self.file_path_ is None:
       return 'Untitiled'

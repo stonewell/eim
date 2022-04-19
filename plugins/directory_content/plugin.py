@@ -7,6 +7,7 @@ from core.builtin_commands import BuiltinCommands
 
 
 class DirectoryContentItem(QListWidgetItem):
+
   def __init__(self, item, *args):
     QListWidgetItem.__init__(self, *args)
     self.item_ = item
@@ -23,6 +24,7 @@ class DirectoryContentItem(QListWidgetItem):
 
   def __lt__(self, other):
     return self.custom_lt(other)
+
 
 class Plugin(IPlugin):
 
@@ -57,7 +59,8 @@ class Plugin(IPlugin):
     self.text_edit_ = cw.text_edit_
 
     self.text_edit_.returnPressed.connect(self.execute_command)
-    self.list_widget_.itemDoubleClicked[QListWidgetItem].connect(self.execute_command)
+    self.list_widget_.itemDoubleClicked[QListWidgetItem].connect(
+        self.execute_command)
 
     self.__load_dir_content()
 
@@ -87,7 +90,8 @@ class Plugin(IPlugin):
       else:
         icon = self.content_window_.style().standardIcon(QStyle.SP_FileIcon)
 
-      self.list_items_.append(DirectoryContentItem(item, icon, item.name, self.list_widget_))
+      self.list_items_.append(
+          DirectoryContentItem(item, icon, item.name, self.list_widget_))
 
     self.list_widget_.sortItems()
 
@@ -116,7 +120,7 @@ class Plugin(IPlugin):
       self.ctx.close_content_window()
 
   def on_text_edited(self, txt):
-    pass
+    return False
 
   def should_add_mock_item(self, txt):
     return len(txt) > 0
@@ -133,7 +137,8 @@ class Plugin(IPlugin):
   def create_mock_item(self, txt):
     icon = self.content_window_.style().standardIcon(QStyle.SP_FileIcon)
 
-    item = DirectoryContentItem(None, icon, '[?] {}'.format(txt), self.list_widget_)
+    item = DirectoryContentItem(None, icon, '[?] {}'.format(txt),
+                                self.list_widget_)
     item.order_ = -3
     item.mock_ = True
     item.mock_name_ = txt
@@ -141,4 +146,3 @@ class Plugin(IPlugin):
     self.list_items_.append(item)
 
     return item
-

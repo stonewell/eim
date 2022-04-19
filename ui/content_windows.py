@@ -127,7 +127,8 @@ class ListContentWindow(ContentWindow):
         self.item_selection_changed)
     self.text_edit_.textEdited[str].connect(self.on_text_edited)
     self.text_edit_.returnPressed.connect(self.execute_command)
-    self.content_widget_.itemDoubleClicked[QListWidgetItem].connect(self.execute_command)
+    self.content_widget_.itemDoubleClicked[QListWidgetItem].connect(
+        self.execute_command)
 
   def execute_command(self):
     self.need_update_text_ = True
@@ -223,6 +224,12 @@ class ListContentWindow(ContentWindow):
 
   def on_text_edited(self, txt):
     self.__remove_mock_item()
+
+    if self.list_window_delegate_ is not None and hasattr(
+        self.list_window_delegate_, 'on_text_edited'):
+      if self.list_window_delegate_.on_text_edited(txt):
+        logging.debug('list window delegate handled on text edited')
+        return
 
     for row in range(self.content_widget_.count()):
       item = self.content_widget_.item(row)
