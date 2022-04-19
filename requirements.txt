@@ -4,3 +4,4 @@ pluggy
 appdirs
 fuzzywuzzy
 python-Levenshtein
+tree_sitter
