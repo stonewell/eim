@@ -390,17 +390,9 @@ class EditorContext(object):
   def buffer_names(self):
     return [buf.name() for buf in self.buffers_]
 
-  def __directory_content_path_selected(self, item, on_get_path):
-    on_get_path(item)
-    self.close_content_window()
-
   def ask_for_file_path(self, on_get_path):
-    self.run_command(
-        BuiltinCommands.OPEN, None, False, {
-            'directory_content_file_path_selected':
-            lambda item: self.__directory_content_path_selected(
-                item, on_get_path)
-        })
+    self.run_command(BuiltinCommands.OPEN, None, False,
+                     {'directory_content_file_path_selected': on_get_path})
 
   def get_document_content(self, document):
     return self.ui_helper.get_document_content(document)

@@ -52,13 +52,13 @@ class Plugin(IPlugin):
       self.__directory_content_file_path_selected = args[0][
           'directory_content_file_path_selected']
     except:
-      self.__directory_content_file_path_selected = None
+      self.__directory_content_file_path_selected = self.ctx.load_buffer
 
     try:
       self.__directory_content_dir_path_selected = args[0][
           'directory_content_dir_path_selected']
     except:
-      self.__directory_content_dir_path_selected = None
+      self.__directory_content_dir_path_selected = self.__load_dir_content
 
     def item_text_match(item, text):
       if item.text().find(text) >= 0:
@@ -127,17 +127,10 @@ class Plugin(IPlugin):
 
   def __load_path(self, path_item):
     if path_item.is_dir():
-      if self.__directory_content_dir_path_selected is None:
-        self.__load_dir_content(path_item)
-      else:
-        self.__directory_content_dir_path_selected(path_item)
+      self.__directory_content_dir_path_selected(path_item)
     else:
-      #load file
-      if self.__directory_content_file_path_selected is None:
-        self.ctx.load_buffer(path_item)
-        self.ctx.close_content_window()
-      else:
-        self.__directory_content_file_path_selected(path_item)
+      self.__directory_content_file_path_selected(path_item)
+      self.ctx.close_content_window()
 
   def on_text_edited(self, txt):
     if txt.find('/') < 0:
