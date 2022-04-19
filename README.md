@@ -14,3 +14,4 @@
 ## TODO
 - [ ] ask for input
 - [x] directory content plugin support path input
+- [ ] show error message
