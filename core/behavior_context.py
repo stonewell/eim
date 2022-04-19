@@ -56,7 +56,7 @@ class BehaviorContext(object):
 
   def get_command_callable(self, cmd_name):
 
-    def __run_command(ctx):
+    def __run_command(ctx, *args):
       c = cmd_name
       logging.debug('context:{}, run command:{}'.format(self.name, cmd_name))
 
@@ -76,7 +76,7 @@ class BehaviorContext(object):
             self.name, cmd_name, c))
 
       if callable(c):
-        ctx.run_command(cmd_name, c, save_history)
+        ctx.run_command(cmd_name, c, save_history, *args)
       else:
         logging.error('context:{}, cmd:{} is not map to a callable:{}'.format(
             self.name, cmd_name, c))

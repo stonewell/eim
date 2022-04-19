@@ -43,6 +43,8 @@ class Plugin(IPlugin):
     self.editor_ = editor
 
     self.ctx.register_command(BuiltinCommands.OPEN, self.show, None, False)
+    self.ctx.hook_command('directory_content_path_selected',
+                          self.__path_selected, None, False)
 
   def show(self, ctx):
     self.content_window_ = cw = ctx.create_list_content_window()
@@ -80,7 +82,8 @@ class Plugin(IPlugin):
     for name, order in [('.', -2), ('..', -1)]:
       item = dir.resolve() / name
       icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
-      l_item = DirectoryContentItem(item, icon, item.as_posix(), self.list_widget_)
+      l_item = DirectoryContentItem(item, icon, item.as_posix(),
+                                    self.list_widget_)
       l_item.order_ = order
 
       self.list_items_.append(l_item)
@@ -106,11 +109,17 @@ class Plugin(IPlugin):
 
   def item_double_clicked(self, item):
     if hasattr(item, 'mock_'):
-      selectItem = self.current_list_dir_ / item.mock_name_
+      selected_item = self.current_list_dir_ / item.mock_name_
     else:
-      selectItem = item.item_
+      selected_item = item.item_
 
-    self.__load_path(selectItem)
+    self.ctx.run_command('directory_content_path_selected', None, False,
+                         selected_item)
+
+  def __path_selected(self, ctx, *args):
+    selected_item = args[0]
+
+    self.__load_path(selected_item)
 
   def __load_path(self, path_item):
     if path_item.is_dir():
@@ -143,8 +152,7 @@ class Plugin(IPlugin):
     else:
       txt = new_path.relative_to(tmp_path).as_posix()
 
-    logging.debug('switch to:{}, update text:{}'.format(
-        tmp_path, txt))
+    logging.debug('switch to:{}, update text:{}'.format(tmp_path, txt))
 
     self.__load_dir_content(tmp_path)
 

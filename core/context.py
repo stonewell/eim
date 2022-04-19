@@ -290,7 +290,7 @@ class EditorContext(object):
 
     self.__bind_config_keys(keys)
 
-  def run_command(self, cmd_name, cmd_callable=None, save_history=True):
+  def run_command(self, cmd_name, cmd_callable=None, save_history=True, *cmd_args):
     logging.debug('running command:{}'.format(cmd_name))
 
     if cmd_callable is None:
@@ -303,7 +303,7 @@ class EditorContext(object):
       logging.warning('cmd:{} is not found'.format(cmd_name))
       return
 
-    cmd_callable(self)
+    cmd_callable(self, *cmd_args)
 
     if save_history:
       try:
