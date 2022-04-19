@@ -80,7 +80,7 @@ class Plugin(IPlugin):
     for name, order in [('.', -2), ('..', -1)]:
       item = dir / name
       icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
-      l_item = DirectoryContentItem(item, icon, name, self.list_widget_)
+      l_item = DirectoryContentItem(item, icon, item.as_posix(), self.list_widget_)
       l_item.order_ = order
 
       self.list_items_.append(l_item)
@@ -144,7 +144,7 @@ class Plugin(IPlugin):
       txt = new_path.relative_to(tmp_path).as_posix()
 
     logging.debug('switch to:{}, update text:{}'.format(
-        tmp_path.resolve(), txt))
+        tmp_path, txt))
 
     self.__load_dir_content(tmp_path)
 
