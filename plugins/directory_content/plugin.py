@@ -1,3 +1,4 @@
+import os
 import logging
 
 from PySide6.QtWidgets import QListWidgetItem, QStyle
@@ -120,7 +121,37 @@ class Plugin(IPlugin):
       self.ctx.close_content_window()
 
   def on_text_edited(self, txt):
-    return False
+    if txt.find('/') < 0:
+      return False
+
+    tmp_path = new_path = (
+        self.current_list_dir_ /
+        os.path.expandvars(os.path.expanduser(txt))).resolve()
+
+    while True:
+      if tmp_path.is_dir():
+        break
+
+      if tmp_path.parent == tmp_path or tmp_path == self.current_list_dir_:
+        return False
+
+      tmp_path = tmp_path.parent.resolve()
+
+    logging.debug('will show content:{} for {}'.format(new_path, tmp_path))
+    if new_path == tmp_path:
+      txt = ''
+    else:
+      txt = new_path.relative_to(tmp_path).as_posix()
+
+    logging.debug('switch to:{}, update text:{}'.format(
+        tmp_path.resolve(), txt))
+
+    self.__load_dir_content(tmp_path)
+
+    self.text_edit_.setText(txt)
+    self.content_window_.match_txt_and_mock_item(txt)
+
+    return True
 
   def should_add_mock_item(self, txt):
     return len(txt) > 0

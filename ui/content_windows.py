@@ -124,27 +124,27 @@ class ListContentWindow(ContentWindow):
     self.list_window_delegate_ = None
 
     self.content_widget_.itemSelectionChanged.connect(
-        self.item_selection_changed)
-    self.text_edit_.textEdited[str].connect(self.on_text_edited)
-    self.text_edit_.returnPressed.connect(self.execute_command)
+        self.__item_selection_changed)
+    self.text_edit_.textEdited[str].connect(self.__on_text_edited)
+    self.text_edit_.returnPressed.connect(self.__execute_command)
     self.content_widget_.itemDoubleClicked[QListWidgetItem].connect(
-        self.execute_command)
+        self.__execute_command)
 
-  def execute_command(self):
+  def __execute_command(self):
     self.need_update_text_ = True
 
   def register_commands(self):
     super().register_commands()
 
-    self.ctx_.hook_command(BuiltinCommands.PREV_LINE, self.prev_item,
+    self.ctx_.hook_command(BuiltinCommands.PREV_LINE, self.__prev_item,
                            'list_content_window', False)
-    self.ctx_.hook_command(BuiltinCommands.NEXT_LINE, self.next_item,
+    self.ctx_.hook_command(BuiltinCommands.NEXT_LINE, self.__next_item,
                            'list_content_window', False)
 
   def bind_keys(self):
     pass
 
-  def prev_item(self, ctx):
+  def __prev_item(self, ctx):
     self.need_update_text_ = True
 
     count = self.content_widget_.count()
@@ -162,7 +162,7 @@ class ListContentWindow(ContentWindow):
         self.content_widget_.setCurrentRow(row)
         return
 
-  def next_item(self, ctx):
+  def __next_item(self, ctx):
     self.need_update_text_ = True
 
     count = self.content_widget_.count()
@@ -188,7 +188,7 @@ class ListContentWindow(ContentWindow):
 
     return txt
 
-  def item_selection_changed(self):
+  def __item_selection_changed(self):
     if self.need_update_text_:
       txt = self.__get_item_text(self.content_widget_.currentItem())
       self.text_edit_.setText(txt)
@@ -205,7 +205,7 @@ class ListContentWindow(ContentWindow):
 
     return new_lt
 
-  def item_match_text_ratio(self, item, text):
+  def __item_match_text_ratio(self, item, text):
     if self.list_window_delegate_ is not None:
       item_text = self.list_window_delegate_.get_item_text(item)
     else:
@@ -214,7 +214,7 @@ class ListContentWindow(ContentWindow):
     return fuzz.ratio(text, item_text)
 
   def __update_match_ratio(self, item, txt):
-    ratio = self.item_match_text_ratio(item, txt)
+    ratio = self.__item_match_text_ratio(item, txt)
 
     item.ratio_ = ratio if len(txt) > 0 else 0
     item.__lt__ = self.__get_new_lt(item)
@@ -222,7 +222,7 @@ class ListContentWindow(ContentWindow):
     logging.debug('ratio:{} for {} -> {}'.format(ratio, txt, item.text()))
     item.setHidden(ratio == 0 and len(txt) > 0)
 
-  def on_text_edited(self, txt):
+  def __on_text_edited(self, txt):
     self.__remove_mock_item()
 
     if self.list_window_delegate_ is not None and hasattr(
@@ -231,6 +231,9 @@ class ListContentWindow(ContentWindow):
         logging.debug('list window delegate handled on text edited')
         return
 
+    self.match_txt_and_mock_item(txt)
+
+  def match_txt_and_mock_item(self, txt):
     for row in range(self.content_widget_.count()):
       item = self.content_widget_.item(row)
       self.__update_match_ratio(item, txt)
