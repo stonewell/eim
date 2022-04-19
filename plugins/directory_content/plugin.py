@@ -78,7 +78,7 @@ class Plugin(IPlugin):
 
     # add special folder . and ..
     for name, order in [('.', -2), ('..', -1)]:
-      item = dir / name
+      item = dir.resolve() / name
       icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
       l_item = DirectoryContentItem(item, icon, item.as_posix(), self.list_widget_)
       l_item.order_ = order
