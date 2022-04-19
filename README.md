@@ -7,6 +7,7 @@
 - [ ] EditorConfig
 - [ ] Search Everything
 - [ ] Color Schema
+- [ ] Format file
 - [x] KeyBinding
 - [x] PySide6
 - [x] Keybinding with prefix key, built-in support by pyside6
