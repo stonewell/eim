@@ -83,3 +83,6 @@ class UIHelper(QObject):
       self.editor_.setDocument(buffer.document_)
     else:
       buffer.document_ = self.editor_.document()
+
+  def get_document_content(self, document):
+    return document.toPlainText()

@@ -269,6 +269,10 @@ class EditorContext(object):
     self.register_command(BuiltinCommands.CANCEL,
                           lambda c: c.close_content_window(), 'content_window',
                           False)
+    self.register_command(BuiltinCommands.SAVE,
+                          lambda c: c.save_current_buffer())
+    self.register_command(BuiltinCommands.SAVE_AS,
+                          lambda c: c.save_current_buffer_as())
 
   def __bind_config_keys(self, keys, binding_context=None):
     for key in keys:
@@ -381,3 +385,18 @@ class EditorContext(object):
 
   def buffer_names(self):
     return [buf.name() for buf in self.buffers_]
+
+  def ask_for_file_path(self):
+    return None
+
+  def get_document_content(self, document):
+    return self.ui_helper.get_document_content(document)
+
+  def save_current_buffer_as(self):
+    file_path = self.ask_for_file_path()
+
+    if file_path is not None:
+      self.current_buffer_.save_file(file_path)
+
+  def save_current_buffer(self):
+    self.current_buffer_.save_file()

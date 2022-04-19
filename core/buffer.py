@@ -29,6 +29,21 @@ class EditorBuffer(object):
 
       self.document_ = self.ctx_.create_document(content)
 
+  def save_file(self, file_path = None):
+    if file_path is None and self.file_path_ is None:
+      file_path = self.ctx_.ask_for_file_path()
+    elif file_path is None:
+      file_path = self.file_path_
+
+    if file_path is None:
+      logging.warn('no file path to save')
+      return
+
+    logging.debug('save to file:{}'.format(file_path.resolve()))
+
+    file_path.write_text(self.ctx_.get_document_content(self.document_))
+
+
   def name(self):
     if self.name_ is not None:
        return self.name_
