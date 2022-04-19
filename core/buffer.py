@@ -31,14 +31,14 @@ class EditorBuffer(object):
 
   def save_file(self, file_path=None):
     if file_path is None and self.file_path_ is None:
-      file_path = self.ctx_.ask_for_file_path()
+      self.ctx_.ask_for_file_path(self.__write_to_file)
+      return
     elif file_path is None:
       file_path = self.file_path_
 
-    if file_path is None:
-      logging.warn('no file path to save')
-      return
+    self.__write_to_file(file_path)
 
+  def __write_to_file(self, file_path):
     logging.debug('save to file:{}'.format(file_path.resolve()))
 
     file_path.write_text(self.ctx_.get_document_content(self.document_))

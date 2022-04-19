@@ -43,12 +43,22 @@ class Plugin(IPlugin):
     self.editor_ = editor
 
     self.ctx.register_command(BuiltinCommands.OPEN, self.show, None, False)
-    self.ctx.hook_command('directory_content_path_selected',
-                          self.__path_selected, None, False)
 
-  def show(self, ctx):
+  def show(self, ctx, *args):
     self.content_window_ = cw = ctx.create_list_content_window()
     cw.list_window_delegate_ = self
+
+    try:
+      self.__directory_content_file_path_selected = args[0][
+          'directory_content_file_path_selected']
+    except:
+      self.__directory_content_file_path_selected = None
+
+    try:
+      self.__directory_content_dir_path_selected = args[0][
+          'directory_content_dir_path_selected']
+    except:
+      self.__directory_content_dir_path_selected = None
 
     def item_text_match(item, text):
       if item.text().find(text) >= 0:
@@ -63,7 +73,7 @@ class Plugin(IPlugin):
 
     self.text_edit_.returnPressed.connect(self.execute_command)
     self.list_widget_.itemDoubleClicked[QListWidgetItem].connect(
-        self.execute_command)
+        self.item_double_clicked)
 
     self.__load_dir_content()
 
@@ -113,21 +123,21 @@ class Plugin(IPlugin):
     else:
       selected_item = item.item_
 
-    self.ctx.run_command('directory_content_path_selected', None, False,
-                         selected_item)
-
-  def __path_selected(self, ctx, *args):
-    selected_item = args[0]
-
     self.__load_path(selected_item)
 
   def __load_path(self, path_item):
     if path_item.is_dir():
-      self.__load_dir_content(path_item)
+      if self.__directory_content_dir_path_selected is None:
+        self.__load_dir_content(path_item)
+      else:
+        self.__directory_content_dir_path_selected(path_item)
     else:
       #load file
-      self.ctx.load_buffer(path_item)
-      self.ctx.close_content_window()
+      if self.__directory_content_file_path_selected is None:
+        self.ctx.load_buffer(path_item)
+        self.ctx.close_content_window()
+      else:
+        self.__directory_content_file_path_selected(path_item)
 
   def on_text_edited(self, txt):
     if txt.find('/') < 0:

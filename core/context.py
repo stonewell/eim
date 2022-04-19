@@ -215,7 +215,7 @@ class EditorContext(object):
     binding_context.register_command(cmd_name, cmd_callable, save_history)
 
   def get_behavior_context(self, behavior_context=None, parent_context=None):
-    if behavior_context is None:
+    if behavior_context is None or behavior_context == 'global':
       self.global_behavior_context_.name = 'global'
       return self.global_behavior_context_
 
@@ -290,7 +290,11 @@ class EditorContext(object):
 
     self.__bind_config_keys(keys)
 
-  def run_command(self, cmd_name, cmd_callable=None, save_history=True, *cmd_args):
+  def run_command(self,
+                  cmd_name,
+                  cmd_callable=None,
+                  save_history=True,
+                  *cmd_args):
     logging.debug('running command:{}'.format(cmd_name))
 
     if cmd_callable is None:
@@ -386,17 +390,23 @@ class EditorContext(object):
   def buffer_names(self):
     return [buf.name() for buf in self.buffers_]
 
-  def ask_for_file_path(self):
-    return None
+  def __directory_content_path_selected(self, item, on_get_path):
+    on_get_path(item)
+    self.close_content_window()
+
+  def ask_for_file_path(self, on_get_path):
+    self.run_command(
+        BuiltinCommands.OPEN, None, False, {
+            'directory_content_file_path_selected':
+            lambda item: self.__directory_content_path_selected(
+                item, on_get_path)
+        })
 
   def get_document_content(self, document):
     return self.ui_helper.get_document_content(document)
 
   def save_current_buffer_as(self):
-    file_path = self.ask_for_file_path()
-
-    if file_path is not None:
-      self.current_buffer_.save_file(file_path)
+    self.ask_for_file_path(self.current_buffer_.save_file)
 
   def save_current_buffer(self):
     self.current_buffer_.save_file()
