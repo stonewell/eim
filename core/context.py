@@ -11,6 +11,7 @@ from .app_config import default_config, load_config
 from .behavior_context import BehaviorContext
 from .builtin_commands import BuiltinCommands
 from .buffer import EditorBuffer
+from .url_helper import open_url as eim_open_url
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -402,3 +403,7 @@ class EditorContext(object):
 
   def save_current_buffer(self):
     self.current_buffer_.save_file()
+
+  @staticmethod
+  def open_url(url, timeout=30, extra_headers={}, disable_ssl_check=False):
+    return eim_open_url(url, timeout, extra_headers, disable_ssl_check)
