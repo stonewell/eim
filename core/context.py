@@ -173,8 +173,8 @@ class EditorContext(object):
   def __activate_plugins(self):
     for key in self.plugins_:
       logging.debug('activate plugin:{}'.format(key))
-      self.plugins_[key].plugin_object.activate()
       self.plugins_[key].plugin_object.ctx = self
+      self.plugins_[key].plugin_object.activate()
 
   def update_plugins_with_current_window(self, editor):
     for key in self.plugins_:

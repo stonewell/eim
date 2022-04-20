@@ -7,3 +7,4 @@ python-Levenshtein
 tree_sitter
 tensorflow
 guesslang==2.2.2
+GitPython
