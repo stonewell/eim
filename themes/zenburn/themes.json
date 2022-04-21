@@ -93,7 +93,7 @@
       "weight": "bold"
     },
     "regexp-grouping-construct": {
-      "foreground": "zenburn-yello",
+      "foreground": "zenburn-yellow",
       "weight": "bold"
     },
     "regexp-grouping-backslash": {

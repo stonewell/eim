@@ -31,13 +31,36 @@ class ColorTheme(object):
         'background': '#DCDCDC',
         'weight': 'normal',
     }
-    self.default_theme_def_ = self.get_theme_def('default') or self.base_theme_def_
+    self.default_theme_def_ = self.get_theme_def(
+        'default') or self.base_theme_def_
 
   def get_theme_def(self, theme_key):
     v = self.data_.get(f'theme/{theme_key}', None)
 
     if v is None:
-      return None
+      m = self.theme_def_mapping()
+
+      try:
+        mapped_theme_def = m[theme_key]
+        if isinstance(mapped_theme_def, dict):
+          if 'name' in mapped_theme_def:
+            name = mapped_theme_def['name']
+          else:
+            name = None
+        else:
+          name = mapped_theme_def
+
+        if name is not None:
+          tmp = self.get_theme_def(name)
+        else:
+          tmp = {}
+
+        if isinstance(mapped_theme_def, dict):
+          tmp.update(mapped_theme_def)
+
+        return tmp
+      except:
+        return None
 
     tmp = {}
     tmp.update(self.default_theme_def_)
@@ -47,3 +70,44 @@ class ColorTheme(object):
 
   def get_color_def(self, color_key):
     return self.data_.get(f'color/{color_key}', None)
+
+  def theme_def_mapping(self):
+    return {
+        'function': 'function-name',
+        'function.call': 'function-name',
+        'function.builtin': 'builtin',
+        'function.special': 'preprocessor',
+        'function.macro': 'preprocessor',
+        'method': 'function',
+        'method.call': 'function.call',
+        'type.parameter': 'variable-name',
+        'type.argument': 'type',
+        'type.builtin': 'builtin',
+        'type.super': 'type',
+        'constructor': 'type',
+        'variable': 'variable-name',
+        'variable.parameter': 'variable',
+        'variable.builtin': 'builtin',
+        'variable.special': 'warning',
+        "property": {
+            "name": "constant",
+            "italic": True
+        },
+        'property.definition': 'variable.parameter',
+        'string.special': {
+            "name": 'string',
+            "weight": 'bold',
+        },
+        'escape': 'keyword',
+        'embedded': 'default',
+        'operator': 'keyword',
+        'label': 'preprocessor',
+        'constant.builtin': 'constant',
+        'number': 'constant',
+        'punctuation': 'default',
+        'punctuation.bracket': 'punctuation',
+        'punctuation.delimiter': 'punctuation',
+        'punctuation.special': 'keyword',
+        'tag': 'builtin',
+        'attribute': 'preprocessor',
+    }

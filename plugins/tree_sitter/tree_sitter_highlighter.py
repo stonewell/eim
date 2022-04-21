@@ -23,7 +23,7 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
         theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
 
         if theme_def is None:
-          logging.debug(f'theme:{c[1]} is not found')
+          logging.error(f'theme:{c[1]} is not found')
           continue
 
         f_c = self.ctx_.get_color(theme_def, 'foreground')
@@ -36,9 +36,11 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
         f.setForeground(f_c)
         f.setBackground(b_c)
 
+        f.setFontItalic(
+            True if 'italic' in theme_def and theme_def['italic'] else False)
+
         start_index = c[0].start_byte - self.currentBlock().position()
         count = c[0].end_byte - c[0].start_byte
 
         logging.debug(f'set format at {start_index} cout:{count} using {c[1]}')
         self.setFormat(start_index, count, f)
-
