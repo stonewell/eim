@@ -434,3 +434,19 @@ class EditorContext(object):
 
     logging.warn(f'color theme with name:{color_theme_name} is not found')
     self.color_theme_ = None
+
+  def get_color(self, theme_def, color_key):
+    c = self.color_theme_.get_color_def(theme_def[color_key])
+
+    return self.ui_helper.get_color(
+        theme_def[color_key]) if c is None else self.ui_helper.get_color(c)
+
+  def get_theme_def_color(self, theme_key, color_key, default_color=None):
+    theme_def = self.color_theme_.get_theme_def(theme_key)
+
+    if theme_def is None:
+      if default_color is None:
+        return self.get_theme_def_color('default', color_key)
+      return default_color
+
+    return self.get_color(theme_def, color_key)

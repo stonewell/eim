@@ -26,8 +26,8 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
           logging.debug(f'theme:{c[1]} is not found')
           continue
 
-        f_c = self.__get_color(theme_def, 'foreground')
-        b_c = self.__get_color(theme_def, 'background')
+        f_c = self.ctx_.get_color(theme_def, 'foreground')
+        b_c = self.ctx_.get_color(theme_def, 'background')
         bold = theme_def['weight'] == 'bold'
 
         f = QTextCharFormat()
@@ -42,13 +42,3 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
         logging.debug(f'set format at {start_index} cout:{count} using {c[1]}')
         self.setFormat(start_index, count, f)
 
-  def __get_color(self, theme_def, color_key):
-    c = self.ctx_.color_theme_.get_color_def(theme_def[color_key])
-
-    color = QColor()
-    if c is None:
-      color.setNamedColor(theme_def[color_key])
-    else:
-      color.setNamedColor(c)
-
-    return color

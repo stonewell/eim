@@ -1,7 +1,7 @@
 import os
 import logging
 
-from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument
+from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
 from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt
 
@@ -86,3 +86,9 @@ class UIHelper(QObject):
 
   def get_document_content(self, document):
     return document.toPlainText()
+
+  def get_color(self, c):
+    color = QColor()
+    color.setNamedColor(c)
+
+    return color
