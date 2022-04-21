@@ -26,25 +26,21 @@ class ColorTheme(object):
         logging.exception(f'load theme file:{f.resolve()} failed')
 
     self.data_ = DictQuery(data)
-    self.base_theme_def_ = {
+    self.base_theme_def_ = self.default_theme_def_ = {
         'foreground': '#3F3F3F',
         'background': '#DCDCDC',
         'weight': 'normal',
     }
-    self.default_theme_def_ = self.get_theme_def('default')
+    self.default_theme_def_ = self.get_theme_def('default') or self.base_theme_def_
 
   def get_theme_def(self, theme_key):
     v = self.data_.get(f'theme/{theme_key}', None)
 
     if v is None:
-      return self.base_theme_def_
+      return None
 
     tmp = {}
-    tmp.update(self.base_theme_def_)
-
-    if theme_key != 'default':
-      tmp.update(self.default_theme_def_)
-
+    tmp.update(self.default_theme_def_)
     tmp.update(v)
 
     return tmp

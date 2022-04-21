@@ -21,6 +21,11 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
     if len(captures) > 0:
       for c in captures:
         theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
+
+        if theme_def is None:
+          logging.debug(f'theme:{c[1]} is not found')
+          continue
+
         f_c = self.__get_color(theme_def, 'foreground')
         b_c = self.__get_color(theme_def, 'background')
         bold = theme_def['weight'] == 'bold'
@@ -31,8 +36,11 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
         f.setForeground(f_c)
         f.setBackground(b_c)
 
-        self.setFormat(c[0].start_byte - self.currentBlock().position(),
-                       c[0].end_byte - self.currentBlock().position(), f)
+        start_index = c[0].start_byte - self.currentBlock().position()
+        count = c[0].end_byte - c[0].start_byte
+
+        logging.debug(f'set format at {start_index} cout:{count} using {c[1]}')
+        self.setFormat(start_index, count, f)
 
   def __get_color(self, theme_def, color_key):
     c = self.ctx_.color_theme_.get_color_def(theme_def[color_key])

@@ -30,7 +30,7 @@ class Plugin(IPlugin):
     if not self.editor_.isReadOnly():
       selection = QTextEdit.ExtraSelection()
 
-      line_color = QColor(Qt.yellow).lighter(160)
+      line_color = self.__get_theme_highlight_color()
       selection.format.setBackground(line_color)
 
       selection.format.setProperty(QTextFormat.FullWidthSelection, True)
@@ -41,3 +41,22 @@ class Plugin(IPlugin):
       extra_selections.append(selection)
 
     self.editor_.setExtraSelections(extra_selections)
+
+  def __get_theme_highlight_color(self):
+    theme_def = self.ctx.color_theme_.get_theme_def('highlight')
+
+    if theme_def is None:
+      return QColor(Qt.yellow).lighter(120)
+
+    return self.__get_color(theme_def, 'background')
+
+  def __get_color(self, theme_def, color_key):
+    c = self.ctx.color_theme_.get_color_def(theme_def[color_key])
+
+    color = QColor()
+    if c is None:
+      color.setNamedColor(theme_def[color_key])
+    else:
+      color.setNamedColor(c)
+
+    return color
