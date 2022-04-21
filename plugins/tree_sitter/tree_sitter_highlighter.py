@@ -1,13 +1,17 @@
 import logging
 
 from PySide6.QtGui import QSyntaxHighlighter
+from PySide6.QtGui import QColor
+from PySide6.QtGui import QFont
+from PySide6.QtGui import QTextCharFormat
 
 
 class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
 
-  def __init__(self, buffer):
+  def __init__(self, ctx, buffer):
     QSyntaxHighlighter.__init__(self, buffer.document_)
     self.buffer_ = buffer
+    self.ctx_ = ctx
 
   def highlightBlock(self, text):
     captures = self.buffer_.tree_sitter_tree_.highlight_query(
@@ -16,5 +20,27 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
 
     if len(captures) > 0:
       for c in captures:
-        print(c)
-        print(c[0].start_byte, c[0].end_byte)
+        theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
+        f_c = self.__get_color(theme_def, 'foreground')
+        b_c = self.__get_color(theme_def, 'background')
+        bold = theme_def['weight'] == 'bold'
+
+        f = QTextCharFormat()
+        if bold:
+          f.setFontWeight(QFont.Bold)
+        f.setForeground(f_c)
+        f.setBackground(b_c)
+
+        self.setFormat(c[0].start_byte - self.currentBlock().position(),
+                       c[0].end_byte - self.currentBlock().position(), f)
+
+  def __get_color(self, theme_def, color_key):
+    c = self.ctx_.color_theme_.get_color_def(theme_def[color_key])
+
+    color = QColor()
+    if c is None:
+      color.setNamedColor(theme_def[color_key])
+    else:
+      color.setNamedColor(c)
+
+    return color

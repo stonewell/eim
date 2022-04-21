@@ -61,6 +61,7 @@ def default_config():
           "font": {
               "size": 14
           },
-          "keys": default_key_bindings()
+          "keys": default_key_bindings(),
+          "color-theme": "zenburn"
       }
   })

@@ -13,6 +13,7 @@ from .behavior_context import BehaviorContext
 from .builtin_commands import BuiltinCommands
 from .buffer import EditorBuffer
 from .url_helper import open_url as eim_open_url
+from .color_theme import ColorTheme
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -128,6 +129,10 @@ class EditorContext(object):
 
     logging.debug('config:{}'.format(self.config.get('/app/font')))
     logging.debug('config keys:{}'.format(self.config.get('/app/keys')))
+    logging.debug(
+        f'config color-theme:{self.config.get("/app/color-theme", "zenburn")}')
+
+    self.__load_color_theme()
 
   def __load_plugin_dir(self, plugin_dir):
     if not plugin_dir or not plugin_dir.is_dir():
@@ -408,3 +413,24 @@ class EditorContext(object):
   @staticmethod
   def open_url(url, timeout=30, extra_headers={}, disable_ssl_check=False):
     return eim_open_url(url, timeout, extra_headers, disable_ssl_check)
+
+  def __load_color_theme(self):
+    color_theme_name = self.config.get('/app/color-theme', 'zenburn')
+
+    #try site config
+    theme_paths = [
+        pathlib.Path(self.appdirs_.user_config_dir),
+        pathlib.Path(self.appdirs_.site_config_dir),
+        pathlib.Path(os.path.dirname(__file__)) / '..',
+    ]
+
+    for dir in theme_paths:
+      theme_path = dir / 'themes' / color_theme_name
+
+      if theme_path.is_dir():
+        logging.info(f'load color theme from {theme_path.resolve()}')
+        self.color_theme_ = ColorTheme(theme_path)
+        return
+
+    logging.warn(f'color theme with name:{color_theme_name} is not found')
+    self.color_theme_ = None
