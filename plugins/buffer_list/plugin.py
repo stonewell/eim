@@ -33,9 +33,15 @@ class Plugin(IPlugin):
 
     self.list_items_ = []
 
+    f_c = self.ctx.get_theme_def_color('default', 'foreground')
+    b_c = self.ctx.get_theme_def_color('default', 'background')
+
     for name in buf_names:
       item = QListWidgetItem(name, l)
+      item.setForeground(f_c)
+      item.setBackground(b_c)
       item.custom_lt = self.__get_item_custom_lt(item)
+
       self.list_items_.append(item)
 
     t.returnPressed.connect(self.execute_command)
@@ -74,6 +80,11 @@ class Plugin(IPlugin):
     item.mock_ = True
     item.mock_name_ = txt
     item.custom_lt = self.__get_item_custom_lt(item)
+
+    f_c = self.ctx.get_theme_def_color('default', 'foreground')
+    b_c = self.ctx.get_theme_def_color('default', 'background')
+    item.setForeground(f_c)
+    item.setBackground(b_c)
 
     self.list_items_.append(item)
 

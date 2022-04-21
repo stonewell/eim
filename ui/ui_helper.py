@@ -1,12 +1,18 @@
 import os
 import logging
 
-from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor
+from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
 from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt
 
 from .content_windows import ListContentWindow
 from core.builtin_commands import BuiltinCommands
+
+
+class EIMApplication(QApplication):
+
+  def __init__(self, *args):
+    super().__init__(*args)
 
 
 class UIHelper(QObject):
@@ -17,7 +23,14 @@ class UIHelper(QObject):
     self.ctx_ = ctx
 
     if self.ctx_.args.debug > 2:
-        os.environ['QT_DEBUG_PLUGINS'] = '1'
+      os.environ['QT_DEBUG_PLUGINS'] = '1'
+
+  def create_application(self):
+    self.ctx_.app = app = EIMApplication()
+
+    self.__apply_theme(app)
+
+    return app
 
   def init_commands_and_key_bindings(self):
     self.register_commands()
@@ -63,7 +76,8 @@ class UIHelper(QObject):
     return content_window
 
   def register_commands(self):
-    self.ctx_.register_command(BuiltinCommands.QUIT, lambda c: QCoreApplication.quit())
+    self.ctx_.register_command(BuiltinCommands.QUIT,
+                               lambda c: QCoreApplication.quit())
 
   def bind_keys(self):
     pass
@@ -89,6 +103,31 @@ class UIHelper(QObject):
 
   def get_color(self, c):
     color = QColor()
+
     color.setNamedColor(c)
 
     return color
+
+  def __apply_theme(self, app):
+    font = self.get_font()
+
+    if font:
+      app.setFont(font)
+
+    p = app.palette()
+
+    f_c = self.ctx_.get_theme_def_color('default', 'foreground')
+    b_c = self.ctx_.get_theme_def_color('default', 'background')
+
+    p.setColor(QPalette.Active, QPalette.Base, b_c)
+    p.setColor(QPalette.Active, QPalette.Text, f_c)
+
+    line_color = self.ctx_.get_theme_def_color(
+        'highlight', 'background', p.color(QPalette.Active,
+                                           QPalette.Highlight))
+    p.setColor(QPalette.Active, QPalette.Highlight, line_color)
+    highlight_text_color = self.ctx_.get_theme_def_color(
+        'highlight', 'foreground')
+    p.setColor(QPalette.Active, QPalette.HighlightedText, highlight_text_color)
+
+    app.setPalette(p)

@@ -88,6 +88,9 @@ class Plugin(IPlugin):
 
     self.current_list_dir_ = dir
 
+    f_c = self.ctx.get_theme_def_color('default', 'foreground')
+    b_c = self.ctx.get_theme_def_color('default', 'background')
+
     # add special folder . and ..
     for name, order in [('.', -2), ('..', -1)]:
       item = dir.resolve() / name
@@ -95,6 +98,8 @@ class Plugin(IPlugin):
       l_item = DirectoryContentItem(item, icon, item.as_posix(),
                                     self.list_widget_)
       l_item.order_ = order
+      l_item.setForeground(f_c)
+      l_item.setBackground(b_c)
 
       self.list_items_.append(l_item)
 
@@ -104,8 +109,11 @@ class Plugin(IPlugin):
       else:
         icon = self.content_window_.style().standardIcon(QStyle.SP_FileIcon)
 
-      self.list_items_.append(
-          DirectoryContentItem(item, icon, item.name, self.list_widget_))
+      l_item = DirectoryContentItem(item, icon, item.name, self.list_widget_)
+      l_item.setForeground(f_c)
+      l_item.setBackground(b_c)
+
+      self.list_items_.append(l_item)
 
     self.list_widget_.sortItems()
 
@@ -184,6 +192,11 @@ class Plugin(IPlugin):
     item.order_ = -3
     item.mock_ = True
     item.mock_name_ = txt
+
+    f_c = self.ctx.get_theme_def_color('default', 'foreground')
+    b_c = self.ctx.get_theme_def_color('default', 'background')
+    item.setForeground(f_c)
+    item.setBackground(b_c)
 
     self.list_items_.append(item)
 

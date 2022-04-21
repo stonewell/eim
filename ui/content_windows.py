@@ -4,7 +4,7 @@ import logging
 from PySide6.QtCore import Slot, Qt, QRect, QSize
 from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QListWidgetItem
 from PySide6.QtWidgets import QListWidget
-from PySide6.QtGui import QTextCursor
+from PySide6.QtGui import QTextCursor, QPalette, QColor
 
 from fuzzywuzzy import fuzz
 
@@ -15,7 +15,11 @@ from .textedit_mixin import TextEditMixin
 class ContentWindowLineEdit(QLineEdit):
 
   def __init__(self, ctx, *args):
-    super().__init__(*args)
+    QLineEdit.__init__(self, *args)
+
+    self.ctx_ = ctx
+
+    self.__apply_theme()
 
   def keyPressEvent(self, evt):
     key = evt.keyCombination().toCombined()
@@ -25,6 +29,19 @@ class ContentWindowLineEdit(QLineEdit):
       return
 
     super().keyPressEvent(evt)
+
+  def __apply_theme(self):
+    f_c = self.ctx_.get_theme_def_color('default', 'foreground')
+    b_c = self.ctx_.get_theme_def_color('default', 'background')
+
+    bc_name = b_c.name()
+
+    # palette seems not working for line edit
+    # stylesheet seems need a ARGB hex value
+    if len(bc_name) == 7:
+      bc_name = f'#00{bc_name[1:]}'
+
+    self.setStyleSheet(f'background-color:{bc_name};')
 
 
 class ContentWindow(QWidget, TextEditMixin):
@@ -86,16 +103,18 @@ class ContentWindow(QWidget, TextEditMixin):
 
   def update_geometry(self):
     cr = self.parent_widget_.contentsRect()
+    vm = self.parent_widget_.viewportMargins()
 
     self.setGeometry(
         QRect(cr.left(),
               cr.bottom() - cr.height() / 4, cr.width(),
-              cr.height() / 4))
+              cr.height() / 4) - vm)
 
   def sizeHint(self):
     cr = self.parent_widget_.contentsRect()
+    vm = self.parent_widget_.viewportMargins()
 
-    return QSize(cr.width(), cr.height() / 4)
+    return QSize(cr.width(), cr.height() / 4) - vm
 
   def close(self):
     super().close()
@@ -129,6 +148,8 @@ class ListContentWindow(ContentWindow):
     self.text_edit_.returnPressed.connect(self.__execute_command)
     self.content_widget_.itemDoubleClicked[QListWidgetItem].connect(
         self.__execute_command)
+
+    self.content_widget_.verticalScrollBar().setHidden(True)
 
   def __execute_command(self):
     self.need_update_text_ = True

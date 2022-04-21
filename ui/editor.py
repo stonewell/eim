@@ -1,7 +1,7 @@
 import logging
 
 from PySide6.QtCore import QSize
-from PySide6.QtGui import QTextCursor
+from PySide6.QtGui import QTextCursor, QPalette
 from PySide6.QtWidgets import QPlainTextEdit
 from PySide6.QtWidgets import QAbstractSlider
 
@@ -21,6 +21,8 @@ class Editor(QPlainTextEdit, TextEditMixin):
     ctx.ui_helper.set_current_window(self)
 
     ctx.switch_behavior_context('editor')
+
+    self.__apply_theme()
 
     self.register_commands()
     self.bind_keys()
@@ -70,3 +72,6 @@ class Editor(QPlainTextEdit, TextEditMixin):
     if moved:
       self.setTextCursor(cursor)
       self.ensureCursorVisible()
+
+  def __apply_theme(self):
+    pass

@@ -32,8 +32,15 @@ class Plugin(IPlugin):
 
     self.list_items_ = []
 
+    f_c = self.ctx.get_theme_def_color('default', 'foreground')
+    b_c = self.ctx.get_theme_def_color('default', 'background')
+
     for cmd in self.commands_:
-      self.list_items_.append(QListWidgetItem(cmd, l))
+      item = QListWidgetItem(cmd, l)
+      item.setForeground(f_c)
+      item.setBackground(b_c)
+
+      self.list_items_.append(item)
 
     t.returnPressed.connect(self.execute_command)
     l.itemDoubleClicked[QListWidgetItem].connect(self.execute_command)
