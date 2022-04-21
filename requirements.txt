@@ -4,7 +4,7 @@ pluggy
 appdirs
 fuzzywuzzy
 python-Levenshtein
-tree_sitter
+tree_sitter=0.20.0
 tensorflow
 guesslang==2.2.2
 GitPython

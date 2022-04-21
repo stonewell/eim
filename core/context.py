@@ -3,6 +3,7 @@ import sys
 import argparse
 import logging
 import pathlib
+from pubsub import pub
 
 from appdirs import AppDirs
 from yapsy.PluginManager import PluginManager
@@ -374,14 +375,14 @@ class EditorContext(object):
     self.current_buffer_ = buffer
 
     self.ui_helper.update_document(self.current_buffer_, True)
+    pub.sendMessage('buffer_changed', buf=buffer)
 
   def switch_to_buffer(self, buf_name):
     for buf in self.buffers_:
       logging.debug('switch buf:{} -> {}'.format(buf_name, buf.name()))
 
       if buf_name == buf.name():
-        self.current_buffer_ = buf
-        self.ui_helper.update_document(self.current_buffer_, True)
+        self.__set_current_buffer(buf)
         return
 
     buf = EditorBuffer(self, buf_name)

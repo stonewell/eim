@@ -51,3 +51,6 @@ class EditorBuffer(object):
       return 'Untitiled'
 
     return self.file_path_.name
+
+  def get_lang(self):
+    return 'python'
