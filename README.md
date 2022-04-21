@@ -3,10 +3,11 @@
 
 - [ ] Piece Table with Tree
 - [ ] Treesitter
+-- [*] Syntax Highlighting
 - [ ] LSP
 - [ ] EditorConfig
 - [ ] Search Everything
-- [ ] Color Schema
+- [*] Color Schema
 - [ ] Format file
 - [x] KeyBinding
 - [x] PySide6
