@@ -5,8 +5,8 @@ from pathlib import Path
 
 guess = Guess()
 lang_name_mapping = {
-    'c++': 'cpp',
-    'c+': 'c-sharp',
+    'c++': 'c',
+    'c#': 'c-sharp',
 }
 
 
@@ -129,3 +129,8 @@ class EditorBuffer(object):
     if lang is not None:
       logging.debug(f'lang detected:{lang}')
       self.lang_ = lang
+
+      try:
+        self.lang_ = lang_name_mapping[self.lang_]
+      except(KeyError):
+        pass
