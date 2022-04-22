@@ -25,6 +25,7 @@ class Plugin(IPlugin):
 
   def set_current_window(self, editor):
     self.editor_ = editor
+    self.selected_langs_ = []
 
     pub.subscribe(self.on_buffer_changed, 'buffer_changed')
     self.ctx.register_command('languages_mode', self.show_language_list, None,
@@ -38,7 +39,8 @@ class Plugin(IPlugin):
           buf.name()))
 
   def show_language_list(self, ctx):
-    lang_names = get_lang_names(ctx)
+    lang_names = self.selected_langs_[:]
+    lang_names.extend([n for n in get_lang_names(ctx) if n not in lang_names])
 
     self.content_window_ = cw = ctx.create_list_content_window()
     self.content_window_.list_window_delegate_ = self
@@ -70,6 +72,14 @@ class Plugin(IPlugin):
 
   def item_double_clicked(self, item):
     self.ctx.current_buffer_.set_lang(item.text())
+
+    try:
+      self.selected_langs_.remove(item.text())
+    except:
+      pass
+
+    self.selected_langs_.insert(0, item.text())
+
     self.ctx.close_content_window()
 
   def on_text_edited(self, txt):
