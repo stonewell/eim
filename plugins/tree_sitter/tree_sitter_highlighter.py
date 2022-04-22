@@ -25,6 +25,10 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
     prve_key = None
 
     for c in captures:
+      if c[0].start_byte > (self.currentBlock().position() + self.currentBlock().length()):
+        logging.debug(f'captures {c} exceed current block')
+        continue
+
       theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
 
       if theme_def is None:
@@ -48,7 +52,16 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       start_index = c[0].start_byte - self.currentBlock().position()
       count = c[0].end_byte - c[0].start_byte
 
-      logging.debug(f'set format at {start_index} cout:{count} using {c[1]}')
+      if start_index < 0:
+        count += start_index
+        start_index = 0
+
+      if (start_index + count) > (self.currentBlock().position() +
+                                  self.currentBlock().length()):
+        count = (self.currentBlock().position() +
+                 self.currentBlock().length() - start_index)
+
+      logging.debug(f'set format at {start_index} count:{count} using {c[1]}, {text}')
 
       if prev_start == start_index:
         self.__merge_format(start_index, f, c[1], prev_key)

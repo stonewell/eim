@@ -12,6 +12,7 @@ class EditorBuffer(object):
     self.ctx_ = ctx
     self.document_ = self.ctx_.create_document('')
     self.lang_ = None
+    self.invalid_langs_ = {}
 
   def load_file(self, file_path):
     if not isinstance(file_path, Path):
@@ -58,7 +59,7 @@ class EditorBuffer(object):
     if self.lang_ is not None:
       return self.lang_
 
-    if self.document_.characterCount() <= 256:
+    if self.document_.characterCount() <= 10:
       return None
 
     guess = Guess()
@@ -68,4 +69,14 @@ class EditorBuffer(object):
     if self.lang_ is not None:
       self.lang_ = self.lang_.lower()
 
+    if self.lang_ in self.invalid_langs_:
+      self.lang_ = None
+
     return self.lang_
+
+  def invalid_lang(self):
+    if self.lang_ is None:
+      return
+
+    self.invalid_langs_[self.lang_] = True
+    self.lang_ = None

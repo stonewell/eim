@@ -35,6 +35,8 @@ class TreeSitterLangTree(object):
 
     if not lang_binary.exists():
       logging.warn('buffer language:{} is not supported'.format(lang))
+      self.buffer_.invalid_lang()
+      return
 
     self.lang_ = Language(lang_binary.as_posix(), lang)
     self.parser_ = Parser()
