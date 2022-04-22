@@ -1,6 +1,7 @@
 import logging
 
 from pathlib import Path
+from guesslang import Guess
 
 
 class EditorBuffer(object):
@@ -10,6 +11,7 @@ class EditorBuffer(object):
     self.name_ = name
     self.ctx_ = ctx
     self.document_ = self.ctx_.create_document('')
+    self.lang_ = None
 
   def load_file(self, file_path):
     if not isinstance(file_path, Path):
@@ -53,4 +55,17 @@ class EditorBuffer(object):
     return self.file_path_.name
 
   def get_lang(self):
-    return 'python'
+    if self.lang_ is not None:
+      return self.lang_
+
+    if self.document_.characterCount() <= 256:
+      return None
+
+    guess = Guess()
+
+    self.lang_ = guess.language_name(self.ctx_.get_document_content(self.document_))
+
+    if self.lang_ is not None:
+      self.lang_ = self.lang_.lower()
+
+    return self.lang_

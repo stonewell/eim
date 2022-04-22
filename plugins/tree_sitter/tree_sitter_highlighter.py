@@ -18,42 +18,45 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
         self.currentBlock().position(),
         self.currentBlock().position() + self.currentBlock().length())
 
-    if len(captures) > 0:
-      prev_start = -1
-      prve_key = None
+    if captures is None or len(captures) == 0:
+      return
 
-      for c in captures:
-        theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
+    prev_start = -1
+    prve_key = None
 
-        if theme_def is None:
-          logging.error(f'theme:{c[1]} is not found')
-          continue
+    for c in captures:
+      theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
 
-        f_c = self.ctx_.get_color(theme_def, 'foreground')
-        b_c = self.ctx_.get_color(theme_def, 'background')
-        bold = theme_def['weight'] == 'bold'
+      if theme_def is None:
+        logging.error(f'theme:{c[1]} is not found')
+        continue
 
-        f = QTextCharFormat()
-        if bold:
-          f.setFontWeight(QFont.Bold)
-        f.setForeground(f_c)
-        f.setBackground(b_c)
+      f_c = self.ctx_.get_color(theme_def, 'foreground')
+      b_c = self.ctx_.get_color(theme_def, 'background')
+      bold = theme_def['weight'] == 'bold'
 
-        f.setFontItalic(
-            True if 'italic' in theme_def and theme_def['italic'] else False)
+      f = QTextCharFormat()
+      f.setForeground(f_c)
+      f.setBackground(b_c)
 
-        start_index = c[0].start_byte - self.currentBlock().position()
-        count = c[0].end_byte - c[0].start_byte
+      if bold:
+        f.setFontWeight(QFont.Bold)
 
-        logging.debug(f'set format at {start_index} cout:{count} using {c[1]}')
+      if 'italic' in theme_def:
+        f.setFontItalic(True if theme_def['italic'] else False)
 
-        if prev_start == start_index:
-          self.__merge_format(start_index, f, c[1], prev_key)
+      start_index = c[0].start_byte - self.currentBlock().position()
+      count = c[0].end_byte - c[0].start_byte
 
-        prev_start = start_index
-        prev_key = c[1]
+      logging.debug(f'set format at {start_index} cout:{count} using {c[1]}')
 
-        self.setFormat(start_index, count, f)
+      if prev_start == start_index:
+        self.__merge_format(start_index, f, c[1], prev_key)
+
+      prev_start = start_index
+      prev_key = c[1]
+
+      self.setFormat(start_index, count, f)
 
   def __merge_format(self, start_index, f, key, prev_key):
     merge = key == 'property' and prev_key == 'method.call'

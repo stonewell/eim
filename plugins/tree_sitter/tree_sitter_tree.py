@@ -11,6 +11,7 @@ class TreeSitterLangTree(object):
     self.buffer_ = buffer
     self.ctx_ = ctx
     self.tree_ = None
+    self.query_ = None
 
     self.__load_language()
     self.buffer_.document_.contentsChange[int, int,
@@ -59,6 +60,10 @@ class TreeSitterLangTree(object):
     raise ValueError('unspported platform:{}'.format(platform.system()))
 
   def on_contents_change(self, start, chars_removed, chars_added):
+    if self.tree_ is None:
+      self.__load_language()
+      return
+
     self.tree_.edit(start_byte=start,
                     old_end_byte=start + chars_removed,
                     new_end_byte=start + chars_added,
