@@ -3,6 +3,8 @@ import sys
 import argparse
 import logging
 import pathlib
+import json
+import datetime
 from pubsub import pub
 
 from appdirs import AppDirs
@@ -48,6 +50,8 @@ class EditorContext(object):
     self.__load_config()
 
     self.__load_plugins()
+
+    self.__load_langs_mapping()
 
   @staticmethod
   def parse_arguments():
@@ -450,3 +454,35 @@ class EditorContext(object):
       return default_color
 
     return self.get_color(theme_def, color_key)
+
+  def __load_langs_mapping(self):
+    LANGS_MAP_URL = r'https://raw.githubusercontent.com/jonschlinkert/lang-map/master/lib/lang.json'
+    SEVEN_DAYS_SECONDS = (3600 * 24 * 7)
+
+    langs_file = pathlib.Path(self.appdirs_.user_config_dir) / 'lang.json'
+    try:
+      download_file = True
+
+      if langs_file.exists():
+        mtime = langs_file.stat().st_mtime + SEVEN_DAYS_SECONDS
+
+        if (mtime > datetime.datetime.now().timestamp()):
+          logging.info('langs mapping next update check will be on:{}'.format(
+            datetime.datetime.fromtimestamp(mtime)))
+          download_file = False
+
+      if download_file:
+        logging.info('langs mapping downloading from url:{}'.format(LANGS_MAP_URL))
+
+        with self.open_url(LANGS_MAP_URL) as langs_resp:
+          langs_file.write_bytes(langs_resp.read())
+
+        logging.info('langs mapping downloaded to:{}'.format(
+            langs_file.resolve()))
+    except:
+      logging.exception('unable to load langs mapping')
+    finally:
+      if langs_file.exists():
+        self.langs_mapping_ = json.loads(langs_file.read_text('utf-8'))
+      else:
+        self.langs_mapping_ = {}

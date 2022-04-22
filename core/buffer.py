@@ -1,7 +1,9 @@
 import logging
+from guesslang import Guess
 
 from pathlib import Path
-from guesslang import Guess
+
+guess = Guess()
 
 
 class EditorBuffer(object):
@@ -62,17 +64,36 @@ class EditorBuffer(object):
     if self.document_.characterCount() <= 10:
       return None
 
-    guess = Guess()
-
-    self.lang_ = guess.language_name(self.ctx_.get_document_content(self.document_))
-
-    if self.lang_ is not None:
-      self.lang_ = self.lang_.lower()
-
-    if self.lang_ in self.invalid_langs_:
-      self.lang_ = None
+    self.guess_lang()
 
     return self.lang_
+
+  def set_lang(self, lang):
+    self.lang_ = lang
+
+    if self.lang_ is not None:
+      self.tree_sitter_tree_.reload_languange()
+      self.highlighter_.rehighlight()
+
+  def guess_lang(self):
+    if self.file_path_ is None:
+      self.__try_guess_lang()
+      return
+
+    suffix = self.file_path_.suffix
+    if suffix.startswith('.'):
+      suffix = suffix[1:]
+
+    try:
+      langs = self.ctx_.langs_mapping_[suffix]
+
+      self.lang_ = langs[0]
+
+      if self.lang_ == 'c++':
+        self.lang_ = 'cpp'
+    except:
+      logging.warn(f'no lang mapping for:{suffix}')
+      self.__try_guess_lang()
 
   def invalid_lang(self):
     if self.lang_ is None:
@@ -80,3 +101,25 @@ class EditorBuffer(object):
 
     self.invalid_langs_[self.lang_] = True
     self.lang_ = None
+
+  def __try_guess_lang(self):
+    logging.debug('guess lang running')
+
+    content = self.ctx_.get_document_content(self.document_)
+    langs = guess.probabilities(content)
+
+    lang = None
+    if langs is not None and len(langs) > 0 and langs[0][1] >= 0.5:
+      lang = langs[0][0]
+      logging.debug(
+          f'lang detected:{lang} whose possibility:{langs[0][1]} >= 0.5')
+
+    if lang is not None:
+      lang = lang.lower()
+
+      if lang in self.invalid_langs_:
+        lang = None
+
+    if lang is not None:
+      logging.debug(f'lang detected:{lang}')
+      self.lang_ = lang

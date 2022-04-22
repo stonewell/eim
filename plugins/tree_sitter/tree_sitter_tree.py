@@ -83,3 +83,6 @@ class TreeSitterLangTree(object):
     return self.query_.captures(self.tree_.root_node,
                                 start_byte=begin,
                                 end_byte=end)
+
+  def reload_languange(self):
+    self.__load_language()
