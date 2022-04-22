@@ -122,12 +122,12 @@ class UIHelper(QObject):
     p.setColor(QPalette.Active, QPalette.Base, b_c)
     p.setColor(QPalette.Active, QPalette.Text, f_c)
 
-    line_color = self.ctx_.get_theme_def_color(
-        'highlight', 'background', p.color(QPalette.Active,
-                                           QPalette.Highlight))
-    p.setColor(QPalette.Active, QPalette.Highlight, line_color)
-    highlight_text_color = self.ctx_.get_theme_def_color(
-        'highlight', 'foreground')
-    p.setColor(QPalette.Active, QPalette.HighlightedText, highlight_text_color)
+    #line_color = self.ctx_.get_theme_def_color(
+    #    'highlight', 'background', p.color(QPalette.Active,
+    #                                       QPalette.Highlight))
+    #p.setColor(QPalette.Active, QPalette.Highlight, Qt.yellow)
+    #highlight_text_color = self.ctx_.get_theme_def_color(
+    #    'highlight', 'foreground')
+    #p.setColor(QPalette.Active, QPalette.HighlightedText, highlight_text_color)
 
     app.setPalette(p)

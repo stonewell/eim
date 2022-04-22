@@ -34,7 +34,7 @@ class Plugin(IPlugin):
   def on_buffer_changed(self, buf):
     if not hasattr(buf, 'highlighter_'):
       buf.tree_sitter_tree_ = TreeSitterLangTree(self.ctx, buf)
-      buf.highlighter_ = TreeSitterSyntaxHighlighter(self.ctx, buf)
+      buf.highlighter_ = TreeSitterSyntaxHighlighter(self.ctx, buf, self.editor_)
       logging.debug('install tree and syntax highlighter to buffer:{}'.format(
           buf.name()))
 
