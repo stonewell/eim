@@ -18,7 +18,7 @@
 - [ ] ask for input
 - [x] directory content plugin support path input
 - [ ] show error message
-- [*] syntax high light for multiple line string, comment
+- [X] syntax high light for multiple line string, comment
 - [ ] file modified outside detect
 - [ ] editing feature complete
 - [ ] auto indent
