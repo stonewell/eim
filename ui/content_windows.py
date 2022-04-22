@@ -51,13 +51,13 @@ class ContentWindowLineEdit(QLineEdit):
 
 class ContentWindow(QWidget, TextEditMixin):
 
-  def __init__(self, content_widget, ctx, parent=None):
+  def __init__(self, ctx, parent=None):
     QWidget.__init__(self, parent)
     TextEditMixin.__init__(self)
 
     self.parent_widget_ = parent
     self.ctx_ = ctx
-    self.content_widget_ = content_widget
+    self.content_widget_ = self.create_content_widget()
 
     self.text_edit_ = ContentWindowLineEdit(ctx)
 
@@ -165,11 +165,14 @@ class ContentWindow(QWidget, TextEditMixin):
   def _page_up_down(self, ctx, pageDown):
     logging.debug('content window ignore page up down')
 
+  def create_content_widget(self):
+    return None
+
 
 class ListContentWindow(ContentWindow):
 
   def __init__(self, ctx, parent=None):
-    super().__init__(QListWidget(), ctx, parent)
+    ContentWindow.__init__(self, ctx, parent)
 
     cc = self.ctx_.get_behavior_context('content_window')
     lc = self.ctx_.get_behavior_context('list_content_window', cc)
@@ -183,14 +186,18 @@ class ListContentWindow(ContentWindow):
 
     self.list_window_delegate_ = None
 
-    self.content_widget_.itemSelectionChanged.connect(
+    self.list_widget_.itemSelectionChanged.connect(
         self.__item_selection_changed)
     self.text_edit_.textEdited[str].connect(self.__on_text_edited)
     self.text_edit_.returnPressed.connect(self.__execute_command)
-    self.content_widget_.itemDoubleClicked[QListWidgetItem].connect(
+    self.list_widget_.itemDoubleClicked[QListWidgetItem].connect(
         self.__execute_command)
 
-    self.content_widget_.verticalScrollBar().setHidden(True)
+    self.list_widget_.verticalScrollBar().setHidden(True)
+
+  def create_content_widget(self):
+    self.list_widget_ = QListWidget()
+    return self.list_widget_
 
   def __execute_command(self):
     self.need_update_text_ = True
@@ -209,37 +216,37 @@ class ListContentWindow(ContentWindow):
   def __prev_item(self, ctx):
     self.need_update_text_ = True
 
-    count = self.content_widget_.count()
-    cur_row = self.content_widget_.currentRow()
+    count = self.list_widget_.count()
+    cur_row = self.list_widget_.currentRow()
 
     for row in range(cur_row - 1, -1, -1):
-      item = self.content_widget_.item(row)
+      item = self.list_widget_.item(row)
       if not item.isHidden():
-        self.content_widget_.setCurrentRow(row)
+        self.list_widget_.setCurrentRow(row)
         return
 
     for row in range(count - 1, cur_row - 1, -1):
-      item = self.content_widget_.item(row)
+      item = self.list_widget_.item(row)
       if not item.isHidden():
-        self.content_widget_.setCurrentRow(row)
+        self.list_widget_.setCurrentRow(row)
         return
 
   def __next_item(self, ctx):
     self.need_update_text_ = True
 
-    count = self.content_widget_.count()
-    cur_row = self.content_widget_.currentRow()
+    count = self.list_widget_.count()
+    cur_row = self.list_widget_.currentRow()
 
     for row in range(cur_row + 1, count):
-      item = self.content_widget_.item(row)
+      item = self.list_widget_.item(row)
       if not item.isHidden():
-        self.content_widget_.setCurrentRow(row)
+        self.list_widget_.setCurrentRow(row)
         return
 
     for row in range(0, cur_row + 1):
-      item = self.content_widget_.item(row)
+      item = self.list_widget_.item(row)
       if not item.isHidden():
-        self.content_widget_.setCurrentRow(row)
+        self.list_widget_.setCurrentRow(row)
         return
 
   def __get_item_text(self, item):
@@ -252,7 +259,7 @@ class ListContentWindow(ContentWindow):
 
   def __item_selection_changed(self):
     if self.need_update_text_:
-      txt = self.__get_item_text(self.content_widget_.currentItem())
+      txt = self.__get_item_text(self.list_widget_.currentItem())
       self.text_edit_.setText(txt)
 
   def __get_new_lt(self, item):
@@ -296,11 +303,11 @@ class ListContentWindow(ContentWindow):
     self.match_txt_and_mock_item(txt)
 
   def match_txt_and_mock_item(self, txt):
-    for row in range(self.content_widget_.count()):
-      item = self.content_widget_.item(row)
+    for row in range(self.list_widget_.count()):
+      item = self.list_widget_.item(row)
       self.__update_match_ratio(item, txt)
 
-    self.content_widget_.sortItems()
+    self.list_widget_.sortItems()
     self.need_update_text_ = False
 
     self.select_first_visible_item()
@@ -314,19 +321,19 @@ class ListContentWindow(ContentWindow):
 
   def select_first_visible_item(self):
     try:
-      for row in range(self.content_widget_.count()):
-        item = self.content_widget_.item(row)
+      for row in range(self.list_widget_.count()):
+        item = self.list_widget_.item(row)
 
         if not item.isHidden():
-          self.content_widget_.setCurrentItem(item)
+          self.list_widget_.setCurrentItem(item)
           break
     except:
       logging.exception('set current item failed')
 
   def __add_mock_item(self, txt):
     try:
-      for row in range(self.content_widget_.count()):
-        item = self.content_widget_.item(row)
+      for row in range(self.list_widget_.count()):
+        item = self.list_widget_.item(row)
 
         if txt == self.list_window_delegate_.get_item_text(item):
           logging.debug('find {} in items, do nothing'.format(txt))
@@ -335,27 +342,27 @@ class ListContentWindow(ContentWindow):
       mock_item = self.list_window_delegate_.create_mock_item(txt)
       self.__update_match_ratio(mock_item, txt)
 
-      self.content_widget_.sortItems()
+      self.list_widget_.sortItems()
 
       if not self.__has_non_mock_item_visible():
-        self.content_widget_.setCurrentItem(mock_item)
+        self.list_widget_.setCurrentItem(mock_item)
     except:
       logging.exception('add mock item error')
 
   def __remove_mock_item(self):
     try:
-      for row in range(self.content_widget_.count()):
-        item = self.content_widget_.item(row)
+      for row in range(self.list_widget_.count()):
+        item = self.list_widget_.item(row)
 
         if hasattr(item, 'mock_'):
-          self.content_widget_.takeItem(row)
+          self.list_widget_.takeItem(row)
     except:
       logging.exception('remove mock item failed')
 
   def __has_non_mock_item_visible(self):
     try:
-      for row in range(self.content_widget_.count()):
-        item = self.content_widget_.item(row)
+      for row in range(self.list_widget_.count()):
+        item = self.list_widget_.item(row)
 
         if not hasattr(item, 'mock_') and not item.isHidden():
           return True

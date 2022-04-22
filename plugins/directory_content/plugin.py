@@ -68,7 +68,7 @@ class Plugin(IPlugin):
 
     self.content_window_.item_match_text_ratio = item_text_match
 
-    self.list_widget_ = cw.content_widget_
+    self.list_widget_ = cw.list_widget_
     self.text_edit_ = cw.text_edit_
 
     self.text_edit_.returnPressed.connect(self.execute_command)

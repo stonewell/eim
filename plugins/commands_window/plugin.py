@@ -27,7 +27,7 @@ class Plugin(IPlugin):
 
     self.content_window_ = cw = ctx.create_list_content_window()
 
-    self.list_widget_ = l = cw.content_widget_
+    self.list_widget_ = l = cw.list_widget_
     self.text_edit_ = t = cw.text_edit_
 
     self.list_items_ = []
