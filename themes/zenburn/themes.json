@@ -89,8 +89,7 @@
       "weight": "bold"
     },
     "preprocessor": {
-      "foreground": "zenburn-blue+1",
-      "weight": "bold"
+      "foreground": "zenburn-blue+1"
     },
     "regexp-grouping-construct": {
       "foreground": "zenburn-yellow",

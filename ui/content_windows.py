@@ -1,5 +1,6 @@
 import traceback
 import logging
+import platform
 
 from PySide6.QtCore import Slot, Qt, QRect, QSize
 from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QListWidgetItem
@@ -19,6 +20,9 @@ class ContentWindowLineEdit(QLineEdit):
 
     self.ctx_ = ctx
 
+    self.setFrame(True)
+    self.setAutoFillBackground(True)
+
     self.__apply_theme()
 
   def keyPressEvent(self, evt):
@@ -31,17 +35,18 @@ class ContentWindowLineEdit(QLineEdit):
     super().keyPressEvent(evt)
 
   def __apply_theme(self):
-    f_c = self.ctx_.get_theme_def_color('default', 'foreground')
-    b_c = self.ctx_.get_theme_def_color('default', 'background')
+    # palette seems not working for line edit on windows
+    if platform.system() == 'Windows':
+      f_c = self.ctx_.get_theme_def_color('default', 'foreground')
+      b_c = self.ctx_.get_theme_def_color('default', 'background')
 
-    bc_name = b_c.name()
+      bc_name = b_c.name()
 
-    # palette seems not working for line edit
-    # stylesheet seems need a ARGB hex value
-    if len(bc_name) == 7:
-      bc_name = f'#00{bc_name[1:]}'
+      # stylesheet seems need a ARGB hex value
+      if len(bc_name) == 7:
+        bc_name = f'#00{bc_name[1:]}'
 
-    self.setStyleSheet(f'background-color:{bc_name};')
+      self.setStyleSheet(f'background-color:{bc_name};')
 
 
 class ContentWindow(QWidget, TextEditMixin):

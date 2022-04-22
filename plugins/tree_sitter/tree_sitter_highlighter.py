@@ -19,6 +19,9 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
         self.currentBlock().position() + self.currentBlock().length())
 
     if len(captures) > 0:
+      prev_start = -1
+      prve_key = None
+
       for c in captures:
         theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
 
@@ -43,4 +46,21 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
         count = c[0].end_byte - c[0].start_byte
 
         logging.debug(f'set format at {start_index} cout:{count} using {c[1]}')
+
+        if prev_start == start_index:
+          self.__merge_format(start_index, f, c[1], prev_key)
+
+        prev_start = start_index
+        prev_key = c[1]
+
         self.setFormat(start_index, count, f)
+
+  def __merge_format(self, start_index, f, key, prev_key):
+    merge = key == 'property' and prev_key == 'method.call'
+
+    if not merge:
+      return
+
+    prev_f = self.format(start_index)
+    f.setForeground(prev_f.foreground())
+    f.setBackground(prev_f.background())
