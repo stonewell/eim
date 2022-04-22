@@ -91,6 +91,36 @@ class ContentWindow(QWidget, TextEditMixin):
       logging.debug('content window ignore cursor op:{}, mode:{}'.format(
           op, mode))
 
+  def kill_char(self):
+    self.__kill_text(QTextCursor.Right)
+
+  def kill_word(self):
+    self.__kill_text(QTextCursor.NextWord)
+
+  def kill_end_of_line(self):
+    self.__kill_text(QTextCursor.EndOfLine)
+
+  def kill_start_of_line(self):
+    self.__kill_text(QTextCursor.StartOfLine)
+
+  def __kill_text(self, op):
+    if op == QTextCursor.Left:
+      self.text_edit_.cursorBackward(True)
+    elif op == QTextCursor.Right:
+      self.text_edit_.cursorForward(True)
+    elif op == QTextCursor.EndOfLine:
+      self.text_edit_.end(True)
+    elif op == QTextCursor.StartOfLine:
+      self.text_edit_.home(True)
+    elif op == QTextCursor.PreviousWord:
+      self.text_edit_.cursorWordBackward(True)
+    elif op == QTextCursor.NextWord:
+      self.text_edit_.cursorWordForward(True)
+    else:
+      logging.debug('content window ignore cursor op:{}, mode:{}'.format(
+          op, mode))
+    self.text_edit_.cut()
+
   def select_all(self):
     self.text_edit_.selectAll()
 

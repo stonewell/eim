@@ -23,8 +23,8 @@
   - [X] syntax highlight deal with selected content, handled by QT, but need to refine the text/background color
 - [ ] file modified outside detect
 - [ ] editing feature complete
-  - [ ] kill char
-  - [ ] kill line
+  - [X] kill char
+  - [X] kill line
   - [ ] search
   - [ ] regex search
   - [ ] replace

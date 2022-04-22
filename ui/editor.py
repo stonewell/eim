@@ -75,3 +75,20 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
   def __apply_theme(self):
     pass
+
+  def kill_char(self):
+    self.textCursor().deleteChar()
+
+  def kill_word(self):
+    self.__kill_text(QTextCursor.NextWord)
+
+  def kill_end_of_line(self):
+    self.__kill_text(QTextCursor.EndOfLine)
+
+  def kill_start_of_line(self):
+    self.__kill_text(QTextCursor.StartOfLine)
+
+  def __kill_text(self, op):
+    c = self.textCursor()
+    c.movePosition(op, QTextCursor.KeepAnchor)
+    c.removeSelectedText()

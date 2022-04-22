@@ -69,6 +69,14 @@ class TextEditMixin(MarkerMixin):
                            False)
     self.ctx_.hook_command(BuiltinCommands.CUT, lambda ctx: self.cut(), None,
                            False)
+    self.ctx_.hook_command(BuiltinCommands.KILL_CHAR, lambda ctx: self.kill_char(), None,
+                           False)
+    self.ctx_.hook_command(BuiltinCommands.KILL_WORD, lambda ctx: self.kill_word(), None,
+                           False)
+    self.ctx_.hook_command(BuiltinCommands.KILL_TO_END_OF_LINE, lambda ctx: self.kill_end_of_line(), None,
+                           False)
+    self.ctx_.hook_command(BuiltinCommands.KILL_TO_START_OF_LINE, lambda ctx: self.kill_start_of_line(), None,
+                           False)
 
   def __next_page(self, ctx):
     self._page_up_down(ctx, True)
