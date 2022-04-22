@@ -29,8 +29,8 @@
   - [ ] regex search
   - [ ] replace
   - [ ] regex replace
-  - [ ] undo
-  - [ ] redo
+  - [X] undo
+  - [X] redo
   - [ ] paste with history
 - [X] detect language using file suffix, then use guesslang
 - [X] force buffer lang

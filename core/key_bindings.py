@@ -28,4 +28,6 @@ def default_key_bindings():
       'Esc,Esc': BuiltinCommands.CANCEL,
       'Ctrl+G': BuiltinCommands.CANCEL,
       'Ctrl+X, H': BuiltinCommands.SELECT_ALL,
+      'Ctrl+Shift+-': BuiltinCommands.UNDO,
+      'Ctrl+Shift+=': BuiltinCommands.REDO,
   }

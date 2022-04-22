@@ -121,6 +121,12 @@ class ContentWindow(QWidget, TextEditMixin):
           op, mode))
     self.text_edit_.cut()
 
+  def undo(self):
+    self.text_edit_.undo()
+
+  def redo(self):
+    self.text_edit_.redo()
+
   def select_all(self):
     self.text_edit_.selectAll()
 

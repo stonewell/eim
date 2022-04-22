@@ -28,6 +28,8 @@ class BuiltinCommands(object):
   PASTE = 'paste'
   CUT = 'cut'
   COPY_PASTE_HISTORY = 'copy_paste_history'
+  UNDO = 'undo'
+  REDO = 'redo'
 
   KILL_CHAR = 'kill_char'
   KILL_WORD = 'kill_word'
