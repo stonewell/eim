@@ -87,7 +87,6 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       #   selectF.setBackground(b_c)
       #   self.setFormat(start_index, count, selectF)
 
-
   def __merge_format(self, start_index, f, key, prev_key):
     merge = key == 'property' and prev_key == 'method.call'
 
