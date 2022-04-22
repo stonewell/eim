@@ -21,6 +21,7 @@
 - [ ] show error message
 - [X] syntax high light for multiple line string, comment
   - [X] syntax highlight deal with selected content, handled by QT, but need to refine the text/background color
+  - [ ] considering re-impl selection with extra selection to keep syntax high light when lines selected
 - [ ] file modified outside detect
 - [ ] editing feature complete
   - [X] kill char
