@@ -25,9 +25,14 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
     prve_key = None
 
     for c in captures:
-      if c[0].start_byte > (self.currentBlock().position() + self.currentBlock().length()):
-        logging.debug(f'captures {c} exceed current block')
+      start_index, count, valid_capture = self.__normalize_capture_with_current_block(
+          c)
+
+      if not valid_capture:
         continue
+
+      logging.debug(
+          f'set format at {start_index} count:{count} using {c[1]}, {text}')
 
       theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
 
@@ -49,20 +54,6 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       if 'italic' in theme_def:
         f.setFontItalic(True if theme_def['italic'] else False)
 
-      start_index = c[0].start_byte - self.currentBlock().position()
-      count = c[0].end_byte - c[0].start_byte
-
-      if start_index < 0:
-        count += start_index
-        start_index = 0
-
-      if (start_index + count) > (self.currentBlock().position() +
-                                  self.currentBlock().length()):
-        count = (self.currentBlock().position() +
-                 self.currentBlock().length() - start_index)
-
-      logging.debug(f'set format at {start_index} count:{count} using {c[1]}, {text}')
-
       if prev_start == start_index:
         self.__merge_format(start_index, f, c[1], prev_key)
 
@@ -80,3 +71,31 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
     prev_f = self.format(start_index)
     f.setForeground(prev_f.foreground())
     f.setBackground(prev_f.background())
+
+  def __normalize_capture_with_current_block(self, c):
+    if c[0].start_byte > (self.currentBlock().position() +
+                          self.currentBlock().length()):
+      logging.debug(f'captures {c} exceed current block')
+      return None, None, False
+
+    start_index = c[0].start_byte - self.currentBlock().position()
+    count = c[0].end_byte - c[0].start_byte
+
+    if start_index > self.currentBlock().length():
+      logging.debug(
+          f'captures {c} exceed current block, start:{start_index} > block lenght:{self.currentBlock().length()}'
+      )
+      return None, None, False
+
+    if start_index < 0:
+      count += start_index
+      start_index = 0
+
+    if count <= 0:
+      logging.debug(f'captures {c} exceed current block, count <= 0')
+      return None, None, False
+
+    if (start_index + count) > self.currentBlock().length():
+      count = (self.currentBlock().length() - start_index)
+
+    return start_index, count, True
