@@ -1,5 +1,6 @@
 import os
 import logging
+import platform
 
 from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
@@ -122,12 +123,14 @@ class UIHelper(QObject):
     p.setColor(QPalette.Active, QPalette.Base, b_c)
     p.setColor(QPalette.Active, QPalette.Text, f_c)
 
-    #line_color = self.ctx_.get_theme_def_color(
-    #    'highlight', 'background', p.color(QPalette.Active,
-    #                                       QPalette.Highlight))
-    #p.setColor(QPalette.Active, QPalette.Highlight, Qt.yellow)
-    #highlight_text_color = self.ctx_.get_theme_def_color(
-    #    'highlight', 'foreground')
-    #p.setColor(QPalette.Active, QPalette.HighlightedText, highlight_text_color)
+    if platform.system() == 'Windows':
+      # on windows platform repla
+      c = QColor()
+      c.setNamedColor('#308cc6')
+      p.setColor(QPalette.Active, QPalette.Highlight, c)
+
+      c = QColor()
+      c.setNamedColor('#ffffff')
+      p.setColor(QPalette.Active, QPalette.HighlightedText, c)
 
     app.setPalette(p)

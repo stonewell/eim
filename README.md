@@ -20,7 +20,7 @@
 - [X] directory content plugin support path input
 - [ ] show error message
 - [X] syntax high light for multiple line string, comment
-  - [ ] syntax highlight deal with selected content
+  - [X] syntax highlight deal with selected content, handled by QT, but need to refine the text/background color
 - [ ] file modified outside detect
 - [ ] editing feature complete
   - [ ] kill char
