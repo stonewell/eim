@@ -3,7 +3,7 @@
 
 - [ ] Piece Table with Tree
 - [ ] Treesitter
--- [*] Syntax Highlighting
+- [*] Syntax Highlighting
 - [ ] LSP
 - [ ] EditorConfig
 - [ ] Search Everything
