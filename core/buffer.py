@@ -4,6 +4,10 @@ from guesslang import Guess
 from pathlib import Path
 
 guess = Guess()
+lang_name_mapping = {
+    'c++': 'cpp',
+    'c+': 'c-sharp',
+}
 
 
 class EditorBuffer(object):
@@ -89,9 +93,11 @@ class EditorBuffer(object):
 
       self.lang_ = langs[0]
 
-      if self.lang_ == 'c++':
-        self.lang_ = 'cpp'
-    except:
+      try:
+        self.lang_ = lang_name_mapping[self.lang_]
+      except(KeyError):
+        pass
+    except(KeyError):
       logging.warn(f'no lang mapping for:{suffix}')
       self.__try_guess_lang()
 
