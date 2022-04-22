@@ -3,7 +3,7 @@ import pathlib
 import platform
 
 from tree_sitter import Language, Parser
-
+from .tree_sitter_langs import suffix
 
 class TreeSitterLangTree(object):
 
@@ -31,7 +31,7 @@ class TreeSitterLangTree(object):
     langs_data_query_file = langs_data_dir / 'queries' / lang / 'highlights.scm'
 
     lang_binary = langs_data_bin_dir / '{}.{}'.format(
-        lang, TreeSitterLangTree.__suffix())
+        lang, suffix())
 
     if not lang_binary.exists():
       logging.warn('buffer language:{} is not supported'.format(lang))
@@ -49,17 +49,6 @@ class TreeSitterLangTree(object):
       self.query_ = self.lang_.query(langs_data_query_file.read_text())
     else:
       self.query_ = None
-
-  @staticmethod
-  def __suffix():
-    if platform.system() == 'Linux':
-      return 'so'
-    if platform.system() == 'Windows':
-      return 'dll'
-    if platform.system() == 'Darwin':
-      return 'dylib'
-
-    raise ValueError('unspported platform:{}'.format(platform.system()))
 
   def on_contents_change(self, start, chars_removed, chars_added):
     if self.tree_ is None:

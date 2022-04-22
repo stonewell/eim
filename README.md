@@ -16,11 +16,11 @@
 
 ## TODO
 - [ ] ask for input
-- [x] directory content plugin support path input
+- [X] directory content plugin support path input
 - [ ] show error message
 - [X] syntax high light for multiple line string, comment
 - [ ] file modified outside detect
 - [ ] editing feature complete
 - [ ] auto indent
-- [ ] detect language using file suffix, then use guesslang
-- [ ] force buffer lang
+- [X] detect language using file suffix, then use guesslang
+- [X] force buffer lang

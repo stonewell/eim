@@ -122,7 +122,6 @@ def clone_grammas(langs_data_path):
     logging.exception('tree sitter grammer clone repo failed')
 
 
-@staticmethod
 def update_grammas(langs_data_dir):
   from git import Repo
 
@@ -132,3 +131,29 @@ def update_grammas(langs_data_dir):
     logging.info('tree sitter grammars pulled latest version')
   except:
     Plugin.clone_grammas(langs_data_dir)
+
+
+def get_lang_names(ctx):
+  langs_bin_dir = pathlib.Path(
+      ctx.appdirs_.user_config_dir) / 'tree_sitter_langs' / 'data' / 'bin'
+
+  if not langs_bin_dir.exists():
+    return []
+
+  lang_names = []
+  for lang in langs_bin_dir.iterdir():
+    if lang.is_file() and lang.suffix.lower() == '.' + suffix():
+      lang_names.append(lang.stem)
+
+  return lang_names
+
+
+def suffix():
+  if platform.system() == 'Linux':
+    return 'so'
+  if platform.system() == 'Windows':
+    return 'dll'
+  if platform.system() == 'Darwin':
+    return 'dylib'
+
+  raise ValueError('unspported platform:{}'.format(platform.system()))
