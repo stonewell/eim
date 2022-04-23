@@ -6,7 +6,7 @@ from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor,
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
 from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt
 
-from .content_windows import ListContentWindow
+from .list_content_window import ListContentWindow
 from core.builtin_commands import BuiltinCommands
 
 
