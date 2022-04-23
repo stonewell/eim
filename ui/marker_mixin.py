@@ -23,6 +23,8 @@ class MarkerMixin(object):
     if self.marker_ is not None:
       self.marker_.active_ = v
 
+    self.clear_selection()
+
   def push_marker(self):
     self.marker_ = Marker()
     self.marker_.marker_pos_ = self.cursor_position()
@@ -34,3 +36,5 @@ class MarkerMixin(object):
   def register_commands(self):
     self.ctx_.hook_command(BuiltinCommands.PUSH_MARK,
                            lambda ctx: self.push_marker(), None, False)
+    self.ctx_.hook_command(BuiltinCommands.CANCEL,
+                           lambda ctx: self.active_marker(False), None, False)

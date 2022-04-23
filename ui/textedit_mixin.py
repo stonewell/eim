@@ -63,24 +63,35 @@ class TextEditMixin(MarkerMixin):
                            False)
     self.ctx_.hook_command(BuiltinCommands.SELECT_ALL,
                            lambda ctx: self.select_all(), None, False)
-    self.ctx_.hook_command(BuiltinCommands.PASTE, lambda ctx: self.paste(),
+    self.ctx_.hook_command(BuiltinCommands.PASTE,
+                           self.__wrap_kill_func(lambda ctx: self.paste()),
                            None, False)
-    self.ctx_.hook_command(BuiltinCommands.COPY, lambda ctx: self.copy(), None,
-                           False)
-    self.ctx_.hook_command(BuiltinCommands.CUT, lambda ctx: self.cut(), None,
+    self.ctx_.hook_command(BuiltinCommands.COPY,
+                           self.__wrap_kill_func(lambda ctx: self.copy()),
+                           None, False)
+    self.ctx_.hook_command(BuiltinCommands.CUT,
+                           self.__wrap_kill_func(lambda ctx: self.cut()), None,
                            False)
     self.ctx_.hook_command(BuiltinCommands.KILL_CHAR,
-                           lambda ctx: self.kill_char(), None, False)
+                           self.__wrap_kill_func(lambda ctx: self.kill_char()),
+                           None, False)
     self.ctx_.hook_command(BuiltinCommands.KILL_WORD,
-                           lambda ctx: self.kill_word(), None, False)
-    self.ctx_.hook_command(BuiltinCommands.KILL_TO_END_OF_LINE,
-                           lambda ctx: self.kill_end_of_line(), None, False)
-    self.ctx_.hook_command(BuiltinCommands.KILL_TO_START_OF_LINE,
-                           lambda ctx: self.kill_start_of_line(), None, False)
-    self.ctx_.hook_command(BuiltinCommands.UNDO, lambda ctx: self.undo(), None,
-                           False)
-    self.ctx_.hook_command(BuiltinCommands.REDO, lambda ctx: self.redo(), None,
-                           False)
+                           self.__wrap_kill_func(lambda ctx: self.kill_word()),
+                           None, False)
+    self.ctx_.hook_command(
+        BuiltinCommands.KILL_TO_END_OF_LINE,
+        self.__wrap_kill_func(lambda ctx: self.kill_end_of_line()), None,
+        False)
+    self.ctx_.hook_command(
+        BuiltinCommands.KILL_TO_START_OF_LINE,
+        self.__wrap_kill_func(lambda ctx: self.kill_start_of_line()), None,
+        False)
+    self.ctx_.hook_command(BuiltinCommands.UNDO,
+                           self.__wrap_kill_func(lambda ctx: self.undo()),
+                           None, False)
+    self.ctx_.hook_command(BuiltinCommands.REDO,
+                           self.__wrap_kill_func(lambda ctx: self.redo()),
+                           None, False)
 
   def __next_page(self, ctx):
     self._page_up_down(ctx, True)
@@ -91,3 +102,12 @@ class TextEditMixin(MarkerMixin):
   def _page_up_down(self, ctx, pageDown):
     logging.debug('text edit mixin page up down')
     pass
+
+  def __wrap_kill_func(self, func):
+
+    def __kill_wrapper(ctx):
+      func(ctx)
+
+      self.active_marker(False)
+
+    return __kill_wrapper

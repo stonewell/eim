@@ -20,6 +20,8 @@ class Editor(QPlainTextEdit, TextEditMixin):
     self.ctx_ = ctx
     ctx.ui_helper.set_current_window(self)
 
+    self.kill_ring_ = []
+
     ctx.switch_behavior_context('editor')
 
     self.__apply_theme()
@@ -91,4 +93,40 @@ class Editor(QPlainTextEdit, TextEditMixin):
   def __kill_text(self, op):
     c = self.textCursor()
     c.movePosition(op, QTextCursor.KeepAnchor)
+    self.copy()
     c.removeSelectedText()
+    self.setTextCursor(c)
+
+  def copy(self):
+    self.__save_selection()
+    super().copy()
+
+  def cut(self):
+    self.__save_selection()
+    super().cut()
+
+  def paste(self):
+    super().paste()
+
+  def clear_selection(self):
+    c = self.textCursor()
+    c.clearSelection()
+    self.setTextCursor(c)
+
+  def __save_selection(self):
+    c = self.textCursor()
+
+    txt = c.selectedText()
+
+    if len(txt) == 0:
+      return
+
+    self.update_kill_ring(txt)
+
+  def update_kill_ring(self, txt):
+    try:
+      self.kill_ring_.remove(txt)
+    except:
+      pass
+
+    self.kill_ring_.insert(0, txt)

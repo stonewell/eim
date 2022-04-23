@@ -32,6 +32,7 @@
   - [ ] regex replace
   - [X] undo
   - [X] redo
-  - [ ] paste with history
+  - [X] paste with history
+  - [ ] Search in files with ag/rg
 - [X] detect language using file suffix, then use guesslang
 - [X] force buffer lang

@@ -14,12 +14,10 @@ class ListContentWindow(ContentWindow):
     ContentWindow.__init__(self, ctx, parent)
 
     cc = self.ctx_.get_behavior_context('content_window')
-    lc = self.ctx_.get_behavior_context('list_content_window', cc)
+    lc = self.ctx_.get_behavior_context('list_content_window')
+    lc.set_parent_context(cc)
 
     self.need_update_text_ = False
-
-    self.register_commands()
-    self.bind_keys()
 
     self.ctx_.switch_behavior_context('list_content_window')
 
@@ -50,7 +48,7 @@ class ListContentWindow(ContentWindow):
                            'list_content_window', False)
 
   def bind_keys(self):
-    pass
+    super().bind_keys()
 
   def __prev_item(self, ctx):
     self.need_update_text_ = True
@@ -88,9 +86,13 @@ class ListContentWindow(ContentWindow):
         self.list_widget_.setCurrentRow(row)
         return
 
-  def __get_item_text(self, item):
+  def __get_item_text(self, item, for_display=False):
     if self.list_window_delegate_ is not None:
-      txt = self.list_window_delegate_.get_item_text(item)
+      if for_display and hasattr(self.list_window_delegate_,
+                                 'get_item_display_text'):
+        txt = self.list_window_delegate_.get_item_display_text(item)
+      else:
+        txt = self.list_window_delegate_.get_item_text(item)
     else:
       txt = item.text()
 
@@ -98,7 +100,7 @@ class ListContentWindow(ContentWindow):
 
   def __item_selection_changed(self):
     if self.need_update_text_:
-      txt = self.__get_item_text(self.list_widget_.currentItem())
+      txt = self.__get_item_text(self.list_widget_.currentItem(), True)
       self.text_edit_.setText(txt)
 
   def __get_new_lt(self, item):

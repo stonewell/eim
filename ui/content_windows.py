@@ -58,7 +58,11 @@ class ContentWindow(QWidget, TextEditMixin):
     self.text_edit_ = ContentWindowLineEdit(ctx)
 
     layout = QVBoxLayout()
-    layout.addWidget(self.content_widget_)
+    if isinstance(self.content_widget_, QWidget):
+      layout.addWidget(self.content_widget_)
+    else:
+      layout.addLayout(self.content_widget_)
+
     layout.addWidget(self.text_edit_)
     self.setLayout(layout)
 
@@ -138,6 +142,9 @@ class ContentWindow(QWidget, TextEditMixin):
   def register_commands(self):
     super().register_commands()
 
+  def bind_keys(self):
+    super().bind_keys()
+
   def update_geometry(self):
     cr = self.parent_widget_.contentsRect()
     vm = self.parent_widget_.viewportMargins()
@@ -163,3 +170,6 @@ class ContentWindow(QWidget, TextEditMixin):
 
   def create_content_widget(self):
     return None
+
+  def clear_selection(self):
+    self.text_edit_.deselect()

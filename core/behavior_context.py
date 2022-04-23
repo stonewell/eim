@@ -12,6 +12,9 @@ class BehaviorContext(object):
     self.keys_ = {}
     self.hooked_commands_ = {}
 
+  def set_parent_context(self, parent_context):
+    self.parent_context_ = parent_context
+
   def bind_key(self, key_seq, cmd_or_callable):
     self.keys_[key_seq] = cmd_or_callable
 

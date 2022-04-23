@@ -209,6 +209,13 @@ class EditorContext(object):
 
     return self.content_window_
 
+  def create_list_with_preview_content_window(self):
+    self.close_content_window()
+
+    self.content_window_ = self.ui_helper.create_list_with_preview_content_window()
+
+    return self.content_window_
+
   def bind_key(self, key_seq, cmd_or_callable, binding_context=None):
     binding_context = self.get_behavior_context(binding_context)
 
