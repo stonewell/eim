@@ -14,6 +14,7 @@
 - [x] Keybinding with prefix key, built-in support by pyside6
 - [ ] Flycheck
 - [ ] Auto indent
+- [ ] Status Line
 
 ## TODO
 - [ ] ask for input
