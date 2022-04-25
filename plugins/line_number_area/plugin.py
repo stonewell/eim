@@ -1,4 +1,6 @@
-from PySide6.QtCore import Slot, Qt, QRect, QSize
+from pubsub import pub
+
+from PySide6.QtCore import Slot, Qt, QRect, QSize, QMargins
 from PySide6.QtGui import QColor, QPainter, QTextFormat
 from PySide6.QtWidgets import QPlainTextEdit, QWidget, QTextEdit
 
@@ -27,6 +29,9 @@ class LineNumberArea(QWidget):
   def __init__(self, editor):
     super().__init__(editor)
     self.editor_ = editor
+
+    self.ctx.register_editor_viewport_handler(self)
+
     self.editor_.blockCountChanged[int].connect(
         self.update_line_number_area_width)
     self.editor_.updateRequest[QRect,
@@ -99,3 +104,6 @@ class LineNumberArea(QWidget):
     if current_geometry != rect:
       self.setGeometry(rect)
       self.update_line_number_area_width(0)
+
+  def get_editor_margin(self):
+    return QMargins(self.line_number_area_width(), 0, 0, 0)

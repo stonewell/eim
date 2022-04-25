@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot, Qt, QRect, QSize
+from PySide6.QtCore import Slot, Qt, QRect, QSize, QMargins
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import QWidget
 from pubsub import pub
@@ -9,6 +9,9 @@ class ModeLineArea(QWidget):
   def __init__(self, editor):
     super().__init__(editor)
     self.editor_ = editor
+
+    self.ctx.register_editor_viewport_handler(self)
+
     self.editor_.blockCountChanged[int].connect(
         self.update_mode_line_area_height)
     self.editor_.updateRequest[QRect, int].connect(self.update_mode_line_area)
@@ -51,3 +54,6 @@ class ModeLineArea(QWidget):
     if current_geometry != rect:
       self.setGeometry(rect)
       self.update_mode_line_area_height(0)
+
+  def get_editor_margin(self):
+    return QMargins(0, 0, 0, self.mode_line_area_height())

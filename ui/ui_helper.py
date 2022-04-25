@@ -6,7 +6,7 @@ from functools import reduce
 
 from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
-from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, QMargin
+from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, QMargins, Slot
 
 from .list_content_window import ListContentWindow
 from .list_with_preview_content_window import ListWithPreviewContentWindow
@@ -166,7 +166,10 @@ class UIHelper(QObject):
 
   @Slot()
   def update_editor_viwe_port(self, rect, dy):
-    v = QMargin()
+    if self.editor_ is None or len(self.editor_view_port_handlers_) == 0:
+      return
+
+    v = QMargins()
 
     v = reduce(
         lambda x: v + x,
