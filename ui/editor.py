@@ -92,7 +92,17 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
   def __kill_text(self, op):
     c = self.textCursor()
+
     c.movePosition(op, QTextCursor.KeepAnchor)
+    txt = c.selectedText()
+
+    if len(txt) == 0:
+      if op == QTextCursor.StartOfLine:
+        c.deletePreviousChar()
+      else:
+        c.deleteChar()
+      return
+
     self.copy()
     c.removeSelectedText()
     self.setTextCursor(c)
