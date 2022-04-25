@@ -77,7 +77,6 @@ class UIHelper(QObject):
     content_window.register_commands()
     content_window.bind_keys()
 
-
     return content_window
 
   def create_list_with_preview_content_window(self):
@@ -109,6 +108,14 @@ class UIHelper(QObject):
       self.editor_.setDocument(buffer.document_)
     else:
       buffer.document_ = self.editor_.document()
+
+  def save_editing_state(self, buffer):
+    buffer.text_cursor_ = self.editor_.textCursor()
+
+  def load_editing_state(self, buffer):
+    if buffer.text_cursor_ is not None:
+      self.editor_.setTextCursor(buffer.text_cursor_)
+      self.editor_.ensureCursorVisible()
 
   def get_document_content(self, document):
     return document.toPlainText()

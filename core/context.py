@@ -388,9 +388,15 @@ class EditorContext(object):
       pass
 
     self.buffers_.insert(0, buffer)
+
+    if self.current_buffer_ is not None:
+      self.ui_helper.save_editing_state(self.current_buffer_)
+
     self.current_buffer_ = buffer
 
     self.ui_helper.update_document(self.current_buffer_, True)
+    self.ui_helper.load_editing_state(self.current_buffer_)
+
     pub.sendMessage('buffer_changed', buf=buffer)
 
   def switch_to_buffer(self, buf_name):

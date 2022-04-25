@@ -27,6 +27,7 @@ class EditorBuffer(object):
     self.ctx_ = ctx
     self.document_ = self.ctx_.create_document('')
     self.lang_ = None
+    self.text_cursor_ = None
     self.invalid_langs_ = {}
 
   def load_file(self, file_path):
