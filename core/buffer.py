@@ -4,6 +4,15 @@ from guesslang import Guess
 from pathlib import Path
 
 guess = Guess()
+guess.probabilities('''
+#include <stdio.h>
+
+int main(int argc, char ** argv) {
+  printf("Hello World!\n");
+  return 0
+}
+''')
+
 lang_name_mapping = {
     'c++': 'c',
     'c#': 'c-sharp',
@@ -95,9 +104,9 @@ class EditorBuffer(object):
 
       try:
         self.lang_ = lang_name_mapping[self.lang_]
-      except(KeyError):
+      except (KeyError):
         pass
-    except(KeyError):
+    except (KeyError):
       logging.warn(f'no lang mapping for:{suffix}')
       self.__try_guess_lang()
 
@@ -132,5 +141,5 @@ class EditorBuffer(object):
 
       try:
         self.lang_ = lang_name_mapping[self.lang_]
-      except(KeyError):
+      except (KeyError):
         pass

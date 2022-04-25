@@ -36,5 +36,8 @@ class MarkerMixin(object):
   def register_commands(self):
     self.ctx_.hook_command(BuiltinCommands.PUSH_MARK,
                            lambda ctx: self.push_marker(), None, False)
-    self.ctx_.hook_command(BuiltinCommands.CANCEL,
-                           lambda ctx: self.active_marker(False), None, False)
+    self.ctx_.hook_command(BuiltinCommands.CANCEL, self.cmd_cancel, None,
+                           False)
+
+  def cmd_cancel(self, ctx):
+    self.active_marker(False)

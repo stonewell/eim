@@ -173,3 +173,9 @@ class ContentWindow(QWidget, TextEditMixin):
 
   def clear_selection(self):
     self.text_edit_.deselect()
+
+  def cmd_cancel(self, ctx):
+    if self.is_marker_active():
+      self.active_marker(False)
+    else:
+      self.ctx_.close_content_window()
