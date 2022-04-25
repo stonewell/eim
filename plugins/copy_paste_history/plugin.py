@@ -45,7 +45,7 @@ class Plugin(IPlugin):
       item.setForeground(f_c)
       item.setBackground(b_c)
       item.preview_text_ = v
-      self.order_ = index
+      item.order_ = index
       item.custom_lt = self.__get_item_custom_lt(item)
 
       self.list_items_.append(item)
@@ -63,11 +63,8 @@ class Plugin(IPlugin):
     self.item_double_clicked(self.list_widget_.currentItem())
 
   def item_double_clicked(self, item):
-    txt = self.list_widget_.currentItem().preview_text_
-    c = self.editor_.textCursor()
-    c.insertText(txt)
-
-    self.editor_.update_kill_ring(txt)
+    order = self.list_widget_.currentItem().order_
+    self.editor_.paste_from_history(order)
 
     self.ctx.close_content_window()
 

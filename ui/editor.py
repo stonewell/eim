@@ -2,7 +2,7 @@ import logging
 
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QTextCursor, QPalette
-from PySide6.QtWidgets import QPlainTextEdit
+from PySide6.QtWidgets import QPlainTextEdit, QApplication
 from PySide6.QtWidgets import QAbstractSlider
 
 from core.builtin_commands import BuiltinCommands
@@ -116,7 +116,8 @@ class Editor(QPlainTextEdit, TextEditMixin):
     super().cut()
 
   def paste(self):
-    super().paste()
+    self.__save_paste_history_from_clipboard()
+    self.paste_from_history(0)
 
   def clear_selection(self):
     c = self.textCursor()
@@ -131,12 +132,40 @@ class Editor(QPlainTextEdit, TextEditMixin):
     if len(txt) == 0:
       return
 
-    self.update_kill_ring(txt)
+    self.__update_kill_ring(txt)
 
-  def update_kill_ring(self, txt):
+  def __update_kill_ring(self, txt):
     try:
       self.kill_ring_.remove(txt)
     except:
       pass
 
     self.kill_ring_.insert(0, txt)
+
+  def paste_from_history(self, index):
+    txt = None
+    try:
+      txt = self.kill_ring_[index]
+    except:
+      pass
+
+    if txt is None:
+      return
+
+    c = self.textCursor()
+    c.insertText(txt)
+
+    self.__update_kill_ring(txt)
+
+  def __save_paste_history_from_clipboard(self):
+    clipboard = QApplication.clipboard()
+    mimeData = clipboard.mimeData()
+
+    txt = None
+    if mimeData.hasText():
+      txt = mimeData.text()
+    elif mimeData.hasHtml():
+      txt = mimeData.html()
+
+    if txt is not None:
+      self.__update_kill_ring(txt)
