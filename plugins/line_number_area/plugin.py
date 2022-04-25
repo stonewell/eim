@@ -21,16 +21,17 @@ class Plugin(IPlugin):
 
   def set_current_window(self, editor):
     self.editor_ = editor
-    self.line_number_area_ = LineNumberArea(self.editor_)
+    self.line_number_area_ = LineNumberArea(self.ctx, self.editor_)
 
 
 class LineNumberArea(QWidget):
 
-  def __init__(self, editor):
+  def __init__(self, ctx, editor):
     super().__init__(editor)
     self.editor_ = editor
+    self.ctx_ = ctx
 
-    self.ctx.register_editor_viewport_handler(self)
+    self.ctx_.register_editor_viewport_handler(self)
 
     self.editor_.blockCountChanged[int].connect(
         self.update_line_number_area_width)

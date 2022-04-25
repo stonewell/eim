@@ -6,11 +6,12 @@ from pubsub import pub
 
 class ModeLineArea(QWidget):
 
-  def __init__(self, editor):
+  def __init__(self, ctx, editor):
     super().__init__(editor)
     self.editor_ = editor
+    self.ctx_ = ctx
 
-    self.ctx.register_editor_viewport_handler(self)
+    self.ctx_.register_editor_viewport_handler(self)
 
     self.editor_.blockCountChanged[int].connect(
         self.update_mode_line_area_height)

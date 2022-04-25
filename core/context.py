@@ -44,6 +44,7 @@ class EditorContext(object):
     self.command_history_ = []
     self.current_buffer_ = None
     self.buffers_ = []
+    self.editor_view_port_handlers_ = []
 
     self.validate_args(args)
 
@@ -501,4 +502,4 @@ class EditorContext(object):
         self.langs_mapping_ = {}
 
   def register_editor_viewport_handler(self, handler):
-    self.ui_helper_.register_editor_viewport_handler(handler)
+    self.editor_view_port_handlers_.append(handler)

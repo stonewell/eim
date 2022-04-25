@@ -16,4 +16,4 @@ class Plugin(IPlugin):
 
   def set_current_window(self, editor):
     self.editor_ = editor
-    self.mode_line_area_ = ModeLineArea(self.editor_)
+    self.mode_line_area_ = ModeLineArea(self.ctx, self.editor_)

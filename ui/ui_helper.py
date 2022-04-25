@@ -29,8 +29,6 @@ class UIHelper(QObject):
     if self.ctx_.args.debug > 2:
       os.environ['QT_DEBUG_PLUGINS'] = '1'
 
-    self.editor_view_port_handlers_ = []
-
   def create_application(self):
     self.ctx_.app = app = EIMApplication()
 
@@ -161,19 +159,16 @@ class UIHelper(QObject):
 
     app.setPalette(p)
 
-  def register_editor_viewport_handler(self, handler):
-    self.editor_view_port_handlers_.append(handler)
-
   @Slot()
   def update_editor_viwe_port(self, rect, dy):
-    if self.editor_ is None or len(self.editor_view_port_handlers_) == 0:
+    if self.editor_ is None or len(self.ctx_.editor_view_port_handlers_) == 0:
       return
 
     v = QMargins()
 
     v = reduce(
-        lambda x: v + x,
-        map(lambda x: x.get_editor_margin(), self.editor_view_port_handlers_))
+        lambda x,y: y + x,
+        map(lambda x: x.get_editor_margin(), self.ctx_.editor_view_port_handlers_))
 
     if v != self.editor_.viewportMargins():
       self.editor_.setViewportMargins(v)
