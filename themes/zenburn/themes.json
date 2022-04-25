@@ -111,6 +111,11 @@
     "warning": {
       "foreground": "zenburn-yellow-2",
       "weight": "bold"
+    },
+    "line-number": {
+      "foreground": "zenburn-bg+2",
+      "background": "zenburn-bg-05",
+      "current-line":"zenburn-yellow-2"
     }
   }
 }

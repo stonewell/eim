@@ -44,20 +44,28 @@ class LineNumberArea(QWidget):
 
   def paintEvent(self, event):
     painter = QPainter(self)
-    painter.fillRect(event.rect(), Qt.lightGray)
+
+    f_c = self.ctx_.get_theme_def_color('line-number', 'foreground', Qt.black)
+    b_c = self.ctx_.get_theme_def_color('line-number', 'background', Qt.lightGray)
+    c_c = self.ctx_.get_theme_def_color('line-number', 'current-line', Qt.yellow)
+
+    painter.fillRect(event.rect(), b_c)
+
     block = self.editor_.firstVisibleBlock()
     block_number = block.blockNumber()
     offset = self.editor_.contentOffset()
     top = self.editor_.blockBoundingGeometry(block).translated(offset).top()
     bottom = top + self.editor_.blockBoundingRect(block).height()
 
-    painter.setPen(Qt.black)
     width = self.width()
     height = self.editor_.fontMetrics().height()
+
+    current_block_number = self.editor_.textCursor().blockNumber()
 
     while block.isValid() and top <= event.rect().bottom():
       if block.isVisible() and bottom >= event.rect().top():
         number = str(block_number + 1)
+        painter.setPen(c_c) if block_number == current_block_number else painter.setPen(f_c)
         painter.drawText(0, top, width, height, Qt.AlignRight, number)
 
       block = block.next()

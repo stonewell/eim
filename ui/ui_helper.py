@@ -164,8 +164,6 @@ class UIHelper(QObject):
     if self.editor_ is None or len(self.ctx_.editor_view_port_handlers_) == 0:
       return
 
-    v = QMargins()
-
     v = reduce(
         lambda x,y: y + x,
         map(lambda x: x.get_editor_margin(), self.ctx_.editor_view_port_handlers_))
