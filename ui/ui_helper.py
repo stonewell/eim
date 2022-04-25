@@ -1,10 +1,12 @@
 import os
 import logging
 import platform
+from pubsub import pub
+from functools import reduce
 
 from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
-from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt
+from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, QMargin
 
 from .list_content_window import ListContentWindow
 from .list_with_preview_content_window import ListWithPreviewContentWindow
@@ -26,6 +28,8 @@ class UIHelper(QObject):
 
     if self.ctx_.args.debug > 2:
       os.environ['QT_DEBUG_PLUGINS'] = '1'
+
+    self.editor_view_port_handlers_ = []
 
   def create_application(self):
     self.ctx_.app = app = EIMApplication()
@@ -63,6 +67,10 @@ class UIHelper(QObject):
     self.editor_ = editor
 
     self.ctx_.update_plugins_with_current_window(editor)
+    self.editor_.updateRequest[QRect,
+                               int].connect(self.update_editor_viwe_port)
+    pub.subscribe(lambda: self.update_editor_viwe_port(None, None),
+                  'viewport_changed')
 
   def bind_key(self, keyseq, callable, binding_widget=None):
     logging.debug('bind keyseq:{}'.format(keyseq))
@@ -152,3 +160,17 @@ class UIHelper(QObject):
       p.setColor(QPalette.Active, QPalette.HighlightedText, c)
 
     app.setPalette(p)
+
+  def register_editor_viewport_handler(self, handler):
+    self.editor_view_port_handlers_.append(handler)
+
+  @Slot()
+  def update_editor_viwe_port(self, rect, dy):
+    v = QMargin()
+
+    v = reduce(
+        lambda x: v + x,
+        map(lambda x: x.get_editor_margin(), self.editor_view_port_handlers_))
+
+    if v != self.editor_.viewportMargins():
+      self.editor_.setViewportMargins(v)

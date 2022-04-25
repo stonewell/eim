@@ -499,3 +499,6 @@ class EditorContext(object):
         self.langs_mapping_ = json.loads(langs_file.read_text('utf-8'))
       else:
         self.langs_mapping_ = {}
+
+  def register_editor_viewport_handler(self, handler):
+    self.ui_helper_.register_editor_viewport_handler(handler)

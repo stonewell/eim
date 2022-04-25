@@ -74,7 +74,7 @@ class LineNumberArea(QWidget):
 
   @Slot()
   def update_line_number_area_width(self, newBlockCount):
-    self.editor_.setViewportMargins(self.line_number_area_width(), 0, 0, 0)
+    pub.sendMessage('viewport_changed')
 
   @Slot()
   def update_line_number_area(self, rect, dy):
