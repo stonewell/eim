@@ -38,7 +38,7 @@ class TreeSitterLangTree(object):
       self.buffer_.invalid_lang()
       return
 
-    self.lang_ = Language(lang_binary.as_posix(), lang)
+    self.lang_ = Language(lang_binary.as_posix(), lang.replace('-', '_'))
     self.parser_ = Parser()
     self.parser_.set_language(self.lang_)
 
