@@ -38,11 +38,11 @@ class ContentWindowLineEdit(QLineEdit):
 
       bc_name = b_c.name()
 
-      # stylesheet seems need a ARGB hex value
+      # qlineedit stylesheet seems need a ARGB hex value
       if len(bc_name) == 7:
         bc_name = f'#00{bc_name[1:]}'
 
-      self.setStyleSheet(f'background-color:{bc_name};')
+      self.setStyleSheet(f'background-color:"{bc_name}";')
 
 
 class ContentWindow(QWidget, TextEditMixin):

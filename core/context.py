@@ -397,6 +397,7 @@ class EditorContext(object):
 
     self.ui_helper.update_document(self.current_buffer_, True)
     self.ui_helper.load_editing_state(self.current_buffer_)
+    self.current_buffer_.update_mode_line()
 
     pub.sendMessage('buffer_changed', buf=buffer)
 
@@ -452,6 +453,9 @@ class EditorContext(object):
 
     logging.warn(f'color theme with name:{color_theme_name} is not found')
     self.color_theme_ = None
+
+  def get_theme_def(self, theme_key):
+    return self.color_theme_.get_theme_def(theme_key)
 
   def get_color(self, theme_def, color_key):
     c = self.color_theme_.get_color_def(theme_def[color_key])

@@ -116,6 +116,14 @@
       "foreground": "zenburn-bg+2",
       "background": "zenburn-bg-05",
       "current-line":"zenburn-yellow-2"
+    },
+    "mode-line": {
+      "foreground":"zenburn-green+1",
+      "background":"zenburn-bg-1"
+    },
+    "mode-line-buffer-id": {
+      "foreground":"zenburn-yellow",
+      "weight": "bold"
     }
   }
 }

@@ -14,7 +14,7 @@
 - [x] Keybinding with prefix key, built-in support by pyside6
 - [ ] Flycheck
 - [ ] Auto indent
-- [ ] Status Line
+- [X] Status Line
 
 ## TODO
 - [ ] ask for input
@@ -24,7 +24,9 @@
   - [X] syntax highlight deal with selected content, handled by QT, but need to refine the text/background color
   - [ ] considering re-impl selection with extra selection to keep syntax high light when lines selected
 - [ ] file modified outside detect
+- [ ] prompt for save when quit/close
 - [ ] editing feature complete
+  - [ ] close buffer
   - [X] kill char
   - [X] kill line
   - [ ] search

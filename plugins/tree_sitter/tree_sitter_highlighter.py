@@ -46,7 +46,7 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       logging.debug(
           f'set format at {start_index} count:{count} using {c[1]}, {text}')
 
-      theme_def = self.ctx_.color_theme_.get_theme_def(c[1])
+      theme_def = self.ctx_.get_theme_def(c[1])
 
       if theme_def is None:
         logging.error(f'theme:{c[1]} is not found')
@@ -63,8 +63,8 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       if bold:
         f.setFontWeight(QFont.Bold)
 
-      if 'italic' in theme_def:
-        f.setFontItalic(True if theme_def['italic'] else False)
+      if 'italic' in theme_def and theme_def['italic']:
+        f.setFontItalic(True)
 
       if prev_start == start_index:
         self.__merge_format(start_index, f, c[1], prev_key)

@@ -1,5 +1,7 @@
 import logging
 
+from pubsub import pub
+
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QTextCursor, QPalette
 from PySide6.QtWidgets import QPlainTextEdit, QApplication
@@ -23,6 +25,11 @@ class Editor(QPlainTextEdit, TextEditMixin):
     self.kill_ring_ = []
 
     ctx.switch_behavior_context('editor')
+
+    self.verticalScrollBar().setHidden(True)
+
+    pub.subscribe(lambda buf: self.verticalScrollBar().setHidden(True),
+                  'buffer_changed')
 
     self.__apply_theme()
 

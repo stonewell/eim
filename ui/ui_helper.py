@@ -67,6 +67,8 @@ class UIHelper(QObject):
     self.ctx_.update_plugins_with_current_window(editor)
     self.editor_.updateRequest[QRect,
                                int].connect(self.update_editor_viwe_port)
+    self.editor_.cursorPositionChanged.connect(lambda: pub.sendMessage('cursor_position_changed', pos=self.__get_row_and_col()))
+
     pub.subscribe(lambda: self.update_editor_viwe_port(None, None),
                   'viewport_changed')
 
@@ -165,8 +167,24 @@ class UIHelper(QObject):
       return
 
     v = reduce(
-        lambda x,y: y + x,
-        map(lambda x: x.get_editor_margin(), self.ctx_.editor_view_port_handlers_))
+        lambda x, y: y + x,
+        map(lambda x: x.get_editor_margin(),
+            self.ctx_.editor_view_port_handlers_))
 
     if v != self.editor_.viewportMargins():
       self.editor_.setViewportMargins(v)
+
+  def __get_row_and_col(self):
+    c = self.editor_.textCursor()
+    current_block_number = c.blockNumber()
+    current_block = self.editor_.document().findBlockByNumber(current_block_number)
+    pos_in_block = c.positionInBlock()
+    l = current_block.layout().lineForTextPosition(pos_in_block).lineNumber()
+
+    for b_c in range(self.editor_.blockCount()):
+      if b_c == current_block_number:
+        break
+
+      l += self.editor_.document().findBlockByNumber(b_c).lineCount()
+
+    return (l + 1, c.columnNumber(), self.editor_.document().lineCount())

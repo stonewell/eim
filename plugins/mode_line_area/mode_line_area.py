@@ -1,3 +1,6 @@
+import logging
+import platform
+
 from PySide6.QtCore import Slot, Qt, QRect, QSize, QMargins
 from PySide6.QtWidgets import QStatusBar, QLabel
 
@@ -8,6 +11,13 @@ class ModeLineArea(QStatusBar):
 
   def __init__(self, ctx, editor):
     super().__init__(editor)
+    try:
+      self._init(ctx, editor)
+
+    except:
+      logging.exception('init error')
+
+  def _init(self, ctx, editor):
     self.editor_ = editor
     self.ctx_ = ctx
 
@@ -16,17 +26,14 @@ class ModeLineArea(QStatusBar):
     self.setSizeGripEnabled(False)
 
     self.editor_.updateRequest[QRect, int].connect(self.update_mode_line_area)
+    self.mode_line_items_ = {}
 
-    l = QLabel()
-    self.addPermanentWidget(l)
-    l.setText('Line Numbers')
-
-    l = QLabel()
-    self.addWidget(l, 0)
-    l.setText('Buffer info xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+    pub.subscribe(self.on_update_model_line, 'update_mode_line')
 
     l = QLabel()
     self.addWidget(l, 1)
+
+    self.__apply_theme(self)
 
   def sizeHint(self):
     return QSize(0, self.mode_line_area_height())
@@ -51,3 +58,23 @@ class ModeLineArea(QStatusBar):
 
   def get_editor_margin(self):
     return QMargins(0, 0, 0, self.mode_line_area_height())
+
+  def __apply_theme(self, w):
+    f_c = self.ctx_.get_theme_def_color('mode-line', 'foreground')
+    b_c = self.ctx_.get_theme_def_color('mode-line', 'background')
+
+    w.setStyleSheet(f'background-color:"{b_c.name()}";color:"{f_c.name()}";')
+
+  def on_update_model_line(self, name, message, permanant):
+    if name in self.mode_line_items_:
+      self.mode_line_items_[name].setText(message)
+    else:
+      l = QLabel()
+      l.setText(message)
+
+      if permanant:
+        self.insertPermanentWidget(0, l)
+      else:
+        self.insertWidget(0, l)
+
+      self.mode_line_items_[name] = l
