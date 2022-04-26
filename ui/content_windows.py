@@ -3,7 +3,8 @@ import platform
 
 from PySide6.QtCore import Qt, QRect, QSize
 from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout
-from PySide6.QtGui import QTextCursor
+from PySide6.QtWidgets import QWidget as ContentParentWidget
+from PySide6.QtGui import QTextCursor, QPalette
 
 from core.builtin_commands import BuiltinCommands
 from .textedit_mixin import TextEditMixin
@@ -45,12 +46,18 @@ class ContentWindowLineEdit(QLineEdit):
       self.setStyleSheet(f'background-color:"{bc_name}";')
 
 
-class ContentWindow(QWidget, TextEditMixin):
+class ContentWindow(ContentParentWidget, TextEditMixin):
 
   def __init__(self, ctx, parent=None):
-    QWidget.__init__(self, parent)
+    ContentParentWidget.__init__(self, parent)
     TextEditMixin.__init__(self)
 
+    try:
+      self._init(ctx, parent)
+    except:
+      logging.exception('init error')
+
+  def _init(self, ctx, parent):
     self.parent_widget_ = parent
     self.ctx_ = ctx
     self.content_widget_ = self.create_content_widget()
@@ -65,6 +72,9 @@ class ContentWindow(QWidget, TextEditMixin):
 
     layout.addWidget(self.text_edit_)
     self.setLayout(layout)
+
+    self.setBackgroundRole(QPalette.Base)
+    self.setAutoFillBackground(True)
 
     self.text_edit_.setFocus(Qt.ActiveWindowFocusReason)
     self.update_geometry()
