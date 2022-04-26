@@ -30,4 +30,5 @@ def default_key_bindings():
       'Ctrl+X, H': BuiltinCommands.SELECT_ALL,
       'Ctrl+Shift+-': BuiltinCommands.UNDO,
       'Ctrl+Shift+=': BuiltinCommands.REDO,
+      'Ctrl+X, K': BuiltinCommands.CLOSE_BUFFER,
   }

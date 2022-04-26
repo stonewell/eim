@@ -293,6 +293,9 @@ class EditorContext(object):
     self.register_command(BuiltinCommands.SAVE_AS,
                           lambda c: c.save_current_buffer_as())
 
+    self.register_command(BuiltinCommands.CLOSE_BUFFER,
+                          lambda c: c.close_current_buffer())
+
   def __bind_config_keys(self, keys, binding_context=None):
     for key in keys:
       b = keys[key]
@@ -507,3 +510,14 @@ class EditorContext(object):
 
   def register_editor_viewport_handler(self, handler):
     self.editor_view_port_handlers_.append(handler)
+
+  def close_current_buffer(self):
+    try:
+      self.buffers_.remove(self.current_buffer_)
+    except:
+      pass
+
+    if len(self.buffers_) > 0:
+      self.__set_current_buffer(self.buffers_[0])
+    else:
+      self.switch_to_buffer('Untitiled')

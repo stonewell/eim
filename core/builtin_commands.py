@@ -4,6 +4,7 @@ class BuiltinCommands(object):
   SAVE = 'save'
   SAVE_AS = 'save_as'
   OPEN = 'open'
+  CLOSE_BUFFER = 'clos_buffer'
 
   PREV_LINE = 'prev_line'
   NEXT_LINE = 'next_line'
