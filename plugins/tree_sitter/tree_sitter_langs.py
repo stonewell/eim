@@ -46,6 +46,7 @@ def ensure_tree_sitter_langs(ctx):
           logging.info(
               'tree sitter langs version {} is the latest'.format(content))
 
+          ver_file.write_text(latest_tag)
           update_grammas(langs_dir / 'data')
           return
 
