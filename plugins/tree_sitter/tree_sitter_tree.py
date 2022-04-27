@@ -26,9 +26,13 @@ class TreeSitterLangTree(object):
 
     langs_dir = pathlib.Path(
         self.ctx_.appdirs_.user_config_dir) / 'tree_sitter_langs'
+    neovim_langs_dir = pathlib.Path(
+        self.ctx_.appdirs_.user_config_dir) / 'neovim_tree_sitter'
     langs_data_dir = langs_dir / 'data'
+    neovim_langs_data_dir = neovim_langs_dir / 'data'
     langs_data_bin_dir = langs_data_dir / 'bin'
-    langs_data_query_file = langs_data_dir / 'queries' / lang / 'highlights.scm'
+    langs_data_query_file = langs_data_dir / 'queries' / lang.replace('-', '_') / 'highlights.scm'
+    neovim_langs_data_query_file = neovim_langs_data_dir / 'queries' / lang.replace('-', '_') / 'highlights.scm'
 
     lang_binary = langs_data_bin_dir / '{}.{}'.format(
         lang, suffix())
@@ -45,10 +49,15 @@ class TreeSitterLangTree(object):
     self.tree_ = self.parser_.parse(
         self.buffer_.document_.toPlainText().encode('utf-8'))
 
-    if langs_data_query_file.exists():
+    if neovim_langs_data_query_file.exists():
+      self.query_ = self.lang_.query(neovim_langs_data_query_file.read_text())
+      logging.debug(f'using {neovim_langs_data_query_file.as_posix()} for highlight')
+    elif langs_data_query_file.exists():
       self.query_ = self.lang_.query(langs_data_query_file.read_text())
+      logging.debug(f'using {langs_data_query_file.as_posix()} for highlight')
     else:
       self.query_ = None
+      logging.debug(f'no highlight for lang:{lang}')
 
   def on_contents_change(self, start, chars_removed, chars_added):
     if self.tree_ is None:

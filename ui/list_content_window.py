@@ -129,7 +129,8 @@ class ListContentWindow(ContentWindow):
     item.ratio_ = ratio if len(txt) > 0 else 0
     item.__lt__ = self.__get_new_lt(item)
 
-    logging.debug('ratio:{} for {} -> {}'.format(ratio, txt, item.text()))
+    if self.ctx_.args.debug > 2:
+      logging.debug('ratio:{} for {} -> {}'.format(ratio, txt, item.text()))
     item.setHidden(ratio == 0 and len(txt) > 0)
 
   def __on_text_edited(self, txt):

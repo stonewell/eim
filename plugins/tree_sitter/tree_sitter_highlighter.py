@@ -43,8 +43,9 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       if not valid_capture:
         continue
 
-      logging.debug(
-          f'set format at {start_index} count:{count} using {c[1]}, {text}')
+      if self.ctx_.args.debug > 2:
+        logging.debug(
+            f'set format at {start_index} count:{count} using {c[1]}, {text}')
 
       theme_def = self.ctx_.get_theme_def(c[1])
 
@@ -100,16 +101,18 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
   def __normalize_capture_with_current_block(self, c):
     if c[0].start_byte > (self.currentBlock().position() +
                           self.currentBlock().length()):
-      logging.debug(f'captures {c} exceed current block')
+      if self.ctx_.args.debug > 2:
+        logging.debug(f'captures {c} exceed current block')
       return None, None, False
 
     start_index = c[0].start_byte - self.currentBlock().position()
     count = c[0].end_byte - c[0].start_byte
 
     if start_index > self.currentBlock().length():
-      logging.debug(
-          f'captures {c} exceed current block, start:{start_index} > block lenght:{self.currentBlock().length()}'
-      )
+      if self.ctx_.args.debug > 2:
+        logging.debug(
+            f'captures {c} exceed current block, start:{start_index} > block lenght:{self.currentBlock().length()}'
+        )
       return None, None, False
 
     if start_index < 0:
@@ -117,7 +120,8 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       start_index = 0
 
     if count <= 0:
-      logging.debug(f'captures {c} exceed current block, count <= 0')
+      if self.ctx_.args.debug > 2:
+        logging.debug(f'captures {c} exceed current block, count <= 0')
       return None, None, False
 
     if (start_index + count) > self.currentBlock().length():

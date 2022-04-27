@@ -131,7 +131,7 @@ def update_grammas(langs_data_dir):
     repo.remotes.origin.pull()
     logging.info('tree sitter grammars pulled latest version')
   except:
-    Plugin.clone_grammas(langs_data_dir)
+    clone_grammas(langs_data_dir)
 
 
 def get_lang_names(ctx):
