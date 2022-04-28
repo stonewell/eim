@@ -78,19 +78,28 @@ class ColorTheme(object):
     return {
         'function': 'function-name',
         'function.call': 'function-name',
-        'function.builtin': 'builtin',
+        'function.builtin': {
+          "name":"function",
+          "weight":"bold"
+          },
         'function.special': 'preprocessor',
         'function.macro': 'preprocessor',
         'method': 'function',
         'method.call': 'function.call',
         'type.parameter': 'variable-name',
         'type.argument': 'type',
-        'type.builtin': 'builtin',
+        'type.builtin': {
+            "name": 'type',
+            "weight": "bold"
+        },
         'type.super': 'type',
         'constructor': 'type',
         'variable': 'variable-name',
         'variable.parameter': 'variable',
-        'variable.builtin': 'builtin',
+        'variable.builtin':  {
+            "name": 'keyword',
+            "weight": "bold"
+        },
         'variable.special': 'warning',
         "property": {
             "name": "constant",
@@ -105,7 +114,10 @@ class ColorTheme(object):
         'embedded': 'default',
         'operator': 'keyword',
         'label': 'preprocessor',
-        'constant.builtin': 'constant',
+        'constant.builtin':  {
+            "name": 'constant',
+            "weight": "bold"
+        },
         'number': 'constant',
         'punctuation': 'default',
         'punctuation.bracket': 'punctuation',
@@ -132,7 +144,7 @@ class ColorTheme(object):
         'sepcialcomment': 'comment-delimiter',
         'debug': 'preprocessor',
         'parameter': 'variable',
-        '_isinstance': 'builtin',
-        'none': 'builtin',
+        '_isinstance': 'function.builtin',
+        'none': 'variable.builtin',
         'error': 'warning',
     }

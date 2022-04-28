@@ -5,6 +5,8 @@ import platform
 from tree_sitter import Language, Parser
 from .tree_sitter_langs import suffix
 from .tree_sitter_highlighter_state import TreeSitterHighlightState
+from .neovim_tree_sitter_highlighter_state import NeovimTreeSitterHighlightState
+from .neovim_query_convert import convert as neovim_query_convert
 
 
 class TreeSitterLangTree(object):
@@ -52,8 +54,9 @@ class TreeSitterLangTree(object):
     self.tree_ = self.parser_.parse(
         self.buffer_.document_.toPlainText().encode('utf-8'))
 
-    if neovim_langs_data_query_file.exists() and False:
-      self.query_ = self.lang_.query(neovim_langs_data_query_file.read_text())
+    if neovim_langs_data_query_file.exists():
+      self.query_ = self.lang_.query(
+          neovim_query_convert(neovim_langs_data_query_file.read_text()))
       self.query_type_ = 'nvim_treesitter'
       logging.debug(
           f'using {neovim_langs_data_query_file.as_posix()} for highlight')
@@ -87,7 +90,7 @@ class TreeSitterLangTree(object):
     if self.query_type_ == 'treesitter':
       state = TreeSitterHighlightState(self.ctx_)
     else:
-      raise NotImplementedError()
+      state = NeovimTreeSitterHighlightState(self.ctx_)
 
     return (self.query_.captures(self.tree_.root_node,
                                  start_byte=begin,
