@@ -35,6 +35,9 @@ class ColorTheme(object):
         'default') or self.base_theme_def_
 
   def get_theme_def(self, theme_key):
+    if theme_key.startswith('keyword.'):
+      theme_key = 'keyword'
+
     v = self.data_.get(f'theme/{theme_key}', None)
 
     if v is None:
@@ -110,4 +113,26 @@ class ColorTheme(object):
         'punctuation.special': 'keyword',
         'tag': 'builtin',
         'attribute': 'preprocessor',
+        'character': 'string',
+        'number': 'constant',
+        'boolean': 'constant',
+        'float': 'constant',
+        'conditional': 'keyword',
+        'repeat': 'keyword',
+        'exception': 'keyword',
+        'include': 'preprocessor',
+        'define': 'preprocessor',
+        'macro': 'define',
+        'precondit': 'preprocessor',
+        'storageclass': 'keyword',
+        'structure': 'type',
+        'typedef': 'type',
+        'specialchar': 'constant',
+        'delimiter': 'comment-delimiter',
+        'sepcialcomment': 'comment-delimiter',
+        'debug': 'preprocessor',
+        'parameter': 'variable',
+        '_isinstance': 'builtin',
+        'none': 'builtin',
+        'error': 'warning',
     }

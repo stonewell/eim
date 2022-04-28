@@ -40,7 +40,7 @@ def ensure_tree_sitter_langs(ctx):
       latest_tag = latest_tag_url[len(TREE_SITTER_LANGS_LATEST_TAG_PREFIX):]
 
       if ver_file.exists():
-        content = f.read_text()
+        content = ver_file.read_text()
 
         if content == latest_tag:
           logging.info(
