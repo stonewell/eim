@@ -3,7 +3,8 @@
 
 - [ ] Piece Table with Tree
 - [ ] Treesitter
-- [x] Syntax Highlighting
+  - [x] Syntax Highlighting
+  - [ ] Auto indent
 - [ ] LSP
 - [ ] EditorConfig
 - [ ] Search Everything
@@ -13,7 +14,6 @@
 - [x] PySide6
 - [x] Keybinding with prefix key, built-in support by pyside6
 - [ ] Flycheck
-- [ ] Auto indent
 - [X] Status Line
 
 ## TODO
@@ -26,7 +26,7 @@
 - [ ] file modified outside detect
 - [ ] prompt for save when quit/close
 - [ ] editing feature complete
-  - [ ] close buffer
+  - [X] close buffer
   - [X] kill char
   - [X] kill line
   - [ ] search
@@ -39,3 +39,4 @@
   - [ ] Search in files with ag/rg
 - [X] detect language using file suffix, then use guesslang
 - [X] force buffer lang
+- [ ] recent files
