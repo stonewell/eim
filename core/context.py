@@ -210,7 +210,8 @@ class EditorContext(object):
   def create_list_with_preview_content_window(self):
     self.close_content_window()
 
-    self.content_window_ = self.ui_helper.create_list_with_preview_content_window()
+    self.content_window_ = self.ui_helper.create_list_with_preview_content_window(
+    )
 
     return self.content_window_
 
@@ -324,9 +325,9 @@ class EditorContext(object):
 
     if not callable(cmd_callable):
       logging.warning('cmd:{} is not found'.format(cmd_name))
-      return
+      return None
 
-    cmd_callable(self, *cmd_args)
+    result = cmd_callable(self, *cmd_args)
 
     if save_history:
       try:
@@ -337,6 +338,8 @@ class EditorContext(object):
       self.command_history_.append(cmd_name)
     else:
       logging.debug('run cmd:{} skip history'.format(cmd_name))
+
+    return result
 
   def get_commands(self):
     commands = self.command_history_[:]
@@ -486,11 +489,12 @@ class EditorContext(object):
 
         if (mtime > datetime.datetime.now().timestamp()):
           logging.info('langs mapping next update check will be on:{}'.format(
-            datetime.datetime.fromtimestamp(mtime)))
+              datetime.datetime.fromtimestamp(mtime)))
           download_file = False
 
       if download_file:
-        logging.info('langs mapping downloading from url:{}'.format(LANGS_MAP_URL))
+        logging.info(
+            'langs mapping downloading from url:{}'.format(LANGS_MAP_URL))
 
         with self.open_url(LANGS_MAP_URL) as langs_resp:
           langs_file.write_bytes(langs_resp.read())

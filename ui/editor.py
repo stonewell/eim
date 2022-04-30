@@ -2,7 +2,7 @@ import logging
 
 from pubsub import pub
 
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QTextCursor, QPalette
 from PySide6.QtWidgets import QPlainTextEdit, QApplication
 from PySide6.QtWidgets import QAbstractSlider
@@ -50,6 +50,19 @@ class Editor(QPlainTextEdit, TextEditMixin):
     self.ctx_.switch_behavior_context('editor')
 
   def keyPressEvent(self, evt):
+    if (evt.keyCombination().toCombined()
+        == Qt.Key_Tab) or (evt.keyCombination().toCombined()
+                           == (Qt.Key.Key_Backtab | Qt.SHIFT)):
+      evt.accept()
+
+      back_tab = evt.keyCombination().toCombined() == (Qt.Key.Key_Backtab
+                                                       | Qt.SHIFT)
+
+      indent = self.ctx_.run_command('calculate_indent')
+
+      if indent is not None:
+        return
+
     super().keyPressEvent(evt)
 
   def cursor_position(self):

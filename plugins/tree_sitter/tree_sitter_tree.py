@@ -39,6 +39,10 @@ class TreeSitterLangTree(object):
         '-', '_') / 'highlights.scm'
     neovim_langs_data_query_file = neovim_langs_data_dir / 'queries' / lang.replace(
         '-', '_') / 'highlights.scm'
+    langs_data_indent_file = langs_data_dir / 'queries' / lang.replace(
+        '-', '_') / 'indents.scm'
+    neovim_langs_data_indent_file = neovim_langs_data_dir / 'queries' / lang.replace(
+        '-', '_') / 'indents.scm'
 
     lang_binary = langs_data_bin_dir / '{}.{}'.format(lang, suffix())
 
@@ -54,19 +58,57 @@ class TreeSitterLangTree(object):
     self.tree_ = self.parser_.parse(
         self.buffer_.document_.toPlainText().encode('utf-8'))
 
+    # highlight
+    self.query_ = None
     if neovim_langs_data_query_file.exists():
-      self.query_ = self.lang_.query(
-          neovim_query_convert(neovim_langs_data_query_file.read_text()))
-      self.query_type_ = 'nvim_treesitter'
-      logging.debug(
-          f'using {neovim_langs_data_query_file.as_posix()} for highlight')
-    elif langs_data_query_file.exists():
-      self.query_ = self.lang_.query(langs_data_query_file.read_text())
-      self.query_type_ = 'treesitter'
-      logging.debug(f'using {langs_data_query_file.as_posix()} for highlight')
-    else:
-      self.query_ = None
+      try:
+        self.query_ = self.lang_.query(
+            neovim_query_convert(neovim_langs_data_query_file.read_text()))
+        self.query_type_ = 'nvim_treesitter'
+        logging.debug(
+            f'using {neovim_langs_data_query_file.as_posix()} for highlight')
+      except:
+        logging.exception(
+            f'failed loading {neovim_langs_data_query_file.as_posix()} for highlight'
+        )
+
+    if self.query_ is None and langs_data_query_file.exists():
+      try:
+        self.query_ = self.lang_.query(langs_data_query_file.read_text())
+        self.query_type_ = 'treesitter'
+        logging.debug(
+            f'using {langs_data_query_file.as_posix()} for highlight')
+      except:
+        logging.exception(
+            f'failed loading {langs_data_query_file.as_posix()} for highlight')
+
+    if self.query_ is None:
       logging.debug(f'no highlight for lang:{lang}')
+
+    # indents
+    self.indent_ = None
+    if neovim_langs_data_indent_file.exists():
+      try:
+        self.indent_ = self.lang_.query(
+            neovim_query_convert(neovim_langs_data_indent_file.read_text()))
+        self.indent_type_ = 'nvim_treesitter'
+        logging.debug(
+            f'using {neovim_langs_data_indent_file.as_posix()} for indents')
+      except:
+        logging.exception(
+            f'failed loading {neovim_langs_data_indent_file.as_posix()} for indents'
+        )
+    if self.indent_ is None and langs_data_indent_file.exists():
+      try:
+        self.indent_ = self.lang_.query(langs_data_indent_file.read_text())
+        self.indent_type_ = 'treesitter'
+        logging.debug(f'using {langs_data_indent_file.as_posix()} for indents')
+      except:
+        logging.exception(
+            f'failed loading {langs_data_indent_file.as_posix()} for indents')
+
+    if self.indent_ is None:
+      logging.debug(f'no indent for lang:{lang}')
 
   def on_contents_change(self, start, chars_removed, chars_added):
     if self.tree_ is None:

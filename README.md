@@ -40,3 +40,5 @@
 - [X] detect language using file suffix, then use guesslang
 - [X] force buffer lang
 - [ ] recent files
+- [ ] guess indention of file
+- [ ] guess new line style of file
