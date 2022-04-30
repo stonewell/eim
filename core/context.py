@@ -86,25 +86,22 @@ class EditorContext(object):
   def validate_args(args):
     pass
 
-  def __merge_keys(self, old_keys, new_keys):
-    for key in old_keys:
-      if key in new_keys:
-        if isinstance(old_keys[key], dict) and isinstance(new_keys[key], dict):
-          old_keys[key].update(new_keys[key])
-          new_keys[key].update(old_keys[key])
-
-    old_keys.update(new_keys)
-    new_keys.update(old_keys)
+  def __deep_merge(self, old_dict, new_dict):
+    for key in new_dict:
+      if key in old_dict:
+        if isinstance(old_dict[key], dict) and isinstance(new_dict[key], dict):
+          self.__deep_merge(old_dict[key], new_dict[key])
+        else:
+          old_dict[key] = new_dict[key]
+      else:
+        old_dict[key] = new_dict[key]
 
   def __load_config_file(self, config):
     if config and config.is_file():
       logging.debug('load {} and merge'.format(config))
       new_config = load_config(config)
 
-      old_keys = self.config.get('/app/keys', {})
-      new_keys = new_config.get('/app/keys', {})
-      self.__merge_keys(old_keys, new_keys)
-      self.config.update(new_config)
+      self.__deep_merge(self.config, new_config)
     else:
       logging.debug('config file:{} is not exists'.format(
           config.resolve() if config else 'None'))
