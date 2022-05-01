@@ -15,9 +15,10 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
     self.editor_ = editor
 
   def highlightBlock(self, text):
+    current_block = self.currentBlock()
     captures, state = self.buffer_.tree_sitter_tree_.highlight_query(
-        self.currentBlock().position(),
-        self.currentBlock().position() + self.currentBlock().length())
+        current_block.position(),
+        current_block.position() + current_block.length())
 
     if captures is None or len(captures) == 0:
       return
@@ -35,7 +36,7 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
 
     for c in captures:
       start_index, count, update_format = state.should_update_format(
-          self.currentBlock(), c)
+          current_block, c)
 
       if not update_format:
         continue
@@ -64,8 +65,7 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
 
       if self.ctx_.args.debug > 2:
         logging.debug(
-          f'set format at {start_index} count:{count} using {c[1]}, {text}'
-        )
+            f'set format at {start_index} count:{count} using {c[1]}, {text}')
 
       #handling selection
       # if ((start_index >= select_begin and start_index < select_end) or

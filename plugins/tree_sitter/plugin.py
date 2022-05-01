@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QListWidgetItem
 from .tree_sitter_langs import ensure_tree_sitter_langs, get_lang_names
 from .tree_sitter_highlighter import TreeSitterSyntaxHighlighter
 from .tree_sitter_tree import TreeSitterLangTree
+from .tree_sitter_autoindent import TreeSitterAutoIndent
 
 
 class Plugin(IPlugin):
@@ -34,9 +35,12 @@ class Plugin(IPlugin):
   def on_buffer_changed(self, buf):
     if not hasattr(buf, 'highlighter_'):
       buf.tree_sitter_tree_ = TreeSitterLangTree(self.ctx, buf)
-      buf.highlighter_ = TreeSitterSyntaxHighlighter(self.ctx, buf, self.editor_)
-      logging.debug('install tree and syntax highlighter to buffer:{}'.format(
-          buf.name()))
+      buf.highlighter_ = TreeSitterSyntaxHighlighter(self.ctx, buf,
+                                                     self.editor_)
+      buf.indent_ = TreeSitterAutoIndent(self.ctx, buf, self.editor_)
+      logging.debug(
+          'install tree and syntax highlighter, auto indent to buffer:{}'.
+          format(buf.name()))
 
   def show_language_list(self, ctx):
     lang_names = self.selected_langs_[:]

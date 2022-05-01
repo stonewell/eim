@@ -15,7 +15,8 @@ class TreeSitterLangTree(object):
     self.buffer_ = buffer
     self.ctx_ = ctx
     self.tree_ = None
-    self.query_ = None
+    self.highlight_ = None
+    self.indent_ = None
 
     self.__load_language()
     self.buffer_.document_.contentsChange[int, int,
@@ -59,12 +60,12 @@ class TreeSitterLangTree(object):
         self.buffer_.document_.toPlainText().encode('utf-8'))
 
     # highlight
-    self.query_ = None
+    self.highlight_ = None
     if neovim_langs_data_query_file.exists():
       try:
-        self.query_ = self.lang_.query(
+        self.highlight_ = self.lang_.query(
             neovim_query_convert(neovim_langs_data_query_file.read_text()))
-        self.query_type_ = 'nvim_treesitter'
+        self.highlight_type_ = 'nvim_treesitter'
         logging.debug(
             f'using {neovim_langs_data_query_file.as_posix()} for highlight')
       except:
@@ -72,17 +73,17 @@ class TreeSitterLangTree(object):
             f'failed loading {neovim_langs_data_query_file.as_posix()} for highlight'
         )
 
-    if self.query_ is None and langs_data_query_file.exists():
+    if self.highlight_ is None and langs_data_query_file.exists():
       try:
-        self.query_ = self.lang_.query(langs_data_query_file.read_text())
-        self.query_type_ = 'treesitter'
+        self.highlight_ = self.lang_.query(langs_data_query_file.read_text())
+        self.highlight_type_ = 'treesitter'
         logging.debug(
             f'using {langs_data_query_file.as_posix()} for highlight')
       except:
         logging.exception(
             f'failed loading {langs_data_query_file.as_posix()} for highlight')
 
-    if self.query_ is None:
+    if self.highlight_ is None:
       logging.debug(f'no highlight for lang:{lang}')
 
     # indents
@@ -126,17 +127,27 @@ class TreeSitterLangTree(object):
         self.buffer_.document_.toPlainText().encode('utf-8'), self.tree_)
 
   def highlight_query(self, begin, end):
-    if self.query_ is None:
+    if self.highlight_ is None:
       return None, None
 
-    if self.query_type_ == 'treesitter':
+    if self.highlight_type_ == 'treesitter':
       state = TreeSitterHighlightState(self.ctx_)
     else:
       state = NeovimTreeSitterHighlightState(self.ctx_)
 
-    return (self.query_.captures(self.tree_.root_node,
+    return (self.highlight_.captures(self.tree_.root_node,
                                  start_byte=begin,
                                  end_byte=end), state)
 
   def reload_languange(self):
     self.__load_language()
+
+  def indent_query(self, begin, end):
+    if self.indent_ is None:
+      return None, None
+
+    state = None
+
+    return (self.indent_.captures(self.tree_.root_node,
+                                 start_byte=begin,
+                                 end_byte=end), state)

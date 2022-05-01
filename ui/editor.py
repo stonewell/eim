@@ -3,7 +3,7 @@ import logging
 from pubsub import pub
 
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtGui import QTextCursor, QPalette
+from PySide6.QtGui import QTextCursor, QPalette, QKeySequence
 from PySide6.QtWidgets import QPlainTextEdit, QApplication
 from PySide6.QtWidgets import QAbstractSlider
 
@@ -50,13 +50,12 @@ class Editor(QPlainTextEdit, TextEditMixin):
     self.ctx_.switch_behavior_context('editor')
 
   def keyPressEvent(self, evt):
-    if (evt.keyCombination().toCombined()
-        == Qt.Key_Tab) or (evt.keyCombination().toCombined()
-                           == (Qt.Key.Key_Backtab | Qt.SHIFT)):
+    key_combined = evt.keyCombination().toCombined()
+    if (key_combined == Qt.Key_Tab) or (key_combined
+                                        == (Qt.Key.Key_Backtab | Qt.SHIFT)):
       evt.accept()
 
-      back_tab = evt.keyCombination().toCombined() == (Qt.Key.Key_Backtab
-                                                       | Qt.SHIFT)
+      back_tab = key_combined == (Qt.Key.Key_Backtab | Qt.SHIFT)
 
       indent = self.ctx_.run_command('calculate_indent')
 
@@ -64,6 +63,15 @@ class Editor(QPlainTextEdit, TextEditMixin):
         return
 
     super().keyPressEvent(evt)
+
+    if (evt == QKeySequence.InsertLineSeparator
+        or evt == QKeySequence.InsertParagraphSeparator):
+      soft_line_break = evt == QKeySequence.InsertLineSeparator
+
+      indent = self.ctx_.run_command('calculate_indent')
+
+      if indent is not None:
+        pass
 
   def cursor_position(self):
     return self.textCursor().position
