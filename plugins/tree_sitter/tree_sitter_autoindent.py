@@ -26,8 +26,14 @@ class TreeSitterAutoIndent(object):
     pos_in_block = c.positionInBlock()
     l = current_block.layout().lineForTextPosition(pos_in_block)
 
-    if l.textLength() == 0:
-      last_block, last_l = self.find_last_non_empty_line(current_block, l)
+#    if l.textLength() == 0:
+#      last_block, last_l = self.find_last_non_empty_line(current_block, l)
+
+    nn = self.__get_last_node_at_pos(current_block.position() + pos_in_block - 2)
+
+    while nn is not None:
+      print(nn.id, nn)
+      nn = nn.parent
 
     captures, state = self.buffer_.tree_sitter_tree_.indent_query(
         last_block.position(),
@@ -37,9 +43,18 @@ class TreeSitterAutoIndent(object):
       return None
 
     for capture in captures:
-      print(capture[0].id, capture[1])
+      print(capture[0].id, capture[1], capture[0])
 
     return None
 
   def find_last_non_empty_line(self, current_block, l):
     return None, None
+
+  def __get_first_node_at_line(self, line_number):
+    pass
+
+  def __get_last_node_at_line(self, line_number):
+    pass
+
+  def __get_last_node_at_pos(self, pos):
+    return self.buffer_.tree_sitter_tree_.node_descendant_for_byte_range(pos, pos)

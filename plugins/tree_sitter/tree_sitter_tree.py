@@ -10,6 +10,9 @@ from .neovim_query_convert import convert as neovim_query_convert
 
 
 class TreeSitterLangTree(object):
+  CONTINUE = 1
+  BREAK = 2
+  GO = 0
 
   def __init__(self, ctx, buffer):
     self.buffer_ = buffer
@@ -136,8 +139,8 @@ class TreeSitterLangTree(object):
       state = NeovimTreeSitterHighlightState(self.ctx_)
 
     return (self.highlight_.captures(self.tree_.root_node,
-                                 start_byte=begin,
-                                 end_byte=end), state)
+                                     start_byte=begin,
+                                     end_byte=end), state)
 
   def reload_languange(self):
     self.__load_language()
@@ -149,5 +152,119 @@ class TreeSitterLangTree(object):
     state = None
 
     return (self.indent_.captures(self.tree_.root_node,
-                                 start_byte=begin,
-                                 end_byte=end), state)
+                                  start_byte=begin,
+                                  end_byte=end), state)
+
+  def __point_lt(self, start_row, start_column, end_row, end_column):
+    return (start_row < end_row) or (start_row == end_row
+                                     and start_column < end_column)
+
+  def __point_lte(self, start_row, start_column, end_row, end_column):
+    return (start_row < end_row) or (start_row == end_row
+                                     and start_column <= end_column)
+
+  def __node_descendant_for_range(self, check_child_node, include_anonymous):
+    node = self.tree_.root_node
+    last_visible_node = node
+
+    did_descend = True
+
+    while did_descend:
+      did_descend = False
+
+      cursor = node.walk()
+
+      if not cursor.goto_first_child():
+        break
+
+      while True:
+        child = cursor.node
+
+        check = check_child_node(child)
+
+        if check == TreeSitterLangTree.CONTINUE:
+          if not cursor.goto_next_sibling():
+            break
+
+          continue
+        elif check == TreeSitterLangTree.BREAK:
+          break
+
+        node = child
+
+        if include_anonymous:
+          last_visible_node = node
+        elif node.is_named:
+          last_visible_node = node
+
+        did_descend = True
+        break
+
+    return last_visible_node
+
+  def __node_descendant_for_point_range(self, start_row, start_column, end_row,
+                                        end_column, include_anonymous):
+
+    def check_child_node(child):
+      node_end_row, node_end_col = child.end_point
+      node_start_row, node_start_col = child.start_point
+
+      # The end of this node must extend far enough forward to touch
+      # the end of the range and exceed the start of the range.
+      if self.__point_lt(node_end_row, node_end_col, end_row, end_column):
+        return TreeSitterLangTree.CONTINUE
+
+      if self.__point_lte(node_end_row, node_end_col, start_row, start_column):
+        return TreeSitterLangTree.CONTINUE
+
+      # The start of this node must extend far enough backward to
+      # touch the start of the range.
+      if self.__point_lt(start_row, start_column, node_start_row,
+                         node_start_col):
+        return TreeSitterLangTree.BREAK
+
+      return TreeSitterLangTree.GO
+
+    return self.__node_descendant_for_range(check_child_node,
+                                            include_anonymous)
+
+  def __node_descendant_for_byte_range(self, start_byte, end_byte,
+                                       include_anonymous):
+
+    def check_child_node(child):
+      node_end_byte = child.end_byte
+      node_start_byte = child.start_byte
+
+      # The end of this node must extend far enough forward to touch
+      # the end of the range and exceed the start of the range.
+      if node_end_byte < end_byte:
+        return TreeSitterLangTree.CONTINUE
+
+      if node_end_byte <= start_byte:
+        return TreeSitterLangTree.CONTINUE
+
+      # The start of this node must extend far enough backward to
+      # touch the start of the range.
+      if start_byte < node_start_byte:
+        return TreeSitterLangTree.BREAK
+
+      return TreeSitterLangTree.GO
+
+    return self.__node_descendant_for_range(check_child_node,
+                                            include_anonymous)
+
+  def node_descendant_for_point_range(self, start_row, start_column, end_row,
+                                      end_column):
+    return self.__node_descendant_for_point_range(start_row, start_column,
+                                                  end_row, end_column, True)
+
+  def node_named_descendant_for_point_range(self, start_row, start_column,
+                                            end_row, end_column):
+    return self.__node_descendant_for_point_range(start_row, start_column,
+                                                  end_row, end_column, False)
+
+  def node_descendant_for_byte_range(self, start_bytes, end_bytes):
+    return self.__node_descendant_for_byte_range(start_bytes, end_bytes, True)
+
+  def node_named_descendant_for_byte_range(self, start_bytes, end_bytes):
+    return self.__node_descendant_for_byte_range(start_bytes, end_bytes, False)
