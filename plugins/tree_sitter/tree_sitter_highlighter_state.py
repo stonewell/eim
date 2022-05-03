@@ -29,6 +29,10 @@ class TreeSitterHighlightState(object):
     return start_index, count, False
 
   def _normalize_capture_with_current_block(self, current_block, c):
+    if self.ctx_.args.debug > 2:
+      logging.debug(
+          f'normalizes capture:{c}, start:{c[0].start_byte}, end:{c[0].end_byte}')
+
     if c[0].start_byte > (current_block.position() + current_block.length()):
       if self.ctx_.args.debug > 2:
         logging.debug(f'captures {c} exceed current block')
@@ -56,4 +60,8 @@ class TreeSitterHighlightState(object):
     if (start_index + count) > current_block.length():
       count = (current_block.length() - start_index)
 
+    if self.ctx_.args.debug > 2:
+      logging.debug(
+          f'normalizes capture:{c}, start:{c[0].start_byte}, end:{c[0].end_byte}, start_index:{start_index}, count:{count}'
+      )
     return start_index, count, True

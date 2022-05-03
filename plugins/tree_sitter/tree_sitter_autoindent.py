@@ -1,5 +1,6 @@
 import logging
 import re
+from PySide6.QtGui import QTextCursor
 
 
 class TreeSitterAutoIndent(object):
@@ -41,8 +42,12 @@ class TreeSitterAutoIndent(object):
 
       if node.id in indents['indent_end']:
         node = self.__get_first_node_at_line(current_block, l)
+        logging.debug(f'last line:{last_line.lineNumber()} indent_end, get line:{l.lineNumber()} first node:{node}')
+      else:
+        logging.debug(f'last line:{last_line.lineNumber()} get last node:{node}')
     else:
       node = self.__get_first_node_at_line(current_block, l)
+      logging.debug(f'non empty line get line:{l.lineNumber()} first node:{node}')
 
     if node is None:
       logging.warning(
@@ -107,7 +112,15 @@ class TreeSitterAutoIndent(object):
     logging.debug(f'indent:{indent} at line:{lnum}')
 
     if indent > 0:
-      c.insertText(' ' * indent)
+      line_indent = self.__get_first_non_empty_char(current_block, l)
+
+      if line_indent != indent:
+        c.beginEditBlock()
+        c.clearSelection()
+        c.setPosition(current_block.position() + l.textStart())
+        c.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, line_indent)
+        c.insertText(' ' * indent)
+        c.endEditBlock()
     elif indent < 0:
       logging.warning(f'invalid indent:{indent} at line:{lnum}')
 
@@ -134,7 +147,7 @@ class TreeSitterAutoIndent(object):
     for capture in captures:
       try:
         indents[capture[1]][capture[0].id] = {}
-      except(KeyError):
+      except (KeyError):
         indents[capture[1]] = {}
         indents[capture[1]][capture[0].id] = {}
 

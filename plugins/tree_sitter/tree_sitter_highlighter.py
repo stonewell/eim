@@ -4,6 +4,7 @@ from PySide6.QtGui import QSyntaxHighlighter
 from PySide6.QtGui import QColor
 from PySide6.QtGui import QFont
 from PySide6.QtGui import QTextCharFormat
+from PySide6.QtGui import QTextCursor
 
 
 class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
@@ -61,11 +62,12 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       if 'italic' in theme_def and theme_def['italic']:
         f.setFontItalic(True)
 
-      self.setFormat(start_index, count, f)
+      self.__set_format(start_index, count, f)
 
       if self.ctx_.args.debug > 2:
         logging.debug(
-            f'set format at {start_index} count:{count} using {c[1]}, {text}')
+            f'set format at {start_index} count:{count} using {c[1]}, [{text}], [{text[start_index:start_index + count]}]'
+        )
 
       #handling selection
       # if ((start_index >= select_begin and start_index < select_end) or
@@ -79,3 +81,15 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       #   b_c = self.ctx_.get_color(theme_def, 'background')
       #   selectF.setBackground(b_c)
       #   self.setFormat(start_index, count, selectF)
+
+  def __set_format(self, p, c, f):
+    tc = self.editor_.textCursor()
+    current_block = self.currentBlock()
+
+    tc.beginEditBlock()
+    tc.clearSelection()
+    tc.setPosition(current_block.position() + p)
+    tc.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, c)
+    tc.setCharFormat(f)
+    tc.clearSelection()
+    tc.endEditBlock()
