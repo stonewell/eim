@@ -315,13 +315,14 @@ class EditorContext(object):
                   cmd_callable=None,
                   save_history=True,
                   *cmd_args):
-    logging.debug('running command:{}'.format(cmd_name))
+    logging.debug(f'running command:{cmd_name}, callable:{cmd_callable}, save history:{save_history}, args:{cmd_args}')
 
     if cmd_callable is None:
       cmd_callable = self.current_behavior_context_.get_command_callable(
           cmd_name)
       #command callable will handle save history
       save_history = False
+      logging.debug(f'get callable from behaivor context:{cmd_callable}')
 
     if not callable(cmd_callable):
       logging.warning('cmd:{} is not found'.format(cmd_name))

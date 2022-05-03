@@ -5,32 +5,31 @@ from PySide6.QtGui import QTextCursor
 
 class TreeSitterAutoIndent(object):
 
-  def __init__(self, ctx, buffer, editor):
-    self.buffer_ = buffer
+  def __init__(self, ctx):
     self.ctx_ = ctx
-    self.editor_ = editor
 
-    self.ctx_.hook_command('calculate_indent', self.calculate_indent, 'editor',
-                           False)
+    self.ctx_.hook_command('calculate_indent', self.__calculate_indent,
+                           'editor', False)
 
-  def calculate_indent(self, ctx):
-    indents = self.__get_indents()
+  def __calculate_indent(self, ctx, editor):
+    buffer = ctx.current_buffer_
+
+    indents = self.__get_indents(buffer, editor)
 
     if indents is None:
       return None
 
-    c = self.editor_.textCursor()
-    current_block_number = self.editor_.textCursor().blockNumber()
+    c = editor.textCursor()
+    current_block_number = editor.textCursor().blockNumber()
 
-    current_block = self.buffer_.document_.findBlockByNumber(
-        current_block_number)
+    current_block = buffer.document_.findBlockByNumber(current_block_number)
 
     pos_in_block = c.positionInBlock()
     l = current_block.layout().lineForTextPosition(pos_in_block)
 
     node = None
     if self.__is_empty_line(current_block, l):
-      last_block, last_line = self.find_last_non_empty_line(current_block, l)
+      last_block, last_line = self.__find_last_non_empty_line(current_block, l)
 
       if last_block is None:
         logging.warning(
@@ -38,16 +37,20 @@ class TreeSitterAutoIndent(object):
         )
         return None
 
-      node = self.__get_last_node_at_line(last_block, last_line)
+      node = self.__get_last_node_at_line(buffer, editor, last_block, last_line)
 
       if node.id in indents['indent_end']:
-        node = self.__get_first_node_at_line(current_block, l)
-        logging.debug(f'last line:{last_line.lineNumber()} indent_end, get line:{l.lineNumber()} first node:{node}')
+        node = self.__get_first_node_at_line(buffer, editor, current_block, l)
+        logging.debug(
+            f'last line:{last_line.lineNumber()} indent_end, get line:{l.lineNumber()} first node:{node}'
+        )
       else:
-        logging.debug(f'last line:{last_line.lineNumber()} get last node:{node}')
+        logging.debug(
+            f'last line:{last_line.lineNumber()} get last node:{node}')
     else:
-      node = self.__get_first_node_at_line(current_block, l)
-      logging.debug(f'non empty line get line:{l.lineNumber()} first node:{node}')
+      node = self.__get_first_node_at_line(buffer, editor, current_block, l)
+      logging.debug(
+          f'non empty line get line:{l.lineNumber()} first node:{node}')
 
     if node is None:
       logging.warning(
@@ -64,7 +67,7 @@ class TreeSitterAutoIndent(object):
     root_start = 0
     is_processed_by_row = {}
 
-    lnum = self.__get_line_number(current_block, l)
+    lnum = self.__get_line_number(editor, current_block, l)
 
     while node is not None:
       end_row, end_col = node.end_point
@@ -126,9 +129,9 @@ class TreeSitterAutoIndent(object):
 
     return (1, indent)
 
-  def __get_indents(self):
-    captures, state = self.buffer_.tree_sitter_tree_.indent_query(
-        0, self.buffer_.document_.characterCount())
+  def __get_indents(self, buffer, editor):
+    captures, state = buffer.tree_sitter_tree_.indent_query(
+        0, buffer.document_.characterCount())
 
     if captures is None or len(captures) == 0:
       return None
@@ -153,7 +156,7 @@ class TreeSitterAutoIndent(object):
 
     return indents
 
-  def find_last_non_empty_line(self, current_block, l):
+  def __find_last_non_empty_line(self, current_block, l):
     while True:
       if not self.__is_empty_line(current_block, l):
         return current_block, l
@@ -168,23 +171,22 @@ class TreeSitterAutoIndent(object):
       else:
         return None, None
 
-  def __get_first_node_at_line(self, b, l):
-    lnum = self.__get_line_number(b, l)
+  def __get_first_node_at_line(self, buffer, editor, b, l):
+    lnum = self.__get_line_number(editor, b, l)
     col = self.__get_first_non_empty_char(b, l)
 
-    return self.buffer_.tree_sitter_tree_.node_descendant_for_point_range(
+    return buffer.tree_sitter_tree_.node_descendant_for_point_range(
         lnum, col, lnum, col)
 
-  def __get_last_node_at_line(self, b, l):
-    lnum = self.__get_line_number(b, l)
+  def __get_last_node_at_line(self, buffer, editor, b, l):
+    lnum = self.__get_line_number(editor, b, l)
     col = l.textLength() - 1
 
-    return self.buffer_.tree_sitter_tree_.node_descendant_for_point_range(
+    return buffer.tree_sitter_tree_.node_descendant_for_point_range(
         lnum, col, lnum, col)
 
-  def __get_last_node_at_pos(self, pos):
-    return self.buffer_.tree_sitter_tree_.node_descendant_for_byte_range(
-        pos, pos)
+  def __get_last_node_at_pos(self, buffer, pos):
+    return buffer.tree_sitter_tree_.node_descendant_for_byte_range(pos, pos)
 
   def __is_empty_line(self, b, l):
     if l.textLength() == 0:
@@ -194,14 +196,14 @@ class TreeSitterAutoIndent(object):
                         b.text()[l.textStart():l.textStart() + l.textLength()],
                         flags=re.MULTILINE) is not None
 
-  def __get_line_number(self, b, l):
+  def __get_line_number(self, editor, b, l):
     lnum = l.lineNumber()
 
-    for b_c in range(self.editor_.blockCount()):
+    for b_c in range(editor.blockCount()):
       if b_c == b.blockNumber():
         break
 
-      lnum += self.editor_.document().findBlockByNumber(b_c).lineCount()
+      lnum += editor.document().findBlockByNumber(b_c).lineCount()
 
     return lnum
 

@@ -31,13 +31,16 @@ class Plugin(IPlugin):
     pub.subscribe(self.on_buffer_changed, 'buffer_changed')
     self.ctx.register_command('languages_mode', self.show_language_list, None,
                               True)
+    self.indent_ = TreeSitterAutoIndent(self.ctx)
 
   def on_buffer_changed(self, buf):
+    if self.indent_ is None:
+      self.indent_ = TreeSitterAutoIndent(self.ctx)
+
     if not hasattr(buf, 'highlighter_'):
       buf.tree_sitter_tree_ = TreeSitterLangTree(self.ctx, buf)
       buf.highlighter_ = TreeSitterSyntaxHighlighter(self.ctx, buf,
                                                      self.editor_)
-      buf.indent_ = TreeSitterAutoIndent(self.ctx, buf, self.editor_)
       logging.debug(
           'install tree and syntax highlighter, auto indent to buffer:{}'.
           format(buf.name()))
