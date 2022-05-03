@@ -109,8 +109,7 @@ class TreeSitterAutoIndent(object):
     if indent > 0:
       c.insertText(' ' * indent)
     elif indent < 0:
-      for index in range(indent, 0, -1):
-        c.deletePreviousChar()
+      logging.warning(f'invalid indent:{indent} at line:{lnum}')
 
     return (1, indent)
 
