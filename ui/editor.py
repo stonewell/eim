@@ -51,6 +51,8 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
   def keyPressEvent(self, evt):
     key_combined = evt.keyCombination().toCombined()
+    indent = None
+
     if (key_combined == Qt.Key_Tab) or (key_combined
                                         == (Qt.Key.Key_Backtab | Qt.SHIFT)):
       evt.accept()
@@ -59,19 +61,14 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
       indent = self.ctx_.run_command('calculate_indent')
 
-      if indent is not None:
-        return
-
-    super().keyPressEvent(evt)
+    if indent is None:
+      super().keyPressEvent(evt)
 
     if (evt == QKeySequence.InsertLineSeparator
         or evt == QKeySequence.InsertParagraphSeparator):
       soft_line_break = evt == QKeySequence.InsertLineSeparator
 
-      indent = self.ctx_.run_command('calculate_indent')
-
-      if indent is not None:
-        pass
+      self.ctx_.run_command('calculate_indent')
 
   def cursor_position(self):
     return self.textCursor().position

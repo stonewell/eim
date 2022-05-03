@@ -4,7 +4,7 @@
 - [ ] Piece Table with Tree
 - [ ] Treesitter
   - [x] Syntax Highlighting
-  - [ ] Auto indent
+  - [X] Auto indent
 - [ ] LSP
 - [ ] EditorConfig
 - [ ] Search Everything

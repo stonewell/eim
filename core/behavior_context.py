@@ -79,10 +79,12 @@ class BehaviorContext(object):
             self.name, cmd_name, c))
 
       if callable(c):
-        ctx.run_command(cmd_name, c, save_history, *args)
+        return ctx.run_command(cmd_name, c, save_history, *args)
       else:
         logging.error('context:{}, cmd:{} is not map to a callable:{}'.format(
             self.name, cmd_name, c))
+
+      return None
 
     return __run_command
 
