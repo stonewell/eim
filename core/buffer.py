@@ -218,6 +218,8 @@ class EditorBuffer(object):
                     message=msg,
                     permanant=True)
 
+    self.__update_buffer_id_mode_line()
+
   def __get_line_percent(self, v, pos):
     l, c, tl = pos
 

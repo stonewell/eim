@@ -268,3 +268,18 @@ class TreeSitterLangTree(object):
 
   def node_named_descendant_for_byte_range(self, start_bytes, end_bytes):
     return self.__node_descendant_for_byte_range(start_bytes, end_bytes, False)
+
+  def __walk_node(self, node):
+    print(node, node.parent, node.id,
+          node.parent.id if node.parent is not None else '')
+
+    cursor = node.walk()
+
+    if not cursor.goto_first_child():
+      return
+
+    while True:
+      self.__walk_node(cursor.node)
+
+      if not cursor.goto_next_sibling():
+        break

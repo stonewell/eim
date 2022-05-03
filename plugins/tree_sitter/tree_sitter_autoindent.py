@@ -28,7 +28,10 @@ class TreeSitterAutoIndent(object):
     l = current_block.layout().lineForTextPosition(pos_in_block)
 
     node = None
-    if self.__is_empty_line(current_block, l):
+
+    # always check last line indent
+    # it seems to get better behavior
+    if self.__is_empty_line(current_block, l) or True:
       last_block, last_line = self.__find_last_non_empty_line(current_block, l)
 
       if last_block is None:
@@ -37,7 +40,8 @@ class TreeSitterAutoIndent(object):
         )
         return None
 
-      node = self.__get_last_node_at_line(buffer, editor, last_block, last_line)
+      node = self.__get_last_node_at_line(buffer, editor, last_block,
+                                          last_line)
 
       if node.id in indents['indent_end']:
         node = self.__get_first_node_at_line(buffer, editor, current_block, l)
@@ -157,8 +161,9 @@ class TreeSitterAutoIndent(object):
     return indents
 
   def __find_last_non_empty_line(self, current_block, l):
+    l_exclude = l
     while True:
-      if not self.__is_empty_line(current_block, l):
+      if not self.__is_empty_line(current_block, l) and l != l_exclude:
         return current_block, l
 
       cur_lnum = l.lineNumber()
