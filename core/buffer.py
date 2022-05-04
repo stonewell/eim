@@ -1,4 +1,6 @@
+import os
 import logging
+
 from guesslang import Guess
 from pubsub import pub
 from pathlib import Path
@@ -253,7 +255,9 @@ class EditorBuffer(object):
 
     options.update(self.ctx_.config.get('app/editor', {}))
 
-    ec = ec_get_properties(self.__get_file_full_path())
+    full_path = self.__get_file_full_path()
+
+    ec = ec_get_properties(full_path)
 
     if ec:
       logging.debug(f'loaded editor config:{ec}')
@@ -263,6 +267,6 @@ class EditorBuffer(object):
 
   def __get_file_full_path(self):
     if self.file_path_ is not None:
-      return self.file_path_.resolve().as_posix()
+      return os.path.abspath(self.file_path_.as_posix())
 
-    return (Path('.') / self.name()).resolve().as_posix()
+    return os.path.abspath(self.name())
