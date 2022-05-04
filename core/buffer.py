@@ -2,6 +2,7 @@ import logging
 from guesslang import Guess
 from pubsub import pub
 from pathlib import Path
+from editorconfig import get_properties as ec_get_properties
 
 guess = Guess()
 guess.probabilities('''
@@ -230,3 +231,38 @@ class EditorBuffer(object):
       return 'Bottom'
 
     return f'{self.__round(v)}%'
+
+  def get_indent_options(self):
+    options = self.__get_editor_options()
+
+    # TODO detect indent of file
+    indent_style = options.get('indent_style', 'space').lower()
+    indent_size = int(options.get('indent_size', '2'))
+
+    return (' ', indent_size) if indent_style == 'space' else ('\t', 1)
+
+  def apply_editor_config(self):
+    options = self.__get_editor_options()
+
+    tab_width = int(options.get('tab_width', '4'))
+
+    self.ctx_.set_tab_width(tab_width)
+
+  def __get_editor_options(self):
+    options = {}
+
+    options.update(self.ctx_.config.get('app/editor', {}))
+
+    ec = ec_get_properties(self.__get_file_full_path())
+
+    if ec:
+      logging.debug(f'loaded editor config:{ec}')
+      options.update(ec)
+
+    return options
+
+  def __get_file_full_path(self):
+    if self.file_path_ is not None:
+      return self.file_path_.resolve().as_posix()
+
+    return (Path('.') / self.name()).resolve().as_posix()

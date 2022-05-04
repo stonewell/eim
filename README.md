@@ -2,11 +2,16 @@
 ## Editor Improved
 
 - [ ] Piece Table with Tree
-- [ ] Treesitter
+- [X] Treesitter
   - [x] Syntax Highlighting
   - [X] Auto indent
+  - [X] leverage nvim treesitter queries
 - [ ] LSP
-- [ ] EditorConfig
+- [X] EditorConfig
+  - [X] indent
+  - [ ] code page
+  - [X] tab size
+  - [ ] save trim trail space and add new line
 - [ ] Search Everything
 - [x] Color Schema
 - [ ] Format file
@@ -42,3 +47,4 @@
 - [ ] recent files
 - [ ] guess indention of file
 - [ ] guess new line style of file
+- [ ] message buffer

@@ -3,6 +3,7 @@ import json
 import pathlib
 
 from .key_bindings import default_key_bindings
+from .editor_config import default_editor_config
 
 
 class DictQuery(dict):
@@ -59,9 +60,10 @@ def default_config():
   return DictQuery({
       "app": {
           "font": {
-              "size": 14
+              "size": 12.5,
           },
           "keys": default_key_bindings(),
-          "color-theme": "zenburn"
+          "color-theme": "zenburn",
+          "editor": default_editor_config(),
       }
   })

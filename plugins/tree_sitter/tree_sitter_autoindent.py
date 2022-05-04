@@ -65,7 +65,8 @@ class TreeSitterAutoIndent(object):
     if node.id in indents['zero_indent']:
       return (0, 0)
 
-    indent_size = 2
+    indent_char, indent_size = buffer.get_indent_options()
+    logging.debug(f'indent using char:[{indent_char}], indent size:{indent_size}')
     indent = 0
 
     root_start = 0
@@ -93,26 +94,21 @@ class TreeSitterAutoIndent(object):
 
       is_processed = False
 
-      if ((start_row not in is_processed_by_row
-           or not is_processed_by_row[start_row])
+      if ((not is_processed_by_row.get(start_row, False))
           and ((node.id in indents['branch'] and start_row == lnum) or
                (node.id in indents['dedent'] and start_row != lnum))):
         indent = indent - indent_size
         is_processed = True
 
-      if ((start_row not in is_processed_by_row
-           or not is_processed_by_row[start_row])
+      if ((not is_processed_by_row.get(start_row, False))
           and node.id in indents['indent']
           #and start_row != end_row
           and (start_row != lnum)):
         indent = indent + indent_size
         is_processed = True
 
-      if start_row in is_processed_by_row:
-        is_processed_by_row[
-            start_row] = is_processed_by_row[start_row] or is_processed
-      else:
-        is_processed_by_row[start_row] = is_processed
+      is_processed_by_row[start_row] = is_processed_by_row.get(
+          start_row, False) or is_processed
 
       node = node.parent
 
@@ -126,7 +122,7 @@ class TreeSitterAutoIndent(object):
         c.clearSelection()
         c.setPosition(current_block.position() + l.textStart())
         c.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, line_indent)
-        c.insertText(' ' * indent)
+        c.insertText(indent_char * indent)
         c.endEditBlock()
     elif indent < 0:
       logging.warning(f'invalid indent:{indent} at line:{lnum}')

@@ -4,7 +4,7 @@ import platform
 from pubsub import pub
 from functools import reduce
 
-from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette
+from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette, QFontMetrics
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
 from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, QMargins, Slot
 
@@ -53,11 +53,20 @@ class UIHelper(QObject):
       ptSize = fConfig.get('size', 14)
       bold = fConfig.get('bold', False)
       italic = fConfig.get('italic', False)
+      monospace = fConfig.get('monospace', True)
 
-      logging.debug('family:{}, ptSize:{}, bold:{}, italic:{}'.format(
-          family, ptSize, bold, italic))
+      logging.debug(
+          f'family:{family}, ptSize:{ptSize}, bold:{bold}, italic:{italic}, monospace:{monospace}'
+      )
 
       f = QFont(family, ptSize, QFont.Bold if bold else -1, italic)
+
+      if monospace:
+        f.setStyleHint(QFont.Monospace, QFont.PreferAntialias)
+      else:
+        f.setStyleHint(QFont.AnyStyle, QFont.PreferAntialias)
+
+      f.setHintingPreference(QFont.PreferFullHinting)
 
     return f
 
@@ -190,3 +199,14 @@ class UIHelper(QObject):
       l += self.editor_.document().findBlockByNumber(b_c).lineCount()
 
     return (l + 1, c.columnNumber(), self.editor_.document().lineCount())
+
+  def set_tab_width(self, tab_width):
+    if self.editor_ is None:
+      return
+
+    fm = QFontMetrics(self.get_font())
+
+    distance = fm.horizontalAdvance(' ' * tab_width)
+
+    logging.debug(f'set tab width:{distance} for {tab_width} spaces')
+    self.editor_.setTabStopDistance(distance)

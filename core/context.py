@@ -294,6 +294,13 @@ class EditorContext(object):
     self.register_command(BuiltinCommands.CLOSE_BUFFER,
                           lambda c: c.close_current_buffer())
 
+    self.register_command('apply_editor_config',
+                          self.__apply_editor_config)
+
+  def __apply_editor_config(self, ctx):
+    ctx.current_buffer_.apply_editor_config()
+    ctx.close_content_window()
+
   def __bind_config_keys(self, keys, binding_context=None):
     for key in keys:
       b = keys[key]
@@ -402,6 +409,7 @@ class EditorContext(object):
     self.ui_helper.update_document(self.current_buffer_, True)
     self.ui_helper.load_editing_state(self.current_buffer_)
     self.current_buffer_.update_mode_line()
+    self.current_buffer_.apply_editor_config()
 
     pub.sendMessage('buffer_changed', buf=buffer)
 
@@ -523,3 +531,6 @@ class EditorContext(object):
       self.__set_current_buffer(self.buffers_[0])
     else:
       self.switch_to_buffer('Untitiled')
+
+  def set_tab_width(self, tab_width):
+    self.ui_helper.set_tab_width(tab_width)

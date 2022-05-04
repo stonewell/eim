@@ -61,8 +61,12 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
       indent = self.ctx_.run_command('calculate_indent', None, False, self)
 
-    if indent is None:
-      super().keyPressEvent(evt)
+      if indent is None:
+        indent_char, indent_size = self.ctx_.current_buffer_.get_indent_options()
+        self.textCursor().insertText(indent_char * indent_size)
+        return
+
+    super().keyPressEvent(evt)
 
     if (evt == QKeySequence.InsertLineSeparator
         or evt == QKeySequence.InsertParagraphSeparator):

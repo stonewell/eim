@@ -9,3 +9,4 @@ tensorflow
 guesslang==2.2.2
 GitPython
 PyPubSub
+editorconfig
