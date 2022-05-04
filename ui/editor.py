@@ -64,7 +64,8 @@ class Editor(QPlainTextEdit, TextEditMixin):
       if indent is None:
         indent_char, indent_size = self.ctx_.current_buffer_.get_indent_options()
         self.textCursor().insertText(indent_char * indent_size)
-        return
+
+      return
 
     super().keyPressEvent(evt)
 
