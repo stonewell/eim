@@ -50,25 +50,35 @@ class Editor(QPlainTextEdit, TextEditMixin):
     self.ctx_.switch_behavior_context('editor')
 
   def keyPressEvent(self, evt):
-    key_combined = evt.keyCombination().toCombined()
-    indent = None
+    if not self.__pre_key_press_event(evt):
+      super().keyPressEvent(evt)
 
-    if (key_combined == Qt.Key_Tab) or (key_combined
-                                        == (Qt.Key.Key_Backtab | Qt.SHIFT)):
+    self.__post_key_press_event(evt)
+
+  def __pre_key_press_event(self, evt):
+    key_combined = evt.keyCombination().toCombined()
+
+    if ((key_combined == Qt.Key_Tab)
+        or (key_combined == (Qt.Key.Key_Backtab | Qt.SHIFT))):
       evt.accept()
 
-      back_tab = key_combined == (Qt.Key.Key_Backtab | Qt.SHIFT)
+      self.__handle_tab_indent(evt)
 
-      indent = self.ctx_.run_command('calculate_indent', None, False, self)
+      return True
 
-      if indent is None:
-        indent_char, indent_size = self.ctx_.current_buffer_.get_indent_options()
-        self.textCursor().insertText(indent_char * indent_size)
+    return False
 
-      return
+  def __handle_tab_indent(self, evt):
+    key_combined = evt.keyCombination().toCombined()
+    back_tab = key_combined == (Qt.Key.Key_Backtab | Qt.SHIFT)
 
-    super().keyPressEvent(evt)
+    indent = self.ctx_.run_command('calculate_indent', None, False, self)
 
+    if indent is None:
+      indent_char, indent_size = self.ctx_.current_buffer_.get_indent_options()
+      self.textCursor().insertText(indent_char * indent_size)
+
+  def __post_key_press_event(self, evt):
     if (evt == QKeySequence.InsertLineSeparator
         or evt == QKeySequence.InsertParagraphSeparator):
       soft_line_break = evt == QKeySequence.InsertLineSeparator
