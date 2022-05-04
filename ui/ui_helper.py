@@ -4,7 +4,7 @@ import platform
 from pubsub import pub
 from functools import reduce
 
-from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette, QFontMetrics
+from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette, QFontMetrics, QFontDatabase, QFontInfo
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
 from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, QMargins, Slot
 
@@ -68,6 +68,27 @@ class UIHelper(QObject):
 
       f.setHintingPreference(QFont.PreferFullHinting)
 
+      c_info = QFontInfo(f)
+
+      if monospace and not c_info.fixedPitch():
+        fontFamilies = QFontDatabase.families()
+
+        new_font = QFont(f)
+
+        for family in fontFamilies:
+          new_font.setFamily(family)
+
+          info = QFontInfo(new_font)
+
+          if info.fixedPitch():
+            logging.debug(
+                f'resolve to family:{info.family()}, ptSize:{info.pointSize()}, bold:{info.weight()}, italic:{info.italic()}, monospace:{info.fixedPitch()}'
+            )
+            return new_font
+
+    logging.debug(
+        f'resolve to family:{c_info.family()}, ptSize:{c_info.pointSize()}, bold:{c_info.weight()}, italic:{c_info.italic()}, monospace:{c_info.fixedPitch()}'
+    )
     return f
 
   def set_current_window(self, editor):
