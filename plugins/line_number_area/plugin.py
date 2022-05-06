@@ -107,6 +107,7 @@ class LineNumberArea(QWidget):
   def update_geometry(self):
     current_geometry = self.geometry()
     cr = self.editor_.contentsRect()
+
     width = self.line_number_area_width()
     rect = QRect(cr.left(), cr.top(), width, cr.height())
 

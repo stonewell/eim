@@ -64,7 +64,7 @@ class ContentWindow(ContentParentWidget, TextEditMixin):
 
     self.text_edit_ = ContentWindowLineEdit(ctx)
 
-    layout = QVBoxLayout()
+    self.layout_ = layout = QVBoxLayout()
     if isinstance(self.content_widget_, QWidget):
       layout.addWidget(self.content_widget_)
     else:
@@ -168,7 +168,7 @@ class ContentWindow(ContentParentWidget, TextEditMixin):
     cr = self.parent_widget_.contentsRect()
     vm = self.parent_widget_.viewportMargins()
 
-    return QSize(cr.width(), cr.height() / 4) - vm
+    return QSize(cr.width(), cr.height() / 4)
 
   def close(self):
     super().close()

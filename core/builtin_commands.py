@@ -4,7 +4,7 @@ class BuiltinCommands(object):
   SAVE = 'save'
   SAVE_AS = 'save_as'
   OPEN = 'open'
-  CLOSE_BUFFER = 'clos_buffer'
+  CLOSE_BUFFER = 'close_buffer'
 
   PREV_LINE = 'prev_line'
   NEXT_LINE = 'next_line'
@@ -34,3 +34,7 @@ class BuiltinCommands(object):
 
   KILL_CHAR = 'kill_char'
   KILL_WORD = 'kill_word'
+
+  SEARCH = 'search'
+  REVERSE_SEARCH = 'reverse_search'
+  SEARCH_REGEX = 'search_regex'

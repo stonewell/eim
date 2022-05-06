@@ -10,6 +10,8 @@ from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, 
 
 from .list_content_window import ListContentWindow
 from .list_with_preview_content_window import ListWithPreviewContentWindow
+from .input_content_window import InputContentWindow
+
 from core.builtin_commands import BuiltinCommands
 
 
@@ -113,6 +115,13 @@ class UIHelper(QObject):
 
   def create_list_content_window(self):
     content_window = ListContentWindow(self.ctx_, self.editor_)
+    content_window.register_commands()
+    content_window.bind_keys()
+
+    return content_window
+
+  def create_input_content_window(self):
+    content_window = InputContentWindow(self.ctx_, self.editor_)
     content_window.register_commands()
     content_window.bind_keys()
 

@@ -207,11 +207,18 @@ class EditorContext(object):
 
     return self.content_window_
 
+  def create_input_content_window(self):
+    self.close_content_window()
+
+    self.content_window_ = self.ui_helper.create_input_content_window()
+
+    return self.content_window_
+
   def create_list_with_preview_content_window(self):
     self.close_content_window()
 
-    self.content_window_ = self.ui_helper.create_list_with_preview_content_window(
-    )
+    self.content_window_ = \
+      self.ui_helper.create_list_with_preview_content_window()
 
     return self.content_window_
 
@@ -294,8 +301,7 @@ class EditorContext(object):
     self.register_command(BuiltinCommands.CLOSE_BUFFER,
                           lambda c: c.close_current_buffer())
 
-    self.register_command('apply_editor_config',
-                          self.__apply_editor_config)
+    self.register_command('apply_editor_config', self.__apply_editor_config)
 
   def __apply_editor_config(self, ctx):
     ctx.current_buffer_.apply_editor_config()
@@ -322,7 +328,9 @@ class EditorContext(object):
                   cmd_callable=None,
                   save_history=True,
                   *cmd_args):
-    logging.debug(f'running command:{cmd_name}, callable:{cmd_callable}, save history:{save_history}, args:{cmd_args}')
+    logging.debug(
+        f'running command:{cmd_name}, callable:{cmd_callable}, save history:{save_history}, args:{cmd_args}'
+    )
 
     if cmd_callable is None:
       cmd_callable = self.current_behavior_context_.get_command_callable(
