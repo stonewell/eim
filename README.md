@@ -34,8 +34,8 @@
   - [X] close buffer
   - [X] kill char
   - [X] kill line
-  - [ ] search
-  - [ ] regex search
+  - [X] search
+  - [X] regex search
   - [ ] replace
   - [ ] regex replace
   - [X] undo
