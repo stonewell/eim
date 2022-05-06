@@ -3,6 +3,7 @@ import logging
 from PySide6.QtWidgets import QTextEdit, QHBoxLayout
 from PySide6.QtWidgets import QAbstractSlider
 from PySide6.QtGui import QTextCursor
+from PySide6.QtCore import QRect
 
 from .list_content_window import ListContentWindow
 
@@ -21,6 +22,7 @@ class ListWithPreviewContentWindow(ListContentWindow):
 
     self.preview_edit_ = QTextEdit()
     self.preview_edit_.verticalScrollBar().setHidden(True)
+    self.preview_edit_.verticalScrollBar().setGeometry(QRect(0, 0, 0, 0))
 
     layout = QHBoxLayout()
     layout.addWidget(list_widget)

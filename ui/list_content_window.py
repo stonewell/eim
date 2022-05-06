@@ -1,6 +1,7 @@
 import logging
 
 from PySide6.QtWidgets import QListWidgetItem, QListWidget
+from PySide6.QtCore import QRect
 
 from fuzzywuzzy import fuzz
 
@@ -31,6 +32,7 @@ class ListContentWindow(ContentWindow):
         self.__execute_command)
 
     self.list_widget_.verticalScrollBar().setHidden(True)
+    self.list_widget_.verticalScrollBar().setGeometry(QRect(0, 0, 0, 0))
 
   def create_content_widget(self):
     self.list_widget_ = QListWidget()

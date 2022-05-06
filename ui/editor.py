@@ -2,7 +2,7 @@ import logging
 
 from pubsub import pub
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QSize, Qt, QRect
 from PySide6.QtGui import QTextCursor, QPalette, QKeySequence
 from PySide6.QtWidgets import QPlainTextEdit, QApplication
 from PySide6.QtWidgets import QAbstractSlider
@@ -27,14 +27,18 @@ class Editor(QPlainTextEdit, TextEditMixin):
     ctx.switch_behavior_context('editor')
 
     self.verticalScrollBar().setHidden(True)
+    self.verticalScrollBar().setGeometry(QRect(0, 0, 0, 0))
 
-    pub.subscribe(lambda buf: self.verticalScrollBar().setHidden(True),
-                  'buffer_changed')
+    pub.subscribe(self.__on_buffer_changed, 'buffer_changed')
 
     self.__apply_theme()
 
     self.register_commands()
     self.bind_keys()
+
+  def __on_buffer_changed(self, buf):
+    self.verticalScrollBar().setHidden(True)
+    self.verticalScrollBar().setGeometry(QRect(0, 0, 0, 0))
 
   def resizeEvent(self, e):
     super().resizeEvent(e)

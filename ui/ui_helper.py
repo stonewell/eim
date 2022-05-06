@@ -234,9 +234,7 @@ class UIHelper(QObject):
     if self.editor_ is None:
       return
 
-    fm = QFontMetrics(self.get_font())
-
-    distance = fm.horizontalAdvance(' ' * tab_width)
+    distance = self.editor_.fontMetrics().horizontalAdvance(' ' * tab_width)
 
     logging.debug(f'set tab width:{distance} for {tab_width} spaces')
     self.editor_.setTabStopDistance(distance)

@@ -39,6 +39,9 @@ class LineNumberArea(QWidget):
                                int].connect(self.update_line_number_area)
     self.update_line_number_area_width(0)
 
+    # reupdate geometry to count margins
+    self.update_geometry()
+
   def sizeHint(self):
     return QSize(self.line_number_area_width(), 0)
 
@@ -107,9 +110,10 @@ class LineNumberArea(QWidget):
   def update_geometry(self):
     current_geometry = self.geometry()
     cr = self.editor_.contentsRect()
+    vms = self.ctx_.get_margins_for_handler(self) or QMargins(0, 0, 0, 0)
 
     width = self.line_number_area_width()
-    rect = QRect(cr.left(), cr.top(), width, cr.height())
+    rect = QRect(cr.left() + vms.left(), cr.top() + vms.top(), width, cr.height() - vms.top() - vms.bottom())
 
     if current_geometry != rect:
       self.setGeometry(rect)

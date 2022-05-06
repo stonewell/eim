@@ -35,6 +35,9 @@ class ModeLineArea(QStatusBar):
 
     self.__apply_theme(self)
 
+    # reupdate geometry to count margins
+    self.update_geometry()
+
   def sizeHint(self):
     return QSize(0, self.mode_line_area_height())
 
@@ -48,10 +51,13 @@ class ModeLineArea(QStatusBar):
 
   def update_geometry(self):
     current_geometry = self.geometry()
-    cr = self.editor_.contentsRect() - self.editor_.viewportMargins()
+    cr = self.editor_.contentsRect()
+    vms = self.ctx_.get_margins_for_handler(self) or QMargins(0, 0, 0, 0)
+
+    cr -= vms
 
     height = self.mode_line_area_height()
-    rect = QRect(cr.left(), cr.bottom(), cr.width(), height)
+    rect = QRect(cr.left(), cr.bottom() - height, cr.width(), height)
 
     if current_geometry != rect:
       self.setGeometry(rect)

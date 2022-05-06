@@ -529,6 +529,18 @@ class EditorContext(object):
   def register_editor_viewport_handler(self, handler):
     self.editor_view_port_handlers_.append(handler)
 
+  def get_margins_for_handler(self, handler):
+    vms = None
+
+    for h in self.editor_view_port_handlers_:
+      if h == handler:
+        break
+
+      vms = h.get_editor_margin() if vms is None \
+        else vms + h.get_editor_margin()
+
+    return vms
+
   def close_current_buffer(self):
     try:
       self.buffers_.remove(self.current_buffer_)
