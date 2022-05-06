@@ -54,6 +54,7 @@ class EditorBuffer(object):
   def __set_buffer_document(self, document):
     self.document_ = document
     self.document_.setModified(False)
+    self.document_.clearUndoRedoStacks()
 
     self.document_.modificationChanged[bool].connect(
         self.__modification_changed)

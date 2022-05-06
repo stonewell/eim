@@ -83,13 +83,18 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
       #   self.setFormat(start_index, count, selectF)
 
   def __set_format(self, p, c, f):
-    tc = self.editor_.textCursor()
     current_block = self.currentBlock()
 
-    tc.beginEditBlock()
-    tc.clearSelection()
-    tc.setPosition(current_block.position() + p)
-    tc.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, c)
-    tc.setCharFormat(f)
-    tc.clearSelection()
-    tc.endEditBlock()
+    layout = current_block.layout()
+    self.setFormat(p, c, f)
+    return
+
+    # tc = self.editor_.textCursor()
+
+    # tc.beginEditBlock()
+    # tc.clearSelection()
+    # tc.setPosition(current_block.position() + p)
+    # tc.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, c)
+    # tc.setCharFormat(f)
+    # tc.clearSelection()
+    # tc.endEditBlock()

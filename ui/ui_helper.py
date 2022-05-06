@@ -145,10 +145,11 @@ class UIHelper(QObject):
     self.editor_.setFocus(Qt.ActiveWindowFocusReason)
 
   def create_document(self, content):
-    doc = QTextDocument(content)
+    doc = QTextDocument(parent=None)
     layout = QPlainTextDocumentLayout(doc)
     doc.setDocumentLayout(layout)
 
+    doc.setPlainText(content)
     return doc
 
   def update_document(self, buffer, load_doc):
