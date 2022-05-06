@@ -17,6 +17,10 @@ class TreeSitterSyntaxHighlighter(QSyntaxHighlighter):
 
   def highlightBlock(self, text):
     current_block = self.currentBlock()
+    if text != current_block.text():
+      logging.warning(
+          f'[{text}], {len(text)} is not same as current block, [{current_block.text()}], {len(current_block.text())}'
+      )
     captures, state = self.buffer_.tree_sitter_tree_.highlight_query(
         current_block.position(),
         current_block.position() + current_block.length())

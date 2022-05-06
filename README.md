@@ -42,6 +42,8 @@
   - [X] redo
   - [X] paste with history
   - [ ] Search in files with ag/rg
+  - [ ] backspace back indent at line begin
+  - [ ] search wrap
 - [X] detect language using file suffix, then use guesslang
 - [X] force buffer lang
 - [ ] recent files
