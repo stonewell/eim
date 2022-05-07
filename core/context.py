@@ -554,3 +554,6 @@ class EditorContext(object):
 
   def set_tab_width(self, tab_width):
     self.ui_helper.set_tab_width(tab_width)
+
+  def get_row_and_col(self):
+    return self.ui_helper.get_row_and_col()

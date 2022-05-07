@@ -100,7 +100,7 @@ class UIHelper(QObject):
     self.editor_.updateRequest[QRect,
                                int].connect(self.update_editor_viwe_port)
     self.editor_.cursorPositionChanged.connect(lambda: pub.sendMessage(
-        'cursor_position_changed', pos=self.__get_row_and_col()))
+        'cursor_position_changed', pos=self.get_row_and_col()))
 
     pub.subscribe(lambda: self.update_editor_viwe_port(None, None),
                   'viewport_changed')
@@ -215,7 +215,7 @@ class UIHelper(QObject):
     if v != self.editor_.viewportMargins():
       self.editor_.setViewportMargins(v)
 
-  def __get_row_and_col(self):
+  def get_row_and_col(self):
     c = self.editor_.textCursor()
     current_block_number = c.blockNumber()
     current_block = self.editor_.document().findBlockByNumber(

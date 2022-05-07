@@ -17,6 +17,8 @@ class BuiltinCommands(object):
   START_OF_LINE = 'start_of_line'
   END_OF_LINE = 'end_of_line'
 
+  GOTO_LINE = 'go_to_line'
+
   SELECT_ALL = 'select_all'
 
   KILL_TO_END_OF_LINE = 'kill_to_end_of_line'

@@ -45,7 +45,7 @@
   - [ ] Search in files with ag/rg
   - [X] backspace back indent at line begin
   - [X] search wrap
-  - [ ] goto line
+  - [X] goto line
 - [X] detect language using file suffix, then use guesslang
 - [X] force buffer lang
 - [ ] recent files

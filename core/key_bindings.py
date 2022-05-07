@@ -33,4 +33,6 @@ def default_key_bindings():
       'Ctrl+X, K': BuiltinCommands.CLOSE_BUFFER,
       'Ctrl+R': BuiltinCommands.REVERSE_SEARCH,
       'Ctrl+S': BuiltinCommands.SEARCH,
+      'Alt+G, G': BuiltinCommands.GOTO_LINE,
+      'Alt+G, Alt+G': BuiltinCommands.GOTO_LINE,
   }

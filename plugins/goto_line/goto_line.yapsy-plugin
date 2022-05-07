@@ -1,0 +1,6 @@
+[Core]
+Name = Goto Line
+Module = __init__.py
+
+[Documentation]
+Version = 0.1
