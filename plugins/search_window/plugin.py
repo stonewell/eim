@@ -3,7 +3,7 @@ from pubsub import pub
 
 from yapsy.IPlugin import IPlugin
 
-from PySide6.QtGui import QTextDocument
+from PySide6.QtGui import QTextDocument, QTextCursor
 from PySide6.QtCore import QMargins
 
 from core.builtin_commands import BuiltinCommands
@@ -117,4 +117,15 @@ class Plugin(IPlugin):
       options |= QTextDocument.FindCaseSensitively
 
     if self.editor_.find(text_to_search, options):
+      self.editor_.centerCursor()
+    else:
+      tc = self.editor_.textCursor()
+
+      if self.search_type_ == Plugin.REVERSE_SEARCH:
+        self.editor_.move_cursor(QTextCursor.End, QTextCursor.MoveAnchor)
+      else:
+        self.editor_.move_cursor(QTextCursor.Start, QTextCursor.MoveAnchor)
+
+      if not self.editor_.find(text_to_search, options):
+        self.editor_.setTextCursor(tc)
       self.editor_.centerCursor()
