@@ -10,8 +10,8 @@ class TreeSitterAutoIndent(object):
 
     self.ctx_.hook_command('calculate_indent', self.__calculate_indent,
                            'editor', False)
-    self.ctx_.hook_command('calculate_line_indent_info', self.__calculate_line_indent_info,
-                           'editor', False)
+    self.ctx_.hook_command('calculate_line_indent_info',
+                           self.__calculate_line_indent_info, 'editor', False)
 
   def __calculate_line_indent_info(self, ctx, editor):
     buffer = ctx.current_buffer_
@@ -26,10 +26,11 @@ class TreeSitterAutoIndent(object):
     empty_line = self.__is_empty_line(current_block, l)
     line_indent = self.__get_first_non_empty_char(current_block, l)
 
-    return (l.textStart(), #line start pos
-            line_indent, #line indents end pos
-            empty_line # if line is empty
-            )
+    return (
+        l.textStart(),  #line start pos
+        line_indent,  #line indents end pos
+        empty_line  # if line is empty
+    )
 
   def __calculate_indent(self, ctx, editor):
     buffer = ctx.current_buffer_
@@ -86,7 +87,8 @@ class TreeSitterAutoIndent(object):
       return (0, 0)
 
     indent_char, indent_size = buffer.get_indent_options()
-    logging.debug(f'indent using char:[{indent_char}], indent size:{indent_size}')
+    logging.debug(
+        f'indent using char:[{indent_char}], indent size:{indent_size}')
     indent = 0
 
     root_start = 0
@@ -99,7 +101,7 @@ class TreeSitterAutoIndent(object):
       start_row, start_col = node.start_point
 
       logging.debug(
-          f'{node}, {start_row}, {end_row}, {lnum}, {node.id in indents["indent"]}, {node.id in indents["branch"]}'
+          f'{node}, {start_row}, {end_row}, {lnum}, {node.id in indents["indent"]}, {node.id in indents["branch"]}, {node.id in indents["aligned_indent"]}'
       )
 
       if ((not node.id in indents['indent']) and (node.id in indents['auto'])

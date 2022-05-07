@@ -5,6 +5,7 @@
 - [X] Treesitter
   - [x] Syntax Highlighting
   - [X] Auto indent
+    - [ ] aligned indent
   - [X] leverage nvim treesitter queries
 - [ ] LSP
 - [X] EditorConfig
@@ -22,7 +23,7 @@
 - [X] Status Line
 
 ## TODO
-- [ ] ask for input
+- [X] ask for input
 - [X] directory content plugin support path input
 - [ ] show error message
 - [X] syntax high light for multiple line string, comment
@@ -44,6 +45,7 @@
   - [ ] Search in files with ag/rg
   - [X] backspace back indent at line begin
   - [X] search wrap
+  - [ ] goto line
 - [X] detect language using file suffix, then use guesslang
 - [X] force buffer lang
 - [ ] recent files

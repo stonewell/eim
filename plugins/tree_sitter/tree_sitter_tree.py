@@ -255,31 +255,38 @@ class TreeSitterLangTree(object):
 
   def node_descendant_for_point_range(self, start_row, start_column, end_row,
                                       end_column):
+    if hasattr(self.tree_.root_node, 'descendant_for_point_range'):
+      return self.tree_.root_node.descendant_for_point_range(
+          (start_row, start_column), (end_row, end_column))
+
+    logging.warning('node do not have function descendant_for_point_range')
     return self.__node_descendant_for_point_range(start_row, start_column,
                                                   end_row, end_column, True)
 
   def node_named_descendant_for_point_range(self, start_row, start_column,
                                             end_row, end_column):
+    if hasattr(self.tree_.root_node, 'named_descendant_for_point_range'):
+      return self.tree_.root_node.named_descendant_for_point_range(
+          (start_row, start_column), (end_row, end_column))
+
+    logging.warning(
+        'node do not have function named_descendant_for_point_range')
     return self.__node_descendant_for_point_range(start_row, start_column,
                                                   end_row, end_column, False)
 
   def node_descendant_for_byte_range(self, start_bytes, end_bytes):
+    if hasattr(self.tree_.root_node, 'descendant_for_byte_range'):
+      return self.tree_.root_node.descendant_for_byte_range(
+          start_bytes, end_bytes)
+
+    logging.warning('node do not have function descendant_for_byte_range')
     return self.__node_descendant_for_byte_range(start_bytes, end_bytes, True)
 
   def node_named_descendant_for_byte_range(self, start_bytes, end_bytes):
+    if hasattr(self.tree_.root_node, 'named_descendant_for_byte_range'):
+      return self.tree_.root_node.named_descendant_for_byte_range(
+          start_bytes, end_bytes)
+
+    logging.warning(
+        'node do not have function named_descendant_for_byte_range')
     return self.__node_descendant_for_byte_range(start_bytes, end_bytes, False)
-
-  def __walk_node(self, node):
-    print(node, node.parent, node.id,
-          node.parent.id if node.parent is not None else '')
-
-    cursor = node.walk()
-
-    if not cursor.goto_first_child():
-      return
-
-    while True:
-      self.__walk_node(cursor.node)
-
-      if not cursor.goto_next_sibling():
-        break
