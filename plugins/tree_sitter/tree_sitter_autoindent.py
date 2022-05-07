@@ -10,6 +10,26 @@ class TreeSitterAutoIndent(object):
 
     self.ctx_.hook_command('calculate_indent', self.__calculate_indent,
                            'editor', False)
+    self.ctx_.hook_command('calculate_line_indent_info', self.__calculate_line_indent_info,
+                           'editor', False)
+
+  def __calculate_line_indent_info(self, ctx, editor):
+    buffer = ctx.current_buffer_
+    c = editor.textCursor()
+    current_block_number = editor.textCursor().blockNumber()
+
+    current_block = buffer.document_.findBlockByNumber(current_block_number)
+
+    pos_in_block = c.positionInBlock()
+    l = current_block.layout().lineForTextPosition(pos_in_block)
+
+    empty_line = self.__is_empty_line(current_block, l)
+    line_indent = self.__get_first_non_empty_char(current_block, l)
+
+    return (l.textStart(), #line start pos
+            line_indent, #line indents end pos
+            empty_line # if line is empty
+            )
 
   def __calculate_indent(self, ctx, editor):
     buffer = ctx.current_buffer_

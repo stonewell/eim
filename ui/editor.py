@@ -62,13 +62,32 @@ class Editor(QPlainTextEdit, TextEditMixin):
   def __pre_key_press_event(self, evt):
     key_combined = evt.keyCombination().toCombined()
 
-    if ((key_combined == Qt.Key_Tab)
-        or (key_combined == (Qt.Key.Key_Backtab | Qt.SHIFT))):
+    if key_combined == Qt.Key_Tab:
       evt.accept()
 
       self.__handle_tab_indent(evt)
 
       return True
+    elif ((key_combined == Qt.Key_Backspace)
+          or (key_combined == (Qt.Key.Key_Backtab | Qt.SHIFT))):
+      line_start, line_indents_end, empty_line = self.ctx_.run_command(
+          'calculate_line_indent_info', None, False, self)
+
+      tc = self.textCursor()
+      if tc.positionInBlock() == line_start:
+        return False
+
+      if empty_line or tc.positionInBlock() <= line_indents_end:
+        indent_char, indent_size = self.ctx_.current_buffer_.get_indent_options(
+        )
+
+        tc.beginEditBlock()
+        tc.clearSelection()
+        for i in range(indent_size):
+          tc.deletePreviousChar()
+        tc.endEditBlock()
+
+        return True
 
     return False
 
