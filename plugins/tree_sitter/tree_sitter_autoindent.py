@@ -91,6 +91,9 @@ class TreeSitterAutoIndent(object):
         f'indent using char:[{indent_char}], indent size:{indent_size}')
     indent = 0
 
+    aligned_indent_char = ' '
+    aligned_indent = 0
+
     root_start = 0
     is_processed_by_row = {}
 
@@ -129,10 +132,23 @@ class TreeSitterAutoIndent(object):
         indent = indent + indent_size
         is_processed = True
 
-      if ((node.id in indents['aligned_indent'])
-          and (start_row != lnum)):
-        indent = start_col + 1
-        indent_char = ' '
+      if ((node.id in indents['aligned_indent']) and (start_row != lnum)
+          and (start_row != end_row)):
+        aligned_block = buffer.document_.findBlock(node.start_byte)
+        aligned_line = aligned_block.layout().lineForTextPosition(
+            node.start_byte - aligned_block.position())
+        aligned_line_indent = self.__get_first_non_empty_char(
+            aligned_block, aligned_line)
+
+        indent = max(aligned_line_indent, 0)
+        indent_char = ' ' if indent == 0 else aligned_block.text()[
+            aligned_line.textStart()]
+
+        if indent == 0:
+          indent = start_col + 1
+        else:
+          aligned_indent_char = ' '
+          aligned_indent = start_col - aligned_line_indent + 1
         break
 
       is_processed_by_row[start_row] = is_processed_by_row.get(
@@ -140,7 +156,8 @@ class TreeSitterAutoIndent(object):
 
       node = node.parent
 
-    logging.debug(f'indent:{indent} at line:{lnum}')
+    logging.debug(
+        f'indent:{indent} at line:{lnum}, aligned indent:{aligned_indent}')
 
     if indent > 0:
       line_indent = self.__get_first_non_empty_char(current_block, l)
@@ -150,7 +167,7 @@ class TreeSitterAutoIndent(object):
         c.clearSelection()
         c.setPosition(current_block.position() + l.textStart())
         c.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, line_indent)
-        c.insertText(indent_char * indent)
+        c.insertText(indent_char * indent + aligned_indent_char * aligned_indent)
         c.endEditBlock()
     elif indent < 0:
       logging.warning(f'invalid indent:{indent} at line:{lnum}')
