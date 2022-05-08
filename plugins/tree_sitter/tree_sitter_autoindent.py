@@ -129,6 +129,12 @@ class TreeSitterAutoIndent(object):
         indent = indent + indent_size
         is_processed = True
 
+      if ((node.id in indents['aligned_indent'])
+          and (start_row != lnum)):
+        indent = start_col + 1
+        indent_char = ' '
+        break
+
       is_processed_by_row[start_row] = is_processed_by_row.get(
           start_row, False) or is_processed
 

@@ -5,7 +5,7 @@
 - [X] Treesitter
   - [x] Syntax Highlighting
   - [X] Auto indent
-    - [ ] aligned indent
+    - [X] aligned indent
   - [X] leverage nvim treesitter queries
 - [ ] LSP
 - [X] EditorConfig
