@@ -140,7 +140,9 @@ class Plugin(IPlugin):
       else:
         self.editor_.move_cursor(QTextCursor.Start, QTextCursor.MoveAnchor)
 
-      if not self.editor_.find(text_to_search, options):
+      if not self.editor_.find(
+          QRegularExpression(text_to_search) if self.search_type_
+          == Plugin.SEARCH_REGEX else text_to_search, options):
         self.editor_.setTextCursor(tc)
       self.editor_.centerCursor()
 
