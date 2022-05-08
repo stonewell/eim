@@ -1,5 +1,4 @@
 import logging
-from pubsub import pub
 
 from yapsy.IPlugin import IPlugin
 
@@ -73,8 +72,8 @@ class Plugin(IPlugin):
     cw.set_input_history(history)
 
     self.text_edit_.returnPressed.connect(self.__execute_command)
+    self.text_edit_.textEdited[str].connect(self.__on_text_edited)
 
-    pub.sendMessage('viewport_changed')
     cw.show()
 
   def __execute_command(self):
@@ -82,7 +81,6 @@ class Plugin(IPlugin):
 
     self.ctx.close_content_window()
     self.content_window_ = None
-    pub.sendMessage('viewport_changed')
 
   def __do_save_search(self):
     txt_to_search = self.text_edit_.text()
@@ -129,3 +127,6 @@ class Plugin(IPlugin):
       if not self.editor_.find(text_to_search, options):
         self.editor_.setTextCursor(tc)
       self.editor_.centerCursor()
+
+  def __on_text_edited(self, txt):
+    self.__do_search()
