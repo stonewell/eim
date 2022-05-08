@@ -1,9 +1,11 @@
 import logging
+from pubsub import pub
 
 from yapsy.IPlugin import IPlugin
 
 from PySide6.QtGui import QTextDocument, QTextCursor
 from PySide6.QtCore import QMargins
+from PySide6.QtCore import QRegularExpression
 
 from core.builtin_commands import BuiltinCommands
 
@@ -55,13 +57,19 @@ class Plugin(IPlugin):
     self.content_window_ = None
 
   def show_input_window(self, ctx, search_type):
-    self.search_type_ = search_type
+    try:
+      self.__show_input_window(ctx, search_type)
+    except:
+      logging.exception('show input window failed')
 
-    self.current_history_ = history = self.search_history_[search_type]
-
+  def __show_input_window(self, ctx, search_type):
     if self.content_window_ is not None:
       self.__do_search()
       return
+
+    self.search_type_ = search_type
+
+    self.current_history_ = history = self.search_history_[search_type]
 
     self.content_window_ = cw = ctx.create_input_content_window()
 
@@ -74,7 +82,11 @@ class Plugin(IPlugin):
     self.text_edit_.returnPressed.connect(self.__execute_command)
     self.text_edit_.textEdited[str].connect(self.__on_text_edited)
 
+    pub.subscribe(self.__on_window_close, 'content_window_closed')
     cw.show()
+
+  def __on_window_close(self):
+    self.content_window_ = None
 
   def __execute_command(self):
     self.__do_save_search()
@@ -114,7 +126,11 @@ class Plugin(IPlugin):
     if text_to_search.lower() != text_to_search:
       options |= QTextDocument.FindCaseSensitively
 
-    if self.editor_.find(text_to_search, options):
+    logging.debug(f'search type:{self.search_type_}, text:{text_to_search}')
+
+    if self.editor_.find(
+        QRegularExpression(text_to_search) if self.search_type_
+        == Plugin.SEARCH_REGEX else text_to_search, options):
       self.editor_.centerCursor()
     else:
       tc = self.editor_.textCursor()

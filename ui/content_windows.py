@@ -1,5 +1,6 @@
 import logging
 import platform
+from pubsub import pub
 
 from PySide6.QtCore import Qt, QRect, QSize
 from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout
@@ -174,6 +175,7 @@ class ContentWindow(ContentParentWidget, TextEditMixin):
     super().close()
 
     self.ctx_.switch_behavior_context()
+    pub.sendMessage('content_window_closed')
 
   def _page_up_down(self, ctx, pageDown):
     logging.debug('content window ignore page up down')
