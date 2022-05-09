@@ -21,6 +21,14 @@ class InputContentWindow(ContentWindow):
 
     self.ctx_.switch_behavior_context('input_content_window')
 
+    self.set_input_content_delegate(self)
+
+  def set_input_content_delegate(self, delegate):
+    self.delegate_ = delegate
+
+  def get_history_display_text(self, history):
+    return history
+
   def create_content_widget(self):
     self.label_widget_ = QLabel()
     return self.label_widget_
@@ -52,7 +60,7 @@ class InputContentWindow(ContentWindow):
         self.input_history_):
       return
 
-    self.text_edit_.setText(self.input_history_[self.current_input_item_])
+    self.text_edit_.setText(self.delegate_.get_history_display_text(self.input_history_[self.current_input_item_]))
 
   def __next_item(self, ctx):
     if len(self.input_history_) == 0:

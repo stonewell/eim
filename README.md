@@ -37,8 +37,8 @@
   - [X] kill line
   - [X] search
   - [X] regex search
-  - [ ] replace
-  - [ ] regex replace
+  - [X] replace
+  - [X] regex replace
   - [X] undo
   - [X] redo
   - [X] paste with history

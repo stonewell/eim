@@ -76,7 +76,11 @@ class Plugin(IPlugin):
     self.text_edit_ = t = cw.text_edit_
     self.label_ = e = cw.label_widget_
 
-    self.label_.setText(f'Search:{history[0] if len(history) > 0 else ""}')
+    if len(history) > 0:
+      self.label_.setText(f'Search: (default {history[0]})')
+    else:
+      self.label_.setText(f'Search: ')
+
     cw.set_input_history(history)
 
     self.text_edit_.returnPressed.connect(self.__execute_command)

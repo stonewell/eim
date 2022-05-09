@@ -40,3 +40,6 @@ class BuiltinCommands(object):
   SEARCH = 'search'
   REVERSE_SEARCH = 'reverse_search'
   SEARCH_REGEX = 'search_regex'
+
+  REPLACE = 'replace'
+  REPLACE_REGEX = 'replace_regex'
