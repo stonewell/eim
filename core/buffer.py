@@ -60,14 +60,16 @@ class EditorBuffer(object):
         self.__modification_changed)
     pub.subscribe(self.__cursor_position_changed, 'cursor_position_changed')
 
-  def save_file(self, file_path=None):
+  def save_file(self, file_path=None, action=None):
     if file_path is None and self.file_path_ is None:
-      self.ctx_.ask_for_file_path(self.__write_to_file)
+      self.ctx_.ask_for_file_path(self.__write_to_file, action)
       return
     elif file_path is None:
       file_path = self.file_path_
 
     self.__write_to_file(file_path)
+    if callable(action):
+      action()
 
   def __write_to_file(self, file_path):
     logging.debug('save to file:{}'.format(file_path.resolve()))
@@ -76,6 +78,8 @@ class EditorBuffer(object):
     file_path.write_text(self.ctx_.get_document_content(self.document_))
 
     self.document_.setModified(False)
+
+    self.update_mode_line()
 
   def name(self):
     if self.file_path_ is not None:
@@ -271,3 +275,10 @@ class EditorBuffer(object):
       return os.path.abspath(self.file_path_.as_posix())
 
     return os.path.abspath(self.name())
+
+  def is_modified(self):
+    return self.document_ is not None and self.document_.isModified()
+
+  def set_modified(self, v):
+    if self.document_ is not None:
+      self.document_.setModified(v)

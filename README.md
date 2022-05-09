@@ -30,7 +30,7 @@
   - [X] syntax highlight deal with selected content, handled by QT, but need to refine the text/background color
   - [ ] considering re-impl selection with extra selection to keep syntax high light when lines selected
 - [ ] file modified outside detect
-- [ ] prompt for save when quit/close
+- [X] prompt for save when quit/close
 - [ ] editing feature complete
   - [X] close buffer
   - [X] kill char

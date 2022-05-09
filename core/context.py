@@ -436,9 +436,18 @@ class EditorContext(object):
   def buffer_names(self):
     return [buf.name() for buf in self.buffers_]
 
-  def ask_for_file_path(self, on_get_path):
-    self.run_command(BuiltinCommands.OPEN, None, False,
-                     {'directory_content_file_path_selected': on_get_path})
+  def ask_for_file_path(self, on_get_path, action=None):
+    self.run_command(
+        BuiltinCommands.OPEN, None, False, {
+            'directory_content_file_path_selected':
+            lambda fp: self.__on_get_file_path(fp, on_get_path, action)
+        })
+
+  def __on_get_file_path(self, file_path, on_get_path, action):
+    on_get_path(file_path)
+
+    if callable(action):
+      action()
 
   def get_document_content(self, document):
     return self.ui_helper.get_document_content(document)
@@ -542,6 +551,10 @@ class EditorContext(object):
     return vms
 
   def close_current_buffer(self):
+    if self.prompt_for_buffer_save(self.close_current_buffer):
+      logging.debug('close current buffer handled by prompt_for_buffer_save')
+      return
+
     try:
       self.buffers_.remove(self.current_buffer_)
     except:
@@ -557,3 +570,36 @@ class EditorContext(object):
 
   def get_row_and_col(self):
     return self.ui_helper.get_row_and_col()
+
+  def prompt_for_buffer_save(self, action):
+    if not self.current_buffer_.is_modified():
+      return False
+
+    cw = self.create_input_content_window()
+
+    t = cw.text_edit_
+    l = cw.label_widget_
+
+    l.setText(f'Buffer modified, save? (Yes or No)')
+
+    t.returnPressed.connect(
+        lambda: self.__do_prompt_for_buffer_save(cw, action))
+
+    cw.show()
+
+    return True
+
+  def __do_prompt_for_buffer_save(self, cw, action):
+    t = cw.text_edit_
+    txt = t.text()
+
+    if txt.lower() != 'yes':
+      self.current_buffer_.set_modified(False)
+      self.close_content_window()
+
+      if callable(action):
+        action()
+      return
+
+    self.close_content_window()
+    self.current_buffer_.save_file(action=action)
