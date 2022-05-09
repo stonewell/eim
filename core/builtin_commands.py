@@ -43,3 +43,5 @@ class BuiltinCommands(object):
 
   REPLACE = 'replace'
   REPLACE_REGEX = 'replace_regex'
+
+  RELOAD_BUFFER = 'reload_buffer'

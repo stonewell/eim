@@ -302,10 +302,26 @@ class EditorContext(object):
                           lambda c: c.close_current_buffer())
 
     self.register_command('apply_editor_config', self.__apply_editor_config)
+    self.register_command(BuiltinCommands.RELOAD_BUFFER,
+                          self.__reload_current_buffer)
+
+  def __reload_current_buffer(self, ctx):
+    ctx.close_content_window()
+
+    self.ui_helper.save_editing_state(self.current_buffer_)
+
+    ctx.current_buffer_.reload_file()
+
+    self.ui_helper.update_document(self.current_buffer_, True)
+    self.ui_helper.load_editing_state(self.current_buffer_)
+    self.current_buffer_.update_mode_line()
+    self.current_buffer_.apply_editor_config()
+
+    pub.sendMessage('buffer_changed', buf=self.current_buffer_)
 
   def __apply_editor_config(self, ctx):
-    ctx.current_buffer_.apply_editor_config()
     ctx.close_content_window()
+    ctx.current_buffer_.apply_editor_config()
 
   def __bind_config_keys(self, keys, binding_context=None):
     for key in keys:
@@ -618,3 +634,6 @@ class EditorContext(object):
         action()
 
     self.close_content_window()
+
+  def update_document_content(self, document, content):
+    self.ui_helper.update_document_content(document, content)

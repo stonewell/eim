@@ -33,7 +33,7 @@ class EditorBuffer(object):
     self.text_cursor_ = None
     self.invalid_langs_ = {}
 
-  def load_file(self, file_path):
+  def load_file(self, file_path, reload=False):
     if not isinstance(file_path, Path):
       file_path = Path(file_path)
 
@@ -44,12 +44,25 @@ class EditorBuffer(object):
 
       return
 
+    logging.debug(f'load file content:{file_path.resolve().as_posix()}, reload:{reload}')
+
     with file_path.open(encoding='utf-8') as f:
       content = f.read()
 
       self.file_path_ = file_path
 
-      self.__set_buffer_document(self.ctx_.create_document(content))
+      if reload:
+        self.ctx_.update_document_content(self.document_, content)
+        self.document_.setModified(False)
+        self.document_.clearUndoRedoStacks()
+      else:
+        self.__set_buffer_document(self.ctx_.create_document(content))
+
+  def reload_file(self):
+    if self.file_path_ is None or not self.file_path_.exists():
+      return
+
+    self.load_file(self.file_path_, True)
 
   def __set_buffer_document(self, document):
     self.document_ = document

@@ -155,6 +155,9 @@ class UIHelper(QObject):
     doc.setPlainText(content)
     return doc
 
+  def update_document_content(self, document, content):
+    document.setPlainText(content)
+
   def update_document(self, buffer, load_doc):
     if load_doc:
       self.editor_.setDocument(buffer.document_)
@@ -163,9 +166,11 @@ class UIHelper(QObject):
 
   def save_editing_state(self, buffer):
     buffer.text_cursor_ = self.editor_.textCursor()
+    buffer.text_cursor_position_ = buffer.text_cursor_.position()
 
   def load_editing_state(self, buffer):
     if buffer.text_cursor_ is not None:
+      buffer.text_cursor_.setPosition(buffer.text_cursor_position_)
       self.editor_.setTextCursor(buffer.text_cursor_)
       self.editor_.ensureCursorVisible()
 
