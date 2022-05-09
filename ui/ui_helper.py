@@ -135,9 +135,11 @@ class UIHelper(QObject):
     return content_window
 
   def register_commands(self):
-    self.ctx_.register_command(
-        BuiltinCommands.QUIT,
-        lambda c: self.ctx_.prompt_for_buffer_save(QCoreApplication.quit))
+    self.ctx_.register_command(BuiltinCommands.QUIT, self.__quit_app)
+
+  def __quit_app(self, ctx):
+    if not self.ctx_.prompt_for_buffer_save(QCoreApplication.quit):
+      QCoreApplication.quit()
 
   def bind_keys(self):
     pass

@@ -137,8 +137,8 @@ class Plugin(IPlugin):
     if path_item.is_dir():
       self.__directory_content_dir_path_selected(path_item)
     else:
-      self.__directory_content_file_path_selected(path_item)
       self.ctx.close_content_window()
+      self.__directory_content_file_path_selected(path_item)
 
   def on_text_edited(self, txt):
     if txt.find('/') < 0:

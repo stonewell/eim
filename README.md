@@ -31,6 +31,7 @@
   - [ ] considering re-impl selection with extra selection to keep syntax high light when lines selected
 - [ ] file modified outside detect
 - [X] prompt for save when quit/close
+- [X] confirm for overwrite
 - [ ] editing feature complete
   - [X] close buffer
   - [X] kill char

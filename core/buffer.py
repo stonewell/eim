@@ -60,18 +60,28 @@ class EditorBuffer(object):
         self.__modification_changed)
     pub.subscribe(self.__cursor_position_changed, 'cursor_position_changed')
 
+  def save_file_as(self):
+    self.ctx_.ask_for_file_path(self.__confirm_overwrite)
+
   def save_file(self, file_path=None, action=None):
     if file_path is None and self.file_path_ is None:
-      self.ctx_.ask_for_file_path(self.__write_to_file, action)
+      self.ctx_.ask_for_file_path(
+          lambda fp: self.__confirm_overwrite(fp, action))
       return
     elif file_path is None:
       file_path = self.file_path_
 
-    self.__write_to_file(file_path)
-    if callable(action):
-      action()
+    self.__write_to_file(file_path, action)
 
-  def __write_to_file(self, file_path):
+  def __confirm_overwrite(self, file_path, action=None):
+    if file_path.exists():
+      self.ctx_.confirm_overwrite_file(
+          file_path, lambda: self.__write_to_file(file_path, action))
+      return
+
+    self.__write_to_file(file_path, action)
+
+  def __write_to_file(self, file_path, action=None):
     logging.debug('save to file:{}'.format(file_path.resolve()))
     self.file_path_ = file_path
 
@@ -80,6 +90,9 @@ class EditorBuffer(object):
     self.document_.setModified(False)
 
     self.update_mode_line()
+
+    if callable(action):
+      action()
 
   def name(self):
     if self.file_path_ is not None:
