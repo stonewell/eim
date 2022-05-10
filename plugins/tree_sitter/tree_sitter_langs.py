@@ -82,7 +82,10 @@ def ensure_tree_sitter_langs(ctx):
       logging.info('tree sitter langs binary extracted to:{}'.format(
           langs_data_bin_path.resolve()))
 
-      clone_grammas(langs_data_path)
+      if (langs_data_path / '.git').exists():
+        update_grammas(langs_data_path)
+      else:
+        clone_grammas(langs_data_path)
 
       ver_file.write_text(latest_tag)
   except:

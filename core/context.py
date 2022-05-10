@@ -35,6 +35,8 @@ class EditorContext(object):
       logging.getLogger('').setLevel(logging.INFO)
 
     logging.debug('debug level:{}'.format(args.debug))
+    logging.debug(f'running as server:{args.server}, client:{args.client}')
+    logging.debug(f'running with editor argument:{args.args}')
 
     self.content_window_ = None
     self.global_behavior_context_ = BehaviorContext(self)
@@ -79,8 +81,36 @@ class EditorContext(object):
                         required=False,
                         type=pathlib.Path,
                         metavar='<plugins directory>')
+    parser.add_argument('--server',
+                        help="start the server",
+                        required=False,
+                        type=EditorContext.validate_server_addr,
+                        nargs='?',
+                        metavar='<SERVER_ADDR:SERVER_PORT>',
+                        default=False)
+    parser.add_argument('--client',
+                        help="connect to server and send command, then quit",
+                        required=False,
+                        nargs='?',
+                        metavar='<SERVER_ADDR:SERVER_PORT>',
+                        default=False)
+    parser.add_argument('args',
+                        help="editor argument such as files to be opened",
+                        nargs='*',
+                        metavar='<Editor Arguments>')
 
     return parser.parse_args()
+
+  @staticmethod
+  def validate_server_addr(value):
+    if isinstance(value, str):
+      parts = value.split(':')
+      if len(parts) != 2 or int(parts[1]) == 0:
+        raise argparse.ArgumentTypeError('Value has to be in SERVER_ADDR:SERVER_PORT format')
+
+      return (parts[0], int(parts[1]))
+
+    return value
 
   @staticmethod
   def validate_args(args):
