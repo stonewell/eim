@@ -4,7 +4,9 @@ import os
 import xmlrpc.client
 from multiprocessing import shared_memory
 
+
 class EditorClient(object):
+
   def __init__(self, ctx):
     super().__init__()
 
@@ -35,9 +37,10 @@ class EditorClient(object):
     shm_server_addr = None
     try:
       shm_server_addr = shared_memory.SharedMemory(name='eim_server_addr',
-                                                 create=False)
+                                                   create=False)
 
-      server_addr = bytes(shm_server_addr.buf[:shm_server_addr.size]).decode('utf-8')
+      server_addr = bytes(
+          shm_server_addr.buf[:shm_server_addr.size]).decode('utf-8')
 
       parts = server_addr.split(':')[:2]
 

@@ -24,7 +24,7 @@ class EditorServer(threading.Thread):
         ('', 0) if self.random_server_addr_ else ctx.args.server,
         requestHandler=RequestHandler)
 
-    self.server_.register_function(ctx.process_cmd_line_args,
+    self.server_.register_function(self.ctx_.process_cmd_line_args,
                                    'process_cmd_line_args')
 
     self.shm_server_addr_ = None
@@ -47,7 +47,8 @@ class EditorServer(threading.Thread):
                                                        create=True,
                                                        size=len(server_addr))
 
-    logging.debug(f'save server addr:{server_addr} to {self.shm_server_addr_.name}')
+    logging.debug(
+        f'save server addr:{server_addr} to {self.shm_server_addr_.name}')
 
     self.shm_server_addr_.buf[:] = server_addr[:]
 

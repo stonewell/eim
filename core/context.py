@@ -678,11 +678,9 @@ class EditorContext(object):
                             args=None,
                             process_client_server_arg=True):
     try:
-      self.__process_cmd_line_args(cur_dir, args, process_client_server_arg)
+      return self.__process_cmd_line_args(cur_dir, args, process_client_server_arg)
     except:
       logging.exception('process cmd line argument failed')
-    finally:
-      return 'OK'
 
   def __process_cmd_line_args(self, cur_dir, args, process_client_server_arg):
     if isinstance(cur_dir, str):
@@ -717,8 +715,6 @@ class EditorContext(object):
         logging.exception(f'invalid command line argument:{arg}')
     else:
       p = pathlib.Path(arg)
-
-      print((cur_dir / p).as_posix())
 
       if p.is_absolute():
         self.load_buffer(p)
