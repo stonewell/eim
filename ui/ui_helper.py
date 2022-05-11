@@ -6,7 +6,7 @@ from functools import reduce
 
 from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette, QFontMetrics, QFontDatabase, QFontInfo
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
-from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, QMargins, Slot
+from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, QMargins, Slot, Signal
 
 from .list_content_window import ListContentWindow
 from .list_with_preview_content_window import ListWithPreviewContentWindow
@@ -22,6 +22,7 @@ class EIMApplication(QApplication):
 
 
 class UIHelper(QObject):
+  run_in_ui_thread_signal_ = Signal(object)
 
   def __init__(self, ctx):
     super().__init__()
@@ -30,6 +31,8 @@ class UIHelper(QObject):
 
     if self.ctx_.args.debug > 2:
       os.environ['QT_DEBUG_PLUGINS'] = '1'
+
+    self.run_in_ui_thread_signal_.connect(self.__run_in_ui_thread)
 
   def create_application(self):
     self.ctx_.app = app = EIMApplication()
@@ -249,3 +252,11 @@ class UIHelper(QObject):
 
     logging.debug(f'set tab width:{distance} for {tab_width} spaces')
     self.editor_.setTabStopDistance(distance)
+
+  @Slot(object)
+  def __run_in_ui_thread(self, obj):
+    if callable(obj):
+      obj()
+
+  def run_in_ui_thread(self, obj):
+    self.run_in_ui_thread_signal_.emit(obj)

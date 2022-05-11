@@ -733,3 +733,6 @@ class EditorContext(object):
   def quit_editing(self):
     if self.editor_server_ is not None:
       self.editor_server_.shutdown()
+
+  def run_in_ui_thread(self, obj):
+    self.ui_helper.run_in_ui_thread(obj)

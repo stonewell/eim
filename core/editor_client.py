@@ -2,7 +2,7 @@ import logging
 import os
 
 import xmlrpc.client
-from multiprocessing import shared_memory
+from multiprocessing import shared_memory, resource_tracker
 
 
 class EditorClient(object):
@@ -53,4 +53,8 @@ class EditorClient(object):
       return None
     finally:
       if shm_server_addr is not None:
+        try:
+          resource_tracker.unregister(shm_server_addr._name, 'shared_memory')
+        except:
+          logging.exception('unregister resource tracker failed')
         shm_server_addr.close()

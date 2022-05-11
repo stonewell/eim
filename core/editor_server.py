@@ -24,7 +24,7 @@ class EditorServer(threading.Thread):
         ('', 0) if self.random_server_addr_ else ctx.args.server,
         requestHandler=RequestHandler)
 
-    self.server_.register_function(self.ctx_.process_cmd_line_args,
+    self.server_.register_function(self.__process_cmd_line_args,
                                    'process_cmd_line_args')
 
     self.shm_server_addr_ = None
@@ -53,8 +53,17 @@ class EditorServer(threading.Thread):
     self.shm_server_addr_.buf[:] = server_addr[:]
 
   def __remove_random_server_addr(self):
-    if self.shm_server_addr_ is None:
-      return
+    try:
+      if self.shm_server_addr_ is None:
+        return
 
-    self.shm_server_addr_.close()
-    self.shm_server_addr_.unlink()
+      self.shm_server_addr_.unlink()
+      self.shm_server_addr_ = None
+    except:
+      logging.exception('remove server addr failed')
+
+  def __process_cmd_line_args(self, cur_dir, args, process_client_server_arg):
+    self.ctx_.run_in_ui_thread(lambda: self.ctx_.process_cmd_line_args(
+        cur_dir, args, process_client_server_arg))
+
+    return True
