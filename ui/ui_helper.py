@@ -138,6 +138,8 @@ class UIHelper(QObject):
     self.ctx_.register_command(BuiltinCommands.QUIT, self.__quit_app)
 
   def __quit_app(self, ctx):
+    self.ctx_.quit_editing()
+
     if not self.ctx_.prompt_for_buffer_save(QCoreApplication.quit):
       QCoreApplication.quit()
 

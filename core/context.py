@@ -16,6 +16,8 @@ from .builtin_commands import BuiltinCommands
 from .buffer import EditorBuffer
 from .url_helper import open_url as eim_open_url
 from .color_theme import ColorTheme
+from .editor_server import EditorServer
+from .editor_client import EditorClient
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -47,6 +49,7 @@ class EditorContext(object):
     self.current_buffer_ = None
     self.buffers_ = []
     self.editor_view_port_handlers_ = []
+    self.editor_server_ = None
 
     self.validate_args(args)
 
@@ -91,6 +94,7 @@ class EditorContext(object):
     parser.add_argument('--client',
                         help="connect to server and send command, then quit",
                         required=False,
+                        type=EditorContext.validate_server_addr,
                         nargs='?',
                         metavar='<SERVER_ADDR:SERVER_PORT>',
                         default=False)
@@ -106,7 +110,8 @@ class EditorContext(object):
     if isinstance(value, str):
       parts = value.split(':')
       if len(parts) != 2 or int(parts[1]) == 0:
-        raise argparse.ArgumentTypeError('Value has to be in SERVER_ADDR:SERVER_PORT format')
+        raise argparse.ArgumentTypeError(
+            'Value has to be in SERVER_ADDR:SERVER_PORT format')
 
       return (parts[0], int(parts[1]))
 
@@ -667,3 +672,68 @@ class EditorContext(object):
 
   def update_document_content(self, document, content):
     self.ui_helper.update_document_content(document, content)
+
+  def process_cmd_line_args(self,
+                            cur_dir=pathlib.Path('.'),
+                            args=None,
+                            process_client_server_arg=True):
+    try:
+      self.__process_cmd_line_args(cur_dir, args, process_client_server_arg)
+    except:
+      logging.exception('process cmd line argument failed')
+    finally:
+      return 'OK'
+
+  def __process_cmd_line_args(self, cur_dir, args, process_client_server_arg):
+    if isinstance(cur_dir, str):
+      cur_dir = pathlib.Path(cur_dir)
+
+    if args is None:
+      args = self.args.args
+
+    if process_client_server_arg and not (self.args.client == False):
+      self.__call_server()
+      return False
+
+    if args is not None and len(args) > 0:
+      for arg in args:
+        self.__handle_cmd_line_argument(arg, cur_dir)
+    else:
+      self.switch_to_buffer('Untitled')
+
+    if process_client_server_arg and not (self.args.server == False):
+      self.__start_server()
+
+    return self.args.client == False
+
+  def __handle_cmd_line_argument(self, arg, cur_dir):
+    if len(arg) == 0:
+      return
+
+    if arg[0] == '+':
+      try:
+        self.run_command(BuiltinCommands.GOTO_LINE, None, False, int(arg[1:]))
+      except:
+        logging.exception(f'invalid command line argument:{arg}')
+    else:
+      p = pathlib.Path(arg)
+
+      print((cur_dir / p).as_posix())
+
+      if p.is_absolute():
+        self.load_buffer(p)
+      else:
+        self.load_buffer(cur_dir / arg)
+
+  def __call_server(self):
+    client = EditorClient(self)
+
+    client.call_server()
+
+  def __start_server(self):
+    self.editor_server_ = EditorServer(self)
+    self.editor_server_.start()
+
+  def quit_editing(self):
+    if self.editor_server_ is not None:
+      self.editor_server_.shutdown()

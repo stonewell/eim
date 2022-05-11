@@ -78,12 +78,17 @@ class Editor(QPlainTextEdit, TextEditMixin):
         return False
 
       if empty_line or tc.positionInBlock() <= line_indents_end:
-        indent_char, indent_size = self.ctx_.current_buffer_.get_indent_options(
-        )
+        indent_char, indent_size = \
+          self.ctx_.current_buffer_.get_indent_options()
+
+        del_char_count = (tc.positionInBlock() - line_start) % indent_size
+
+        if del_char_count == 0:
+          del_char_count = indent_size
 
         tc.beginEditBlock()
         tc.clearSelection()
-        for i in range(indent_size):
+        for i in range(del_char_count):
           tc.deletePreviousChar()
         tc.endEditBlock()
 

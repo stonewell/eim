@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 
 os.environ['QT_QPA_PLATFORMTHEME'] = 'eim'
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = os.path.join(
@@ -21,9 +22,13 @@ if __name__ == "__main__":
   ctx.init_commands_and_key_bindings()
 
   ctx.switch_behavior_context()
-  ctx.switch_to_buffer('Untitled')
 
-  editor.bind_keys()
-  editor.show()
+  if ctx.process_cmd_line_args():
+    editor.bind_keys()
+    editor.show()
 
-  sys.exit(app.exec())
+    sys.exit(app.exec())
+  else:
+    logging.debug(
+        '''command line argument processed, won't start main window''')
+    sys.exit(0)

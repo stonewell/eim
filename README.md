@@ -21,6 +21,7 @@
 - [x] Keybinding with prefix key, built-in support by pyside6
 - [ ] Flycheck
 - [X] Status Line
+- [X] Editing server/client
 
 ## TODO
 - [X] ask for input
@@ -45,6 +46,7 @@
   - [X] paste with history
   - [ ] Search in files with ag/rg
   - [X] backspace back indent at line begin
+    - [X] should align with indent
   - [X] search wrap
   - [X] goto line
 - [X] detect language using file suffix, then use guesslang
@@ -53,3 +55,5 @@
 - [ ] guess indention of file
 - [ ] guess new line style of file
 - [ ] message buffer
+- [ ] quit should check all buffer status
+

@@ -28,9 +28,13 @@ class Plugin(IPlugin):
     self.editor_ = editor
 
     self.ctx.register_command(BuiltinCommands.GOTO_LINE,
-                              self.__show_input_window, 'editor')
+                              self.__show_input_window, None)
 
-  def __show_input_window(self, ctx):
+  def __show_input_window(self, ctx, new_l=None):
+    if new_l is not None:
+      self.__do_goto_line(new_l)
+      return
+
     self.content_window_ = cw = ctx.create_input_content_window()
 
     self.text_edit_ = t = cw.text_edit_
@@ -44,19 +48,17 @@ class Plugin(IPlugin):
 
   def __execute_command(self):
     try:
-      self.__do_goto_line()
+      txt = self.text_edit_.text().strip()
+
+      if len(txt) > 0:
+        new_l = int(txt)
+
+        self.__do_goto_line(new_l)
     except:
       logging.exception('goto line failed')
     self.ctx.close_content_window()
 
-  def __do_goto_line(self):
-    txt = self.text_edit_.text().strip()
-
-    if len(txt) == 0:
-      return
-
-    new_l = int(txt)
-
+  def __do_goto_line(self, new_l):
     if new_l <= 0:
       return
 
