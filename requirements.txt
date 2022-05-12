@@ -4,9 +4,7 @@ pluggy
 appdirs
 fuzzywuzzy
 python-Levenshtein
-tree_sitter>=0.20.0
-tensorflow
-guesslang>=2.2.2
+git+https://github.com/stonewell/py-tree-sitter#egg=tree_sitter
 GitPython
 PyPubSub
 editorconfig

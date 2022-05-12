@@ -1,13 +1,12 @@
 import os
 import logging
 
-from guesslang import Guess
-from pubsub import pub
-from pathlib import Path
-from editorconfig import get_properties as ec_get_properties
+try:
+  from guesslang import Guess
+  TRY_GUESS_LANG = True
 
-guess = Guess()
-guess.probabilities('''
+  guess = Guess()
+  guess.probabilities('''
 #include <stdio.h>
 
 int main(int argc, char ** argv) {
@@ -15,6 +14,12 @@ int main(int argc, char ** argv) {
   return 0;
 }
 ''')
+except:
+  TRY_GUESS_LANG = False
+
+from pubsub import pub
+from pathlib import Path
+from editorconfig import get_properties as ec_get_properties
 
 lang_name_mapping = {
     'c++': 'c',
@@ -44,7 +49,8 @@ class EditorBuffer(object):
 
       return
 
-    logging.debug(f'load file content:{file_path.resolve().as_posix()}, reload:{reload}')
+    logging.debug(
+        f'load file content:{file_path.resolve().as_posix()}, reload:{reload}')
 
     with file_path.open(encoding='utf-8') as f:
       content = f.read()
@@ -164,7 +170,10 @@ class EditorBuffer(object):
     self.lang_ = None
 
   def __try_guess_lang(self):
-    logging.debug('guess lang running')
+    logging.debug(f'guess lang running:{TRY_GUESS_LANG}')
+
+    if not TRY_GUESS_LANG:
+      return
 
     content = self.ctx_.get_document_content(self.document_)
     langs = guess.probabilities(content)
