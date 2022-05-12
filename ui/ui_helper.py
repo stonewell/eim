@@ -224,6 +224,8 @@ class UIHelper(QObject):
 
     p.setColor(QPalette.Active, QPalette.Base, b_c)
     p.setColor(QPalette.Active, QPalette.Text, f_c)
+    p.setColor(QPalette.Inactive, QPalette.Base, b_c)
+    p.setColor(QPalette.Inactive, QPalette.Text, f_c)
 
     if platform.system() == 'Windows':
       # on windows platform repla
