@@ -13,6 +13,12 @@ from core.context import EditorContext
 
 if __name__ == "__main__":
   ctx = EditorContext()
+
+  if ctx.process_cmd_line_client_args():
+    logging.debug(
+        '''command line argument processed, won't start main window''')
+    sys.exit(0)
+
   ctx.ui_helper = UIHelper(ctx)
 
   app = ctx.ui_helper.create_application()

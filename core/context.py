@@ -53,6 +53,9 @@ class EditorContext(object):
 
     self.validate_args(args)
 
+    if not (self.args.client == False):
+      return
+
     self.__load_config()
 
     self.__load_plugins()
@@ -677,6 +680,13 @@ class EditorContext(object):
 
   def update_document_content(self, document, content):
     self.ui_helper.update_document_content(document, content)
+
+  def process_cmd_line_client_args(self):
+    if not (self.args.client == False):
+      self.__call_server()
+      return True
+
+    return False
 
   def process_cmd_line_args(self,
                             cur_dir=pathlib.Path('.'),
