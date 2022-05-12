@@ -1,4 +1,5 @@
 import logging
+import platform
 import os
 
 import xmlrpc.client
@@ -54,7 +55,8 @@ class EditorClient(object):
     finally:
       if shm_server_addr is not None:
         try:
-          resource_tracker.unregister(shm_server_addr._name, 'shared_memory')
+          if platform.system() != 'Windows':
+            resource_tracker.unregister(shm_server_addr._name, 'shared_memory')
         except:
           logging.exception('unregister resource tracker failed')
         shm_server_addr.close()
