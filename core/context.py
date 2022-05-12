@@ -622,7 +622,7 @@ class EditorContext(object):
     t = cw.text_edit_
     l = cw.label_widget_
 
-    l.setText(f'Buffer modified, save? (Yes or No)')
+    l.setText(f'Buffer {self.current_buffer_.name()} modified, save? (Yes or No)')
 
     t.returnPressed.connect(
         lambda: self.__do_prompt_for_buffer_save(cw, action))
@@ -635,9 +635,14 @@ class EditorContext(object):
     t = cw.text_edit_
     txt = t.text()
 
-    if txt.lower() != 'yes':
-      self.current_buffer_.set_modified(False)
+    if len(txt) == 0:
       self.close_content_window()
+      return
+
+    if txt.lower() != 'yes':
+      self.close_content_window()
+
+      self.current_buffer_.set_modified(False)
 
       if callable(action):
         action()

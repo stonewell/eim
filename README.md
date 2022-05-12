@@ -55,5 +55,4 @@
 - [ ] guess indention of file
 - [ ] guess new line style of file
 - [ ] message buffer
-- [ ] quit should check all buffer status
-
+- [X] quit should check all buffer status

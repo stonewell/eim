@@ -143,8 +143,30 @@ class UIHelper(QObject):
   def __quit_app(self, ctx):
     self.ctx_.quit_editing()
 
-    if not self.ctx_.prompt_for_buffer_save(QCoreApplication.quit):
+    def get_buffers():
+      for buf in self.ctx_.buffers_:
+        yield buf
+
+      return None
+
+    buffers = get_buffers()
+
+    def check_modified_buffer():
+      while True:
+        try:
+          buf = next(buffers)
+
+          if buf.is_modified():
+            self.ctx_.switch_to_buffer(buf.name())
+
+            if self.ctx_.prompt_for_buffer_save(check_modified_buffer):
+              return
+        except(StopIteration):
+          break
+
       QCoreApplication.quit()
+
+    check_modified_buffer()
 
   def bind_keys(self):
     pass
