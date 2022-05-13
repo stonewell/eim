@@ -73,7 +73,7 @@ class Plugin(IPlugin):
     tc = self.editor_.textCursor()
 
     moved = tc.movePosition(QTextCursor.Down if new_l > l else QTextCursor.Up,
-                            QTextCursor.MoveAnchor, abs(l - 1 - new_l))
+                            QTextCursor.MoveAnchor, abs(l - new_l))
 
     if moved:
       self.editor_.setTextCursor(tc)

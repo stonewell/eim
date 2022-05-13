@@ -6,6 +6,21 @@ from core.builtin_commands import BuiltinCommands
 from .grep_tool import get_grep_tool
 
 
+class PathWrapper(object):
+
+  def __init__(self, p, line, column_length, text):
+    self.path_ = p
+    self.line_ = line
+    self.column_length_ = column_length
+    self.text_ = text
+
+  def __getattribute__(self, n):
+    if n in ['line_', 'path_', 'column_length_', 'text_']:
+      return super().__getattribute__(n)
+
+    return getattr(self.path_, n)
+
+
 class Plugin(IPlugin):
 
   def __init__(self):
@@ -48,9 +63,12 @@ class Plugin(IPlugin):
     list_helper.clear_items()
 
     for p in self.grep_tool_.list_match_file_name(self.project_root_, txt):
-      list_helper.create_list_item_for_path(p)
+      l_item = list_helper.create_list_item_for_path(p)
+      l_item.setText(f'{p.relative_to(self.project_root_).as_posix()}')
 
     list_helper.sort_and_select_first_item()
+
+    return True
 
   def __show_matches(self, ctx, *args):
     ctx.run_command(
@@ -66,23 +84,28 @@ class Plugin(IPlugin):
     list_helper.clear_items()
 
     if len(txt) < 3:
-      return
+      return True
 
-    self.path_line_mapping_ = {}
+    order = 0
     for m in self.grep_tool_.list_match_files(self.project_root_, txt):
       p, line, column_length, text = m
-      l_item = list_helper.create_list_item_for_path(p)
 
-      self.path_line_mapping_[p] = line
+      p = PathWrapper(p, line, column_length, text)
+
+      l_item = list_helper.create_list_item_for_path(p)
+      l_item.order_ = order
+      order += 1
+
       l_item.setText(
           f'{p.relative_to(self.project_root_).as_posix()}:{line}:{text}')
 
     list_helper.sort_and_select_first_item()
 
+    return True
+
   def __load_file_and_goto_line(self, p):
-    self.ctx.load_buffer(p)
+    self.ctx.load_buffer(p.path_)
     try:
-      self.ctx.run_command(BuiltinCommands.GOTO_LINE, None, False,
-                           self.path_line_mapping_[p])
+      self.ctx.run_command(BuiltinCommands.GOTO_LINE, None, False, p.line_)
     except:
       pass

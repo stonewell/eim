@@ -39,8 +39,8 @@ class AgTool(object):
     try:
       return filter(
           lambda x: x.is_file(),
-          map(lambda x: Path(x.strip()),
-              stringio(self.__run_cmd(cmd_args, dir)).readlines()))
+          map(lambda x: dir / Path(x.strip()),
+              StringIO(self.__run_cmd(cmd_args, dir)).readlines()))
     except:
       return []
 
@@ -88,7 +88,7 @@ class AgTool(object):
           logging.debug(
               f'file:{file}, line:{line}, col_len:{col_lengths}')
 
-          matches.append((Path(file), line, col_lengths, parts[1]))
+          matches.append((dir / Path(file), line, col_lengths, parts[1]))
 
       return matches
     except:
