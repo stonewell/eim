@@ -781,7 +781,7 @@ class EditorContext(object):
         with self.open_url(PROJECT_ROOT_FILES_URL) as _resp:
           project_root_file.write_bytes(_resp.read())
 
-        logging.info(f'project root file downloaded to:{langs_file.resolve()}')
+        logging.info(f'project root file downloaded to:{project_root_file.resolve()}')
 
     except:
       logging.exception('unable to load project root file')
