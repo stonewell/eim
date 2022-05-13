@@ -18,7 +18,7 @@ from .url_helper import open_url as eim_open_url
 from .color_theme import ColorTheme
 from .editor_server import EditorServer
 from .editor_client import EditorClient
-from .project_root import find_project_root
+from .project_root import find_project_root as eim_find_project_root
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -62,6 +62,8 @@ class EditorContext(object):
     self.__load_plugins()
 
     self.__load_langs_mapping()
+
+    self.__load_project_root_files()
 
   @staticmethod
   def parse_arguments():
@@ -755,8 +757,45 @@ class EditorContext(object):
   def run_in_ui_thread(self, obj):
     self.ui_helper.run_in_ui_thread(obj)
 
+  def __load_project_root_files(self):
+    PROJECT_ROOT_FILES_URL = \
+      r'https://raw.githubusercontent.com/stonewell/eim/from_scratch_pyside6/core/project_root.json'
+    SEVEN_DAYS_SECONDS = (3600 * 24 * 7)
+
+    project_root_file = pathlib.Path(self.appdirs_.user_config_dir) / 'project_root.json'
+    try:
+      download_file = True
+
+      if project_root_file.exists():
+        mtime = project_root_file.stat().st_mtime + SEVEN_DAYS_SECONDS
+
+        if (mtime > datetime.datetime.now().timestamp()):
+          logging.info('project root files next update check will be on:{}'.format(
+              datetime.datetime.fromtimestamp(mtime)))
+          download_file = False
+
+      if download_file:
+        logging.info(
+            f'project root files downloading from url:{PROJECT_ROOT_FILES_URL}')
+
+        with self.open_url(PROJECT_ROOT_FILES_URL) as _resp:
+          project_root_file.write_bytes(_resp.read())
+
+        logging.info(f'project root file downloaded to:{langs_file.resolve()}')
+
+    except:
+      logging.exception('unable to load project root file')
+    finally:
+      if project_root_file.exists():
+        self.project_root_files_ = json.loads(project_root_file.read_text('utf-8'))
+      else:
+        self.project_root_files_ = []
+
   def find_project_root(self, p, project_files=[]):
-    pass
+    _files = set(self.project_root_files_)
+    _files.update(project_files)
+
+    return eim_find_project_root(p, _files)
 
   def get_current_buffer_project_root(self):
-    pass
+    return self.find_project_root(self.get_current_buffer_dir()) or pathlib.Path('.').cwd

@@ -60,6 +60,16 @@ class Plugin(IPlugin):
     except:
       self.__directory_content_dir_path_selected = self.__load_dir_content
 
+    try:
+      self.__should_add_mock_item = args[0]['should_add_mock_item']
+    except:
+      self.__should_add_mock_item = True
+
+    try:
+      self.__on_text_edited = args[0]['on_text_edited']
+    except:
+      self.__on_text_edited = None
+
     def item_text_match(item, text):
       if item.text().find(text) >= 0:
         return 1
@@ -71,50 +81,58 @@ class Plugin(IPlugin):
     self.list_widget_ = cw.list_widget_
     self.text_edit_ = cw.text_edit_
 
-    self.text_edit_.returnPressed.connect(self.execute_command)
+    self.text_edit_.returnPressed.connect(self.__execute_command)
     self.list_widget_.itemDoubleClicked[QListWidgetItem].connect(
-        self.item_double_clicked)
+        self.__item_double_clicked)
 
-    self.__directory_content_dir_path_selected()
+    self.__directory_content_dir_path_selected(None, self)
 
     cw.show()
 
-  def __load_dir_content(self, dir=None):
+  def clear_items(self):
     self.list_items_ = []
     self.list_widget_.clear()
+
+  def create_list_item_for_path(self, path):
+    f_c = self.ctx.get_theme_def_color('default', 'foreground')
+    b_c = self.ctx.get_theme_def_color('default', 'background')
+
+    if path.is_dir():
+      icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
+    else:
+      icon = self.content_window_.style().standardIcon(QStyle.SP_FileIcon)
+
+    l_item = DirectoryContentItem(path, icon, path.name, self.list_widget_)
+    l_item.setForeground(f_c)
+    l_item.setBackground(b_c)
+
+    self.list_items_.append(l_item)
+
+    return l_item
+
+  def __load_dir_content(self, dir, list_helper):
+    list_helper.clear_items()
 
     if dir is None:
       dir = self.ctx.get_current_buffer_dir()
 
     self.current_list_dir_ = dir
 
-    f_c = self.ctx.get_theme_def_color('default', 'foreground')
-    b_c = self.ctx.get_theme_def_color('default', 'background')
-
     # add special folder . and ..
     for name, order in [('.', -2), ('..', -1)]:
       item = dir.resolve() / name
-      icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
-      l_item = DirectoryContentItem(item, icon, item.as_posix(),
-                                    self.list_widget_)
+      l_item = list_helper.create_list_item_for_path(item)
       l_item.order_ = order
-      l_item.setForeground(f_c)
-      l_item.setBackground(b_c)
+      l_item.setText(name)
 
       self.list_items_.append(l_item)
 
     for item in self.__list_directory(dir):
-      if item.is_dir():
-        icon = self.content_window_.style().standardIcon(QStyle.SP_DirIcon)
-      else:
-        icon = self.content_window_.style().standardIcon(QStyle.SP_FileIcon)
+      list_helper.create_list_item_for_path(item)
 
-      l_item = DirectoryContentItem(item, icon, item.name, self.list_widget_)
-      l_item.setForeground(f_c)
-      l_item.setBackground(b_c)
+    list_helper.sort_and_select_first_item()
 
-      self.list_items_.append(l_item)
-
+  def sort_and_select_first_item(self):
     self.list_widget_.sortItems()
 
     self.content_window_.select_first_visible_item()
@@ -122,10 +140,10 @@ class Plugin(IPlugin):
   def __list_directory(self, dir):
     return dir.iterdir()
 
-  def execute_command(self):
-    self.item_double_clicked(self.list_widget_.currentItem())
+  def __execute_command(self):
+    self.__item_double_clicked(self.list_widget_.currentItem())
 
-  def item_double_clicked(self, item):
+  def __item_double_clicked(self, item):
     if hasattr(item, 'mock_'):
       selected_item = self.current_list_dir_ / item.mock_name_
     else:
@@ -135,12 +153,15 @@ class Plugin(IPlugin):
 
   def __load_path(self, path_item):
     if path_item.is_dir():
-      self.__directory_content_dir_path_selected(path_item)
+      self.__directory_content_dir_path_selected(path_item, self)
     else:
       self.ctx.close_content_window()
       self.__directory_content_file_path_selected(path_item)
 
   def on_text_edited(self, txt):
+    if callable(self.__on_text_edited):
+      return self.__on_text_edited(txt, self)
+
     if txt.find('/') < 0:
       return False
 
@@ -165,7 +186,7 @@ class Plugin(IPlugin):
 
     logging.debug('switch to:{}, update text:{}'.format(tmp_path, txt))
 
-    self.__load_dir_content(tmp_path)
+    self.__directory_content_dir_path_selected(tmp_path, self)
 
     self.text_edit_.setText(txt)
     self.content_window_.match_txt_and_mock_item(txt)
@@ -173,7 +194,7 @@ class Plugin(IPlugin):
     return True
 
   def should_add_mock_item(self, txt):
-    return len(txt) > 0
+    return len(txt) > 0 and self.__should_add_mock_item
 
   def get_item_text(self, item):
     if hasattr(item, 'mock_'):
