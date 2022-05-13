@@ -798,4 +798,4 @@ class EditorContext(object):
     return eim_find_project_root(p, _files)
 
   def get_current_buffer_project_root(self):
-    return self.find_project_root(self.get_current_buffer_dir()) or pathlib.Path('.').cwd
+    return self.find_project_root(self.get_current_buffer_dir()) or pathlib.Path('.').cwd()
