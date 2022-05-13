@@ -75,7 +75,7 @@ class Plugin(IPlugin):
     self.list_widget_.itemDoubleClicked[QListWidgetItem].connect(
         self.item_double_clicked)
 
-    self.__load_dir_content()
+    self.__directory_content_dir_path_selected()
 
     cw.show()
 

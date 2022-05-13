@@ -18,6 +18,7 @@ from .url_helper import open_url as eim_open_url
 from .color_theme import ColorTheme
 from .editor_server import EditorServer
 from .editor_client import EditorClient
+from .project_root import find_project_root
 
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
@@ -625,7 +626,8 @@ class EditorContext(object):
     t = cw.text_edit_
     l = cw.label_widget_
 
-    l.setText(f'Buffer {self.current_buffer_.name()} modified, save? (Yes or No)')
+    l.setText(
+        f'Buffer {self.current_buffer_.name()} modified, save? (Yes or No)')
 
     t.returnPressed.connect(
         lambda: self.__do_prompt_for_buffer_save(cw, action))
@@ -693,7 +695,8 @@ class EditorContext(object):
                             args=None,
                             process_client_server_arg=True):
     try:
-      return self.__process_cmd_line_args(cur_dir, args, process_client_server_arg)
+      return self.__process_cmd_line_args(cur_dir, args,
+                                          process_client_server_arg)
     except:
       logging.exception('process cmd line argument failed')
 
@@ -751,3 +754,9 @@ class EditorContext(object):
 
   def run_in_ui_thread(self, obj):
     self.ui_helper.run_in_ui_thread(obj)
+
+  def find_project_root(self, p, project_files=[]):
+    pass
+
+  def get_current_buffer_project_root(self):
+    pass
