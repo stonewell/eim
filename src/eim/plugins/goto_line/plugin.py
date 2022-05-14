@@ -4,7 +4,7 @@ from PySide6.QtGui import QTextCursor
 
 from yapsy.IPlugin import IPlugin
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 
 
 class Plugin(IPlugin):

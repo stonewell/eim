@@ -7,7 +7,7 @@ from PySide6.QtGui import QTextDocument, QTextCursor
 from PySide6.QtCore import QMargins
 from PySide6.QtCore import QRegularExpression
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 
 SPLIT_CHAR = ' → '
 

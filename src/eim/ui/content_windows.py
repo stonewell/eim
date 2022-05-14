@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout
 from PySide6.QtWidgets import QWidget as ContentParentWidget
 from PySide6.QtGui import QTextCursor, QPalette
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 from .textedit_mixin import TextEditMixin
 
 

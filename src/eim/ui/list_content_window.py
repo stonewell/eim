@@ -5,7 +5,7 @@ from PySide6.QtCore import QRect
 
 from fuzzywuzzy import fuzz
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 from .content_windows import ContentWindow
 
 

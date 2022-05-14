@@ -7,7 +7,7 @@ from PySide6.QtGui import QTextCursor, QPalette, QKeySequence
 from PySide6.QtWidgets import QPlainTextEdit, QApplication
 from PySide6.QtWidgets import QAbstractSlider
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 from .textedit_mixin import TextEditMixin
 
 

@@ -1,8 +1,7 @@
 from yapsy.IPlugin import IPlugin
-from core.builtin_commands import BuiltinCommands
 from PySide6.QtCore import Qt
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 from .grep_tool import get_grep_tool
 
 

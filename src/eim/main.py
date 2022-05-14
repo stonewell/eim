@@ -6,12 +6,12 @@ os.environ['QT_QPA_PLATFORMTHEME'] = 'eim'
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = os.path.join(
     os.path.dirname(__file__), 'plugins', 'qpa')
 
-from ui.editor import Editor
-from ui.ui_helper import UIHelper
+from .ui.editor import Editor
+from .ui.ui_helper import UIHelper
 
-from core.context import EditorContext
+from .core.context import EditorContext
 
-if __name__ == "__main__":
+def main():
   ctx = EditorContext()
 
   if ctx.process_cmd_line_client_args():
@@ -38,3 +38,6 @@ if __name__ == "__main__":
     logging.debug(
         '''command line argument processed, won't start main window''')
     sys.exit(0)
+
+if __name__ == "__main__":
+  main()

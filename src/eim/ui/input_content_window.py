@@ -3,7 +3,7 @@ import logging
 from PySide6.QtCore import Qt, QRect, QSize
 from PySide6.QtWidgets import QLabel
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 from .content_windows import ContentWindow
 
 

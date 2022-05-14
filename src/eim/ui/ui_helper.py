@@ -12,7 +12,7 @@ from .list_content_window import ListContentWindow
 from .list_with_preview_content_window import ListWithPreviewContentWindow
 from .input_content_window import InputContentWindow
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 
 
 class EIMApplication(QApplication):

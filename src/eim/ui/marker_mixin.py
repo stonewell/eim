@@ -1,6 +1,6 @@
 from PySide6.QtGui import QTextCursor
 
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 
 
 class Marker(object):

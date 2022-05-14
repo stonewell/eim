@@ -4,7 +4,7 @@ import logging
 from PySide6.QtWidgets import QListWidgetItem, QStyle
 
 from yapsy.IPlugin import IPlugin
-from core.builtin_commands import BuiltinCommands
+from eim.core.builtin_commands import BuiltinCommands
 
 
 class DirectoryContentItem(QListWidgetItem):
