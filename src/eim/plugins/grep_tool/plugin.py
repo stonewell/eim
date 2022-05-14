@@ -41,8 +41,6 @@ class Plugin(IPlugin):
       logging.warning('you need an ag(the silver searcher) to make grep work')
       return
 
-    self.project_root_ = self.ctx.get_current_buffer_project_root()
-
     self.ctx.bind_key('Alt+T', self.__show_files)
     self.ctx.bind_key('Alt+P', self.__show_matches)
 
@@ -59,6 +57,8 @@ class Plugin(IPlugin):
     list_helper.sort_and_select_first_item()
 
   def __on_text_edited(self, txt, list_helper):
+    self.project_root_ = self.ctx.get_current_buffer_project_root()
+
     list_helper.clear_items()
 
     for p in self.grep_tool_.list_match_file_name(self.project_root_, txt):
@@ -80,6 +80,8 @@ class Plugin(IPlugin):
         })
 
   def __on_matches_text_edited(self, txt, list_helper):
+    self.project_root_ = self.ctx.get_current_buffer_project_root()
+
     list_helper.clear_items()
 
     if len(txt) < 3:
