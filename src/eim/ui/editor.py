@@ -93,6 +93,12 @@ class Editor(QPlainTextEdit, TextEditMixin):
         tc.endEditBlock()
 
         return True
+    elif (evt == QKeySequence.InsertLineSeparator
+          or evt == QKeySequence.InsertParagraphSeparator):
+      if self.is_marker_active():
+        self.active_marker(False)
+
+        return True
 
     return False
 
