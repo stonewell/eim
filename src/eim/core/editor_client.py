@@ -24,15 +24,21 @@ class EditorClient(object):
   def call_server(self):
     if self.server_addr_ is None:
       logging.error('unable to connect to server')
-      return
+      return False
 
-    cur_dir = os.path.abspath('.')
-    args = self.ctx_.args.args
+    try:
+      cur_dir = os.path.abspath('.')
+      args = self.ctx_.args.args
 
-    logging.debug(f'connect to server:{self.server_addr_}')
-    s = xmlrpc.client.ServerProxy(f'http://{self.server_addr_}')
+      logging.debug(f'connect to server:{self.server_addr_}')
+      s = xmlrpc.client.ServerProxy(f'http://{self.server_addr_}')
 
-    s.process_cmd_line_args(cur_dir, args, False)
+      s.process_cmd_line_args(cur_dir, args, False)
+      
+      return True
+    except:
+      logging.exception('failed calling server')
+      return False
 
   def __read_from_sharedmemory(self):
     shm_server_addr = None

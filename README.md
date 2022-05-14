@@ -56,3 +56,4 @@
 - [ ] guess new line style of file
 - [ ] message buffer
 - [X] quit should check all buffer status
+- [ ] split editor pane

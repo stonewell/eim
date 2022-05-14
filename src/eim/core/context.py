@@ -689,7 +689,9 @@ class EditorContext(object):
 
   def process_cmd_line_client_args(self):
     if not (self.args.client == False):
-      self.__call_server()
+      if not self.__call_server():
+        raise ValueError()
+
       return True
 
     return False
@@ -712,7 +714,9 @@ class EditorContext(object):
       args = self.args.args
 
     if process_client_server_arg and not (self.args.client == False):
-      self.__call_server()
+      if not self.__call_server():
+        raise ValueError()
+      
       return False
 
     if args is not None and len(args) > 0:
@@ -746,7 +750,7 @@ class EditorContext(object):
   def __call_server(self):
     client = EditorClient(self)
 
-    client.call_server()
+    return client.call_server()
 
   def __start_server(self):
     self.editor_server_ = EditorServer(self)

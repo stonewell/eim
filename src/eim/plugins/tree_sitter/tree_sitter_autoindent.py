@@ -144,11 +144,12 @@ class TreeSitterAutoIndent(object):
         indent_char = ' ' if indent == 0 else aligned_block.text()[
             aligned_line.textStart()]
 
-        if indent == 0:
-          indent = start_col + 1
-        else:
-          aligned_indent_char = ' '
-          aligned_indent = start_col - aligned_line_indent + 1
+        aligned_indent_char = ' '
+        aligned_indent = max(start_col - aligned_line_indent, 0)
+
+        # skip delimiter if there is
+        if aligned_indent > 0:
+          aligned_indent += 1
         break
 
       is_processed_by_row[start_row] = is_processed_by_row.get(
@@ -167,7 +168,8 @@ class TreeSitterAutoIndent(object):
         c.clearSelection()
         c.setPosition(current_block.position() + l.textStart())
         c.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, line_indent)
-        c.insertText(indent_char * indent + aligned_indent_char * aligned_indent)
+        c.insertText(indent_char * indent +
+                     aligned_indent_char * aligned_indent)
         c.endEditBlock()
     elif indent < 0:
       logging.warning(f'invalid indent:{indent} at line:{lnum}')
