@@ -518,6 +518,7 @@ class EditorContext(object):
         pathlib.Path(self.appdirs_.user_config_dir),
         pathlib.Path(self.appdirs_.site_config_dir),
         pathlib.Path(os.path.dirname(__file__)) / '..',
+        pathlib.Path(os.path.dirname(__file__)) / '..' / '..',
     ]
 
     for dir in theme_paths:
