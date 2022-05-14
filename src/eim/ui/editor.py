@@ -95,7 +95,7 @@ class Editor(QPlainTextEdit, TextEditMixin):
         return True
     elif (evt == QKeySequence.InsertLineSeparator
           or evt == QKeySequence.InsertParagraphSeparator):
-      if self.is_marker_active():
+      if self.is_marker_active() or self.textCursor().hasSelection():
         self.active_marker(False)
 
         return True
