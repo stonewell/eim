@@ -4,14 +4,16 @@ import platform
 from pubsub import pub
 from functools import reduce
 
-from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette, QFontDatabase, QFontInfo
+from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument
+from PySide6.QtGui import QColor, QPalette, QFontDatabase, QFontInfo
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
+from PySide6.QtWidgets import QSplitter
 from PySide6.QtCore import QObject, QCoreApplication, Qt, QRect, Slot, Signal
 
 from .list_content_window import ListContentWindow
 from .list_with_preview_content_window import ListWithPreviewContentWindow
 from .input_content_window import InputContentWindow
-
+from .editor import Editor
 from eim.core.builtin_commands import BuiltinCommands
 
 
@@ -161,7 +163,7 @@ class UIHelper(QObject):
 
             if self.ctx_.prompt_for_buffer_save(check_modified_buffer):
               return
-        except(StopIteration):
+        except (StopIteration):
           break
 
       QCoreApplication.quit()
@@ -284,3 +286,13 @@ class UIHelper(QObject):
 
   def run_in_ui_thread(self, obj):
     self.run_in_ui_thread_signal_.emit(obj)
+
+  def create_editor(self):
+    #self.splitter_ = QSplitter()
+    editor = Editor(self.ctx_)
+
+    #self.splitter_.addWidget(editor)
+    #self.splitter_.addWidget(Editor(self.ctx_))
+    #self.splitter_.show()
+
+    return editor
