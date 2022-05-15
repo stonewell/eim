@@ -98,6 +98,7 @@ class TreeSitterAutoIndent(object):
     is_processed_by_row = {}
 
     lnum = self.__get_line_number(editor, current_block, l)
+    last_node = node
 
     while node is not None:
       end_row, end_col = node.end_point
@@ -134,6 +135,10 @@ class TreeSitterAutoIndent(object):
 
       if ((node.id in indents['aligned_indent']) and (start_row != lnum)
           and (start_row != end_row)):
+        if node.type == 'ERROR':
+          node = last_node
+          start_row, start_col = node.start_point
+
         aligned_block = buffer.document_.findBlock(node.start_byte)
         aligned_line = aligned_block.layout().lineForTextPosition(
             node.start_byte - aligned_block.position())
