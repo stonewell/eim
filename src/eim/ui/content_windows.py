@@ -191,3 +191,6 @@ class ContentWindow(ContentParentWidget, TextEditMixin):
       self.active_marker(False)
     else:
       self.ctx_.close_content_window()
+
+  def has_focus(self):
+    return self.isActiveWindow()

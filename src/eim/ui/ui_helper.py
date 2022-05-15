@@ -111,12 +111,20 @@ class UIHelper(QObject):
                   'viewport_changed')
 
   def bind_key(self, keyseq, callable, binding_widget=None):
-    logging.debug('bind keyseq:{}'.format(keyseq))
+    logging.debug('bind keyseq:{}, {}'.format(keyseq, self.editor_))
     seq = QKeySequence(keyseq)
     sc = QShortcut(seq,
                    self.editor_ if binding_widget is None else binding_widget)
     sc.activated.connect(callable)
-    sc.activatedAmbiguously.connect(callable)
+    sc.activatedAmbiguously.connect(
+        lambda: self.__activated_ambiguously(keyseq))
+
+  def __activated_ambiguously(self, key_seq):
+    from eim.eim import get_current_active_eim
+
+    _eim = get_current_active_eim()
+
+    _eim.process_key_binding(key_seq)
 
   def create_list_content_window(self):
     content_window = ListContentWindow(self.ctx_, self.editor_)
@@ -171,7 +179,15 @@ class UIHelper(QObject):
     check_modified_buffer()
 
   def bind_keys(self):
-    pass
+    self.ctx_.bind_key('Ctrl+X,3', self.__split_horz)
+
+  def __split_horz(self, ctx):
+    from eim.eim import EIM
+
+    eim = EIM()
+    eim.initialize()
+
+    self.splitter_.addWidget(eim.editor_)
 
   def focus_editor(self):
     self.editor_.setFocus(Qt.ActiveWindowFocusReason)
@@ -288,11 +304,13 @@ class UIHelper(QObject):
     self.run_in_ui_thread_signal_.emit(obj)
 
   def create_editor(self):
-    #self.splitter_ = QSplitter()
+    self.splitter_ = QSplitter()
     editor = Editor(self.ctx_)
+    editor.bind_keys()
 
-    #self.splitter_.addWidget(editor)
-    #self.splitter_.addWidget(Editor(self.ctx_))
-    #self.splitter_.show()
+    self.splitter_.addWidget(editor)
 
-    return editor
+    return self.splitter_
+
+  def editor_has_focus(self):
+    return (self.editor_ is not None and self.editor_.hasFocus())

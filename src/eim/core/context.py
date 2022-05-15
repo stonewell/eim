@@ -311,10 +311,10 @@ class EditorContext(object):
       return
 
     sc = self.ui_helper.bind_key(key_seq,
-                                 lambda: self.key_binding_func(key_seq))
+                                 lambda: self.process_key_binding(key_seq))
     self.ui_key_bindings_[key_seq] = sc
 
-  def key_binding_func(self, key_seq):
+  def process_key_binding(self, key_seq):
     logging.debug('call key binding on context:{}'.format(
         self.current_behavior_context_.name))
     c = self.current_behavior_context_.get_keybinding_callable(key_seq)
@@ -688,7 +688,7 @@ class EditorContext(object):
     self.ui_helper.update_document_content(document, content)
 
   def process_cmd_line_client_args(self):
-    if not (self.args.client == False):
+    if not (self.args.client is False):
       if not self.__call_server():
         raise ValueError()
 
@@ -713,7 +713,7 @@ class EditorContext(object):
     if args is None:
       args = self.args.args
 
-    if process_client_server_arg and not (self.args.client == False):
+    if process_client_server_arg and not (self.args.client is False):
       if not self.__call_server():
         raise ValueError()
 
@@ -725,10 +725,10 @@ class EditorContext(object):
     else:
       self.switch_to_buffer('Untitled')
 
-    if process_client_server_arg and not (self.args.server == False):
+    if process_client_server_arg and not (self.args.server is False):
       self.__start_server()
 
-    return self.args.client == False
+    return self.args.client is False
 
   def __handle_cmd_line_argument(self, arg, cur_dir):
     if len(arg) == 0:
@@ -768,7 +768,8 @@ class EditorContext(object):
       r'https://raw.githubusercontent.com/stonewell/eim/from_scratch_pyside6/core/project_root.json'
     SEVEN_DAYS_SECONDS = (3600 * 24 * 7)
 
-    project_root_file = pathlib.Path(self.appdirs_.user_config_dir) / 'project_root.json'
+    project_root_file = pathlib.Path(
+        self.appdirs_.user_config_dir) / 'project_root.json'
     try:
       download_file = True
 
@@ -776,24 +777,28 @@ class EditorContext(object):
         mtime = project_root_file.stat().st_mtime + SEVEN_DAYS_SECONDS
 
         if (mtime > datetime.datetime.now().timestamp()):
-          logging.info('project root files next update check will be on:{}'.format(
-              datetime.datetime.fromtimestamp(mtime)))
+          logging.info(
+              'project root files next update check will be on:{}'.format(
+                  datetime.datetime.fromtimestamp(mtime)))
           download_file = False
 
       if download_file:
         logging.info(
-            f'project root files downloading from url:{PROJECT_ROOT_FILES_URL}')
+            f'project root files downloading from url:{PROJECT_ROOT_FILES_URL}'
+        )
 
         with self.open_url(PROJECT_ROOT_FILES_URL) as _resp:
           project_root_file.write_bytes(_resp.read())
 
-        logging.info(f'project root file downloaded to:{project_root_file.resolve()}')
+        logging.info(
+            f'project root file downloaded to:{project_root_file.resolve()}')
 
     except:
       logging.exception('unable to load project root file')
     finally:
       if project_root_file.exists():
-        self.project_root_files_ = json.loads(project_root_file.read_text('utf-8'))
+        self.project_root_files_ = json.loads(
+            project_root_file.read_text('utf-8'))
       else:
         self.project_root_files_ = []
 
@@ -804,4 +809,9 @@ class EditorContext(object):
     return eim_find_project_root(p, _files)
 
   def get_current_buffer_project_root(self):
-    return self.find_project_root(self.get_current_buffer_dir()) or pathlib.Path('.').cwd()
+    return self.find_project_root(
+        self.get_current_buffer_dir()) or pathlib.Path('.').cwd()
+
+  def has_content_window_active(self):
+    return (self.content_window_ is not None
+            and self.content_window_.has_focus())
