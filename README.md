@@ -44,7 +44,7 @@
   - [X] undo
   - [X] redo
   - [X] paste with history
-  - [ ] Search in files with ag/rg
+  - [X] Search in files with ag/rg
   - [X] backspace back indent at line begin
     - [X] should align with indent
   - [X] search wrap
