@@ -54,7 +54,7 @@ class EditorContext(object):
 
     self.validate_args(args)
 
-    if not (self.args.client == False):
+    if not (self.args.client is False):
       return
 
     self.__load_config()
@@ -152,22 +152,22 @@ class EditorContext(object):
 
     self.config = default_config()
 
-    #try site config
+    # try site config
     site_config = pathlib.Path(self.appdirs_.site_config_dir) / EIM_CONFIG
 
     self.__load_config_file(site_config)
 
-    #try user config
+    # try user config
     user_config = pathlib.Path(self.appdirs_.user_config_dir) / EIM_CONFIG
 
     self.__load_config_file(user_config)
 
-    #try local config
+    # try local config
     local_config = pathlib.Path(os.path.dirname(__file__)) / '..' / EIM_CONFIG
 
     self.__load_config_file(local_config)
 
-    #load custom config
+    # load custom config
     self.__load_config_file(args.config)
 
     logging.debug('config:{}'.format(self.config.get('/app/font')))
@@ -199,17 +199,17 @@ class EditorContext(object):
     args = self.args
     self.plugins_ = {}
 
-    #try local plugin
+    # try local plugin
     local_plugin = pathlib.Path(os.path.dirname(__file__)) / '..' / EIM_PLUGINS
 
     self.__load_plugin_dir(local_plugin)
 
-    #try site plugin
+    # try site plugin
     site_plugin = pathlib.Path(self.appdirs_.site_data_dir) / EIM_PLUGINS
 
     self.__load_plugin_dir(site_plugin)
 
-    #try user plugin
+    # try user plugin
     user_plugin = pathlib.Path(self.appdirs_.user_data_dir) / EIM_PLUGINS
 
     self.__load_plugin_dir(user_plugin)
@@ -513,7 +513,7 @@ class EditorContext(object):
   def __load_color_theme(self):
     color_theme_name = self.config.get('/app/color-theme', 'zenburn')
 
-    #try site config
+    # try site config
     theme_paths = [
         pathlib.Path(self.appdirs_.user_config_dir),
         pathlib.Path(self.appdirs_.site_config_dir),
@@ -716,7 +716,7 @@ class EditorContext(object):
     if process_client_server_arg and not (self.args.client == False):
       if not self.__call_server():
         raise ValueError()
-      
+
       return False
 
     if args is not None and len(args) > 0:

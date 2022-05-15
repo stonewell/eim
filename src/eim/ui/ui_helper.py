@@ -4,9 +4,9 @@ import platform
 from pubsub import pub
 from functools import reduce
 
-from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette, QFontMetrics, QFontDatabase, QFontInfo
+from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument, QColor, QPalette, QFontDatabase, QFontInfo
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
-from PySide6.QtCore import QEvent, QObject, QCoreApplication, Qt, QRect, QSize, QMargins, Slot, Signal
+from PySide6.QtCore import QObject, QCoreApplication, Qt, QRect, Slot, Signal
 
 from .list_content_window import ListContentWindow
 from .list_with_preview_content_window import ListWithPreviewContentWindow
