@@ -1,4 +1,9 @@
 # eim
+## Install
+```
+pip install git+https://github.com/stonewell/eim.git
+```
+
 ## Editor Improved
 
 - [ ] Piece Table with Tree
