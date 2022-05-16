@@ -149,6 +149,8 @@ class UIHelper(QObject):
 
   def register_commands(self):
     self.ctx_.register_command(BuiltinCommands.QUIT, self.__quit_app)
+    self.ctx_.register_command('split_horizontal', self.__split_horz)
+    self.ctx_.register_command('split_vertical', self.__split_vert)
 
   def __quit_app(self, ctx):
     self.ctx_.quit_editing()
@@ -173,15 +175,25 @@ class UIHelper(QObject):
     check_modified_buffer()
 
   def bind_keys(self):
-    self.ctx_.bind_key('Ctrl+X,3', self.__split_horz)
+    self.ctx_.bind_key('Ctrl+X,2', 'split_vertical')
+    self.ctx_.bind_key('Ctrl+X,3', 'split_horizontal')
 
-  def __split_horz(self, ctx):
+  def __split(self, orientation):
     from eim.eim import EIM
 
     eim = EIM()
     eim.initialize()
 
+    self.splitter_.setOrientation(orientation)
     self.splitter_.addWidget(eim.editor_)
+
+    eim.ctx_.switch_to_buffer(self.ctx_.current_buffer_.name())
+
+  def __split_horz(self, ctx):
+    self.__split(Qt.Horizontal)
+
+  def __split_vert(self, ctx):
+    self.__split(Qt.Vertical)
 
   def focus_editor(self):
     self.editor_.setFocus(Qt.ActiveWindowFocusReason)
