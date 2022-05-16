@@ -50,6 +50,9 @@ pip install git+https://github.com/stonewell/eim.git
   - [X] redo
   - [X] paste with history
   - [X] Search in files with ag/rg
+    - [X] find file in project root
+	- [X] search in project root
+	- [ ] list item performance
   - [X] backspace back indent at line begin
     - [X] should align with indent
   - [X] search wrap
@@ -62,3 +65,6 @@ pip install git+https://github.com/stonewell/eim.git
 - [ ] message buffer
 - [X] quit should check all buffer status
 - [ ] split editor pane
+  - [ ] switch pane command
+  - [ ] close pane
+  - [ ] close all other pane
