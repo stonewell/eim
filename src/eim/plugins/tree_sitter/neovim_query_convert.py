@@ -89,7 +89,12 @@ def convert(content):
 
   v = ''.join(new_vv)
 
-  return re.sub('^\\s+$', '', v, flags=re.MULTILINE)
+  v = re.sub('^\\s+$', '', v, flags=re.MULTILINE)
+  v = re.sub('\(text_block\)', '', v, flags=re.MULTILINE)
+  v = re.sub('\(line_comment\)', '', v, flags=re.MULTILINE)
+  v = re.sub('\(block_comment\)', '(comment)', v, flags=re.MULTILINE)
+
+  return v
 
 if __name__ == '__main__':
   a = pathlib.Path(r'/home/stone/.config/eim/neovim_tree_sitter/data/./queries/python/highlights.scm')

@@ -61,9 +61,15 @@ class Plugin(IPlugin):
 
     list_helper.clear_items()
 
+    count = 10
     for p in self.grep_tool_.list_match_file_name(self.project_root_, txt):
       l_item = list_helper.create_list_item_for_path(p)
       l_item.setText(f'{p.relative_to(self.project_root_).as_posix()}')
+
+      if count == 0:
+        break
+
+      count -= 1
 
     list_helper.sort_and_select_first_item()
 

@@ -84,6 +84,7 @@ class ColorTheme(object):
           },
         'function.special': 'preprocessor',
         'function.macro': 'preprocessor',
+      'function.method': 'function',
         'method': 'function',
         'method.call': 'function.call',
         'type.parameter': 'variable-name',
