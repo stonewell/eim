@@ -770,7 +770,7 @@ class EditorContext(object):
 
   def __load_project_root_files(self):
     PROJECT_ROOT_FILES_URL = \
-      r'https://raw.githubusercontent.com/stonewell/eim/from_scratch_pyside6/core/project_root.json'
+      r'https://raw.githubusercontent.com/stonewell/eim/from_scratch_pyside6/src/eim/core/project_root.json'
     SEVEN_DAYS_SECONDS = (3600 * 24 * 7)
 
     project_root_file = pathlib.Path(
