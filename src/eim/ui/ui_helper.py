@@ -153,13 +153,7 @@ class UIHelper(QObject):
   def __quit_app(self, ctx):
     self.ctx_.quit_editing()
 
-    def get_buffers():
-      for buf in self.ctx_.buffers_:
-        yield buf
-
-      return None
-
-    buffers = get_buffers()
+    buffers = self.ctx_.get_buffers()
 
     def check_modified_buffer():
       while True:

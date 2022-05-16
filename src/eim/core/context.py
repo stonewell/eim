@@ -23,6 +23,12 @@ from .project_root import find_project_root as eim_find_project_root
 EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
 
+__g_all_buffers = []
+
+
+def all_buffers():
+  return __g_all_buffers
+
 
 class EditorContext(object):
 
@@ -48,7 +54,6 @@ class EditorContext(object):
     self.current_behavior_context_ = self.global_behavior_context_
     self.command_history_ = []
     self.current_buffer_ = None
-    self.buffers_ = []
     self.editor_view_port_handlers_ = []
     self.editor_server_ = None
 
@@ -447,7 +452,7 @@ class EditorContext(object):
     return self.ui_helper.create_document(content)
 
   def load_buffer(self, file_path):
-    for buf in self.buffers_:
+    for buf in all_buffers():
       if file_path == buf.file_path_:
         self.__set_current_buffer(buf)
         return
@@ -460,11 +465,11 @@ class EditorContext(object):
 
   def __set_current_buffer(self, buffer):
     try:
-      self.buffers_.remove(buffer)
+      all_buffers().remove(buffer)
     except:
       pass
 
-    self.buffers_.insert(0, buffer)
+    all_buffers().insert(0, buffer)
 
     if self.current_buffer_ is not None:
       self.ui_helper.save_editing_state(self.current_buffer_)
@@ -479,7 +484,7 @@ class EditorContext(object):
     pub.sendMessage('buffer_changed', buf=buffer)
 
   def switch_to_buffer(self, buf_name):
-    for buf in self.buffers_:
+    for buf in all_buffers():
       logging.debug('switch buf:{} -> {}'.format(buf_name, buf.name()))
 
       if buf_name == buf.name():
@@ -491,7 +496,7 @@ class EditorContext(object):
     self.__set_current_buffer(buf)
 
   def buffer_names(self):
-    return [buf.name() for buf in self.buffers_]
+    return [buf.name() for buf in all_buffers()]
 
   def ask_for_file_path(self, on_get_path):
     self.run_command(BuiltinCommands.OPEN, None, False,
@@ -606,12 +611,12 @@ class EditorContext(object):
       return
 
     try:
-      self.buffers_.remove(self.current_buffer_)
+      all_buffers().remove(self.current_buffer_)
     except:
       pass
 
-    if len(self.buffers_) > 0:
-      self.__set_current_buffer(self.buffers_[0])
+    if len(all_buffers()) > 0:
+      self.__set_current_buffer(all_buffers()[0])
     else:
       self.switch_to_buffer('Untitiled')
 
@@ -815,3 +820,9 @@ class EditorContext(object):
   def has_content_window_active(self):
     return (self.content_window_ is not None
             and self.content_window_.has_focus())
+
+  def get_buffers(self):
+    for buf in all_buffers():
+      yield buf
+
+    return None
