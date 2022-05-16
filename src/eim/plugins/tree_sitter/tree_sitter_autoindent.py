@@ -49,14 +49,18 @@ class TreeSitterAutoIndent(object):
     l = current_block.layout().lineForTextPosition(pos_in_block)
 
     node = None
-    logging.debug(f'calculate indent for block:{current_block_number}, line:{l.lineNumber()}')
+    logging.debug(
+        f'calculate indent for block:{current_block_number}, line:{l.lineNumber()}'
+    )
 
     # always check last line indent
     # it seems to get better behavior
     if self.__is_empty_line(current_block, l) or True:
       last_block, last_line = self.__find_last_non_empty_line(current_block, l)
 
-      logging.debug(f'last block:{last_block.blockNumber()}, last line:{last_line.lineNumber()} for block:{current_block_number}, line:{l.lineNumber()}')
+      logging.debug(
+          f'last block:{last_block.blockNumber()}, last line:{last_line.lineNumber()} for block:{current_block_number}, line:{l.lineNumber()}'
+      )
 
       if last_block is None:
         logging.warning(
@@ -231,16 +235,23 @@ class TreeSitterAutoIndent(object):
     lnum = self.__get_line_number(editor, buffer, b, l)
     col = self.__get_first_non_empty_char(b, l)
 
-    return buffer.tree_sitter_tree_.node_descendant_for_point_range(
-        lnum, col, lnum, col)
+    #return buffer.tree_sitter_tree_.node_descendant_for_point_range(
+    #    lnum, col, lnum, col)
+    return self.__get_node_at_pos(buffer, b.position() + l.textStart())
 
   def __get_last_node_at_line(self, buffer, editor, b, l):
     lnum = self.__get_line_number(editor, buffer, b, l)
     col = l.textLength() - 1
 
-    logging.debug(f'get_last_node at at line:{lnum}, col:{col}, block:{b.blockNumber()}, l:{l.lineNumber()}')
-    return buffer.tree_sitter_tree_.node_descendant_for_point_range(
-        lnum, col, lnum, col)
+    logging.debug(
+        f'get_last_node at at line:{lnum}, col:{col}, block:{b.blockNumber()}, l:{l.lineNumber()}'
+    )
+    #return buffer.tree_sitter_tree_.node_descendant_for_point_range(
+    #    lnum, col, lnum, col)
+    return self.__get_node_at_pos(
+        buffer,
+        b.position() + l.textStart() +
+        (l.textLength() - 1 if l.textLength() > 0 else 0))
 
   def __get_node_at_pos(self, buffer, pos):
     return buffer.tree_sitter_tree_.node_descendant_for_byte_range(pos, pos)

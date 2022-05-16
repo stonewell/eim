@@ -79,12 +79,12 @@ class ColorTheme(object):
         'function': 'function-name',
         'function.call': 'function-name',
         'function.builtin': {
-          "name":"function",
-          "weight":"bold"
-          },
+            "name": "function",
+            "weight": "bold"
+        },
         'function.special': 'preprocessor',
         'function.macro': 'preprocessor',
-      'function.method': 'function',
+        'function.method': 'function',
         'method': 'function',
         'method.call': 'function.call',
         'type.parameter': 'variable-name',
@@ -97,7 +97,7 @@ class ColorTheme(object):
         'constructor': 'type',
         'variable': 'variable-name',
         'variable.parameter': 'variable',
-        'variable.builtin':  {
+        'variable.builtin': {
             "name": 'keyword',
             "weight": "bold"
         },
@@ -115,7 +115,7 @@ class ColorTheme(object):
         'embedded': 'default',
         'operator': 'keyword',
         'label': 'preprocessor',
-        'constant.builtin':  {
+        'constant.builtin': {
             "name": 'constant',
             "weight": "bold"
         },
