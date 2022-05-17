@@ -35,6 +35,7 @@ class UIHelper(QObject):
       os.environ['QT_DEBUG_PLUGINS'] = '1'
 
     self.run_in_ui_thread_signal_.connect(self.__run_in_ui_thread)
+    self.splitters_ = []
 
   def create_application(self):
     self.ctx_.app = app = EIMApplication()
@@ -154,6 +155,8 @@ class UIHelper(QObject):
     self.ctx_.register_command('other_pane', self.__other_pane)
 
   def __other_pane(self, ctx):
+    self.ctx_.close_content_window()
+
     from eim.eim import get_next_eim
 
     get_next_eim(self.eim_).activate()
@@ -186,15 +189,29 @@ class UIHelper(QObject):
     self.ctx_.bind_key('Ctrl+X,O', 'other_pane')
 
   def __split(self, orientation):
+    self.ctx_.close_content_window()
+
     from eim.eim import EIM
 
     eim = EIM()
     eim.initialize()
 
-    self.splitter_.setOrientation(orientation)
-    self.splitter_.addWidget(eim.editor_)
+    editor_parent = self.editor_.parent()
+
+    new_parent = QSplitter()
+    if editor_parent is not None:
+      index = editor_parent.indexOf(self.editor_)
+      editor_parent.replaceWidget(index, new_parent)
+
+    new_parent.setOrientation(orientation)
+    new_parent.addWidget(self.editor_)
+    new_parent.addWidget(eim.editor_)
+    new_parent.show()
+
+    self.splitters_.append(new_parent)
 
     eim.ctx_.switch_to_buffer(self.ctx_.current_buffer_.name())
+    eim.activate()
 
   def __split_horz(self, ctx):
     self.__split(Qt.Horizontal)
@@ -317,13 +334,10 @@ class UIHelper(QObject):
     self.run_in_ui_thread_signal_.emit(obj)
 
   def create_editor(self):
-    self.splitter_ = QSplitter()
     editor = Editor(self.ctx_)
     editor.bind_keys()
 
-    self.splitter_.addWidget(editor)
-
-    return self.splitter_
+    return self.editor_
 
   def editor_has_focus(self):
     return (self.editor_ is not None and self.editor_.hasFocus())
