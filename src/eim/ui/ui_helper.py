@@ -153,6 +153,20 @@ class UIHelper(QObject):
     self.ctx_.register_command('split_horizontal', self.__split_horz)
     self.ctx_.register_command('split_vertical', self.__split_vert)
     self.ctx_.register_command('other_pane', self.__other_pane)
+    self.ctx_.register_command('close_other_pane', self.__close_other_pane)
+    self.ctx_.register_command('close_current_pane', self.__close_current_pane)
+
+  def __close_other_pane(self, ctx):
+    editor_parent = self.editor_.parent()
+
+    if editor_parent is not None:
+      index = editor_parent.indexOf(self.editor_)
+      editor_parent.replaceWidget(index, QWidget())
+
+    self.splitters_.clear()
+
+  def __close_current_pane(self, ctx):
+    pass
 
   def __other_pane(self, ctx):
     self.ctx_.close_content_window()
