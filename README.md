@@ -66,5 +66,7 @@ pip install git+https://github.com/stonewell/eim.git
 - [X] quit should check all buffer status
 - [ ] split editor pane
   - [X] switch pane command
-  - [ ] close pane
-  - [ ] close all other pane
+  - [X] close pane
+  - [X] close all other pane
+  - [ ] update pane size when split/close
+- [ ] pub/sub should only handle own events
