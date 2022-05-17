@@ -1,1 +1,3 @@
-python src\main.py $*
+set PYTHONPATH=src
+
+python -m eim.main $*
