@@ -31,10 +31,10 @@ class AgTool(object):
     return proc.stdout.decode('utf-8', errors='ignore')
 
   def list_match_file_name(self, dir, pattern):
-    cmd_args = ['ag', '-l', '--nocolor']
+    cmd_args = ['ag', '--nocolor']
 
     if len(pattern) > 0:
-      cmd_args.extend(['-G', pattern])
+      cmd_args.extend(['-g', pattern])
 
     try:
       return filter(
