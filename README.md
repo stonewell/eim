@@ -70,3 +70,4 @@ pip install git+https://github.com/stonewell/eim.git
   - [X] close all other pane
   - [ ] update pane size when split/close
 - [ ] pub/sub should only handle own events
+  
