@@ -65,6 +65,6 @@ pip install git+https://github.com/stonewell/eim.git
 - [ ] message buffer
 - [X] quit should check all buffer status
 - [ ] split editor pane
-  - [ ] switch pane command
+  - [X] switch pane command
   - [ ] close pane
   - [ ] close all other pane

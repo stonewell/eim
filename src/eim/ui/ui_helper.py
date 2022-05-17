@@ -151,6 +151,12 @@ class UIHelper(QObject):
     self.ctx_.register_command(BuiltinCommands.QUIT, self.__quit_app)
     self.ctx_.register_command('split_horizontal', self.__split_horz)
     self.ctx_.register_command('split_vertical', self.__split_vert)
+    self.ctx_.register_command('other_pane', self.__other_pane)
+
+  def __other_pane(self, ctx):
+    from eim.eim import get_next_eim
+
+    get_next_eim(self.eim_).activate()
 
   def __quit_app(self, ctx):
     self.ctx_.quit_editing()
@@ -177,6 +183,7 @@ class UIHelper(QObject):
   def bind_keys(self):
     self.ctx_.bind_key('Ctrl+X,2', 'split_vertical')
     self.ctx_.bind_key('Ctrl+X,3', 'split_horizontal')
+    self.ctx_.bind_key('Ctrl+X,O', 'other_pane')
 
   def __split(self, orientation):
     from eim.eim import EIM
@@ -320,3 +327,6 @@ class UIHelper(QObject):
 
   def editor_has_focus(self):
     return (self.editor_ is not None and self.editor_.hasFocus())
+
+  def activate_editor(self):
+    return (self.editor_ is not None and self.focus_editor())

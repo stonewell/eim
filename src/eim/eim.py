@@ -18,6 +18,20 @@ def get_current_active_eim():
   raise ValueError('must have an active eim')
 
 
+def get_next_eim(eim):
+  try:
+    index = __g_all_eims.index(eim)
+
+    index += 1
+
+    if index >= len(__g_all_eims):
+      index = 0
+
+    return __g_all_eims[index]
+  except (ValueError):
+    return __g_all_eims[0]
+
+
 def add_eim(eim):
   __g_all_eims.append(eim)
 
@@ -28,6 +42,7 @@ class EIM(object):
     self.ctx_ = ctx = EditorContext()
 
     ctx.ui_helper = UIHelper(ctx)
+    ctx.ui_helper.eim_ = self
 
     add_eim(self)
 
@@ -66,3 +81,6 @@ class EIM(object):
 
   def process_key_binding(self, key_seq):
     self.ctx_.process_key_binding(key_seq)
+
+  def activate(self):
+    self.ctx_.ui_helper.activate_editor()
