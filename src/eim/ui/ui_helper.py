@@ -7,7 +7,7 @@ from functools import reduce
 from PySide6.QtGui import QFont, QKeySequence, QShortcut, QTextDocument
 from PySide6.QtGui import QColor, QPalette, QFontDatabase, QFontInfo
 from PySide6.QtWidgets import QApplication, QPlainTextDocumentLayout
-from PySide6.QtWidgets import QSplitter
+from PySide6.QtWidgets import QSplitter, QWidget
 from PySide6.QtCore import QObject, QCoreApplication, Qt, QRect, Slot, Signal
 
 from .list_content_window import ListContentWindow
@@ -15,6 +15,16 @@ from .list_with_preview_content_window import ListWithPreviewContentWindow
 from .input_content_window import InputContentWindow
 from .editor import Editor
 from eim.core.builtin_commands import BuiltinCommands
+
+__g_all_splitters = []
+
+
+def add_splitter(s):
+  __g_all_splitters.append(s)
+
+
+def clear_splitter():
+  __g_all_splitters.clear()
 
 
 class EIMApplication(QApplication):
@@ -152,8 +162,33 @@ class UIHelper(QObject):
     self.ctx_.register_command('split_horizontal', self.__split_horz)
     self.ctx_.register_command('split_vertical', self.__split_vert)
     self.ctx_.register_command('other_pane', self.__other_pane)
+    self.ctx_.register_command('close_other_pane', self.__close_other_pane)
+    self.ctx_.register_command('close_current_pane', self.__close_current_pane)
+
+  def __close_other_pane(self, ctx):
+    self.ctx_.close_content_window()
+
+    editor_parent = self.editor_.parent()
+
+    if editor_parent is not None:
+      index = editor_parent.indexOf(self.editor_)
+      editor_parent.replaceWidget(index, QWidget())
+
+    clear_splitter()
+
+    self.editor_.show()
+
+  def __close_current_pane(self, ctx):
+    self.ctx_.close_content_window()
+
+    editor_parent = self.editor_.parent()
+
+    if editor_parent is not None:
+      self.editor_.hide()
 
   def __other_pane(self, ctx):
+    self.ctx_.close_content_window()
+
     from eim.eim import get_next_eim
 
     get_next_eim(self.eim_).activate()
@@ -184,17 +219,33 @@ class UIHelper(QObject):
     self.ctx_.bind_key('Ctrl+X,2', 'split_vertical')
     self.ctx_.bind_key('Ctrl+X,3', 'split_horizontal')
     self.ctx_.bind_key('Ctrl+X,O', 'other_pane')
+    self.ctx_.bind_key('Ctrl+X,1', 'close_other_pane')
+    self.ctx_.bind_key('Ctrl+X,0', 'close_current_pane')
 
   def __split(self, orientation):
+    self.ctx_.close_content_window()
+
     from eim.eim import EIM
 
     eim = EIM()
     eim.initialize()
 
-    self.splitter_.setOrientation(orientation)
-    self.splitter_.addWidget(eim.editor_)
+    editor_parent = self.editor_.parent()
+
+    new_parent = QSplitter()
+    if editor_parent is not None:
+      index = editor_parent.indexOf(self.editor_)
+      editor_parent.replaceWidget(index, new_parent)
+
+    new_parent.setOrientation(orientation)
+    new_parent.addWidget(self.editor_)
+    new_parent.addWidget(eim.editor_)
+    new_parent.show()
+
+    add_splitter(new_parent)
 
     eim.ctx_.switch_to_buffer(self.ctx_.current_buffer_.name())
+    eim.activate()
 
   def __split_horz(self, ctx):
     self.__split(Qt.Horizontal)
@@ -317,13 +368,10 @@ class UIHelper(QObject):
     self.run_in_ui_thread_signal_.emit(obj)
 
   def create_editor(self):
-    self.splitter_ = QSplitter()
     editor = Editor(self.ctx_)
     editor.bind_keys()
 
-    self.splitter_.addWidget(editor)
-
-    return self.splitter_
+    return self.editor_
 
   def editor_has_focus(self):
     return (self.editor_ is not None and self.editor_.hasFocus())
