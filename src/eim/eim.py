@@ -11,6 +11,7 @@ __g_all_eims = []
 
 
 def get_current_active_eim():
+  global __g_all_eims
   for _eim in __g_all_eims:
     if _eim.is_active():
       return _eim
@@ -19,6 +20,7 @@ def get_current_active_eim():
 
 
 def get_next_eim(eim):
+  global __g_all_eims
   try:
     index = __g_all_eims.index(eim)
 
@@ -33,7 +35,18 @@ def get_next_eim(eim):
 
 
 def add_eim(eim):
+  global __g_all_eims
   __g_all_eims.append(eim)
+
+
+def remove_eim(eim):
+  global __g_all_eims
+  __g_all_eims.remove(eim)
+
+
+def clear_eim():
+  global __g_all_eims
+  __g_all_eims.clear()
 
 
 class EIM(object):

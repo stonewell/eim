@@ -24,10 +24,30 @@ EIM_CONFIG = 'eim.json'
 EIM_PLUGINS = 'plugins'
 
 __g_all_buffers = []
+__g_editor_server = None
 
 
 def all_buffers():
+  global __g_all_buffers
   return __g_all_buffers
+
+
+def start_editor_server(ctx):
+  global __g_editor_server
+  if __g_editor_server is not None:
+    return
+
+  __g_editor_server = EditorServer(ctx)
+  __g_editor_server.start()
+
+
+def stop_editor_server(ctx):
+  global __g_editor_server
+
+  if __g_editor_server is None:
+    return
+
+  __g_editor_server.shutdown()
 
 
 class EditorContext(object):
@@ -55,7 +75,6 @@ class EditorContext(object):
     self.command_history_ = []
     self.current_buffer_ = None
     self.editor_view_port_handlers_ = []
-    self.editor_server_ = None
 
     self.validate_args(args)
 
@@ -758,12 +777,10 @@ class EditorContext(object):
     return client.call_server()
 
   def __start_server(self):
-    self.editor_server_ = EditorServer(self)
-    self.editor_server_.start()
+    start_editor_server(self)
 
   def quit_editing(self):
-    if self.editor_server_ is not None:
-      self.editor_server_.shutdown()
+    stop_editor_server(self)
 
   def run_in_ui_thread(self, obj):
     self.ui_helper.run_in_ui_thread(obj)

@@ -20,10 +20,12 @@ __g_all_splitters = []
 
 
 def add_splitter(s):
+  global __g_all_splitters
   __g_all_splitters.append(s)
 
 
 def clear_splitter():
+  global __g_all_splitters
   __g_all_splitters.clear()
 
 
@@ -166,6 +168,7 @@ class UIHelper(QObject):
     self.ctx_.register_command('close_current_pane', self.__close_current_pane)
 
   def __close_other_pane(self, ctx):
+    from eim.eim import clear_eim, add_eim
     self.ctx_.close_content_window()
 
     editor_parent = self.editor_.parent()
@@ -175,16 +178,24 @@ class UIHelper(QObject):
       editor_parent.replaceWidget(index, QWidget())
 
     clear_splitter()
+    clear_eim()
+    add_eim(self.eim_)
 
     self.editor_.show()
 
   def __close_current_pane(self, ctx):
+    from eim.eim import remove_eim
     self.ctx_.close_content_window()
 
     editor_parent = self.editor_.parent()
 
     if editor_parent is not None:
-      self.editor_.hide()
+      index = editor_parent.indexOf(self.editor_)
+      w = QWidget()
+      editor_parent.replaceWidget(index, w)
+      w.hide()
+
+    remove_eim(self.eim_)
 
   def __other_pane(self, ctx):
     self.ctx_.close_content_window()
