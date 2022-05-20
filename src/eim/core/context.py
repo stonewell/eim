@@ -382,7 +382,7 @@ class EditorContext(object):
     self.current_buffer_.update_mode_line()
     self.current_buffer_.apply_editor_config()
 
-    pub.sendMessage('buffer_changed', buf=self.current_buffer_)
+    pub.sendMessage('buffer_changed', buf=self.current_buffer_, ctx=self)
 
   def __apply_editor_config(self, ctx):
     ctx.close_content_window()
@@ -500,7 +500,7 @@ class EditorContext(object):
     self.current_buffer_.update_mode_line()
     self.current_buffer_.apply_editor_config()
 
-    pub.sendMessage('buffer_changed', buf=buffer)
+    pub.sendMessage('buffer_changed', buf=buffer, ctx=self)
 
   def switch_to_buffer(self, buf_name):
     for buf in all_buffers():

@@ -175,7 +175,7 @@ class ContentWindow(ContentParentWidget, TextEditMixin):
     super().close()
 
     self.ctx_.switch_behavior_context()
-    pub.sendMessage('content_window_closed')
+    pub.sendMessage('content_window_closed', ctx=self.ctx_)
 
   def _page_up_down(self, ctx, pageDown):
     logging.debug('content window ignore page up down')

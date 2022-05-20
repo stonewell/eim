@@ -33,7 +33,10 @@ class Plugin(IPlugin):
                               True)
     self.indent_ = TreeSitterAutoIndent(self.ctx)
 
-  def on_buffer_changed(self, buf):
+  def on_buffer_changed(self, buf, ctx):
+    if ctx != self.ctx:
+      return
+
     if self.indent_ is None:
       self.indent_ = TreeSitterAutoIndent(self.ctx)
 

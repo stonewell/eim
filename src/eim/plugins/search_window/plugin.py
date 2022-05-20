@@ -89,7 +89,10 @@ class Plugin(IPlugin):
     pub.subscribe(self.__on_window_close, 'content_window_closed')
     cw.show()
 
-  def __on_window_close(self):
+  def __on_window_close(self, ctx):
+    if ctx != self.ctx:
+      return
+
     self.content_window_ = None
 
   def __execute_command(self):

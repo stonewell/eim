@@ -37,7 +37,7 @@ class Editor(QPlainTextEdit, TextEditMixin):
     self.register_commands()
     self.bind_keys()
 
-  def __on_buffer_changed(self, buf):
+  def __on_buffer_changed(self, buf, ctx):
     pass
 
   def __clear_scroll_bar(self):

@@ -71,7 +71,13 @@ class ModeLineArea(QStatusBar):
 
     w.setStyleSheet(f'background-color:"{b_c.name()}";color:"{f_c.name()}";')
 
-  def on_update_model_line(self, name, message, permanant):
+  def on_update_model_line(self, name, message, permanant, buffer, ctx=None):
+    if buffer != self.ctx_.current_buffer_:
+      return
+
+    if name == 'line_pos' and ctx != self.ctx_:
+      return
+
     if name in self.mode_line_items_:
       self.mode_line_items_[name].setText(message)
     else:

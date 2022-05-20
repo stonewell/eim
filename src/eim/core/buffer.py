@@ -219,12 +219,13 @@ class EditorBuffer(object):
     if 'italic' in theme and theme['italic']:
       buffer_id_message = '<i>' + buffer_id_message + '</i>'
 
-    buffer_id_message = f' {"*" if self.document_.isModified() else "-"} {self.__get_document_size()} -\ <font color="{f_c.name()}">{buffer_id_message}</font> '
+    buffer_id_message = f' {"*" if self.document_.isModified() else "-"} {self.__get_document_size()} <font color="{f_c.name()}">{buffer_id_message}</font> '
 
     pub.sendMessage('update_mode_line',
                     name='buffer-id',
                     message=buffer_id_message,
-                    permanant=False)
+                    permanant=False,
+                    buffer=self)
 
   def __modification_changed(self, m):
     self.__update_buffer_id_mode_line()
@@ -246,33 +247,11 @@ class EditorBuffer(object):
 
     return f'{self.__round(c)}{size_units[-1]}'
 
-  def __cursor_position_changed(self, pos):
-    l, c, tl = pos
-
-    s_l = f'{l}'
-    s_c = f'{c}'
-
-    w = max(4, len(s_l), len(s_c))
-
-    msg = f' {s_l.center(w, " ")} : {s_c.center(w, " ")} {self.__get_line_percent(self.__round(float(l) / float(tl), 3) * 100, pos)}  '
-
-    pub.sendMessage('update_mode_line',
-                    name='line_pos',
-                    message=msg,
-                    permanant=True)
+  def __cursor_position_changed(self, pos, buffer):
+    if buffer != self:
+      return
 
     self.__update_buffer_id_mode_line()
-
-  def __get_line_percent(self, v, pos):
-    l, c, tl = pos
-
-    if v == 0 or l == 1:
-      return 'Top'
-
-    if v == 100 or l == tl:
-      return 'Bottom'
-
-    return f'{self.__round(v)}%'
 
   def get_indent_options(self):
     options = self.__get_editor_options()

@@ -69,5 +69,5 @@ pip install git+https://github.com/stonewell/eim.git
   - [X] close pane
   - [X] close all other pane
   - [ ] update pane size when split/close
-- [ ] pub/sub should only handle own events
-  
+- [X] pub/sub should only handle own events
+- [ ] content window should be global not belows to editor

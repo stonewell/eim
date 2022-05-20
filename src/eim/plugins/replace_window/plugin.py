@@ -11,6 +11,7 @@ from eim.core.builtin_commands import BuiltinCommands
 
 SPLIT_CHAR = ' → '
 
+
 class Plugin(IPlugin):
   REPLACE = 0
   REPLACE_REGEX = 1
@@ -86,7 +87,10 @@ class Plugin(IPlugin):
     s, r = history
     return f'{s}{SPLIT_CHAR}{r}'
 
-  def __on_window_close(self):
+  def __on_window_close(self, ctx):
+    if ctx != self.ctx:
+      return
+
     self.content_window_ = None
     self.search_pattern_ = None
 
@@ -167,7 +171,9 @@ class Plugin(IPlugin):
 
       if selection_end is not None and (match_start >= selection_end
                                         or match_end > selection_end):
-        logging.debug(f'replace match {match_start}->{match_end}, exceed:{selection_end}')
+        logging.debug(
+            f'replace match {match_start}->{match_end}, exceed:{selection_end}'
+        )
         break
 
       if edit_started:

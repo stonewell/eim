@@ -116,11 +116,57 @@ class UIHelper(QObject):
     self.ctx_.update_plugins_with_current_window(editor)
     self.editor_.updateRequest[QRect,
                                int].connect(self.update_editor_viwe_port)
-    self.editor_.cursorPositionChanged.connect(lambda: pub.sendMessage(
-        'cursor_position_changed', pos=self.get_row_and_col()))
+    self.editor_.cursorPositionChanged.connect(
+        self.__on_cursor_position_changed)
 
-    pub.subscribe(lambda: self.update_editor_viwe_port(None, None),
-                  'viewport_changed')
+    pub.subscribe(self.__on_viewport_changed, 'viewport_changed')
+
+  def __on_cursor_position_changed(self):
+    pos = self.get_row_and_col()
+    pub.sendMessage('cursor_position_changed',
+                    pos=pos,
+                    buffer=self.ctx_.current_buffer_)
+
+    self.__update_mode_line_pos(pos)
+
+  def __update_mode_line_pos(self, pos):
+    l, c, tl = pos
+
+    s_l = f'{l}'
+    s_c = f'{c}'
+
+    w = max(4, len(s_l), len(s_c))
+
+    msg = f' {s_l.center(w, " ")} : {s_c.center(w, " ")} {self.__get_line_percent(self.__round(float(l) / float(tl), 3) * 100, pos)}  '
+
+    pub.sendMessage('update_mode_line',
+                    name='line_pos',
+                    message=msg,
+                    permanant=True,
+                    buffer=self.ctx_.current_buffer_,
+                    ctx=self.ctx_)
+
+  def __get_line_percent(self, v, pos):
+    l, c, tl = pos
+
+    if v == 0 or l == 1:
+      return 'Top'
+
+    if v == 100 or l == tl:
+      return 'Bottom'
+
+    return f'{self.__round(v)}%'
+
+  def __round(self, c, ndigit=1):
+    r_c = round(c, ndigit)
+
+    return round(c) if r_c == round(c) else r_c
+
+  def __on_viewport_changed(self, ctx):
+    if ctx != self.ctx_:
+      return
+
+    self.update_editor_viwe_port(None, None)
 
   def bind_key(self, keyseq, callable, binding_widget=None):
     logging.debug('bind keyseq:{}, {}'.format(keyseq, self.editor_))
