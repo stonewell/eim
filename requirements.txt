@@ -8,3 +8,4 @@ git+https://github.com/stonewell/py-tree-sitter#egg=tree_sitter
 GitPython
 PyPubSub
 editorconfig
+git+https://github.com/stonewell/pyEverything#egg=pyeverything-stonewell
