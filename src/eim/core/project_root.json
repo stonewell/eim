@@ -39,5 +39,6 @@
   "requirements.txt",
   "setup.py",
   "stack.yaml",
-  "tox.ini"
+  "tox.ini",
+  ".pyeverything"
 ]

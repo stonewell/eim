@@ -1,3 +1,3 @@
 set PYTHONPATH=src
 
-python -m eim.main $*
+python -m eim.main %*

@@ -15,44 +15,57 @@ class AgTool(object):
     cmd_args = ['ag', '--version']
 
     try:
-      return len(self.__run_cmd(cmd_args)) > 0
+      return len(self._run_cmd(cmd_args)) > 0
     except:
       return False
 
-  def __run_cmd(self, cmd_args, dir=None):
+  def _run_cmd(self, cmd_args, dir=None):
     proc = subprocess.run(cmd_args, capture_output=True, cwd=dir)
 
     if proc.stderr:
       logging.error(
-          f'running ag failed:{proc.stderr.decode("utf-8", errors="ignore")}')
+          f'running tool failed:{proc.stderr.decode("utf-8", errors="ignore")}'
+      )
 
     proc.check_returncode()
 
     return proc.stdout.decode('utf-8', errors='ignore')
 
-  def list_match_file_name(self, dir, pattern):
+  def _get_list_match_file_name_cmd_args(self, dir, pattern):
     cmd_args = ['ag', '--nocolor']
 
     if len(pattern) > 0:
       cmd_args.extend(['-g', pattern])
 
+    return cmd_args
+
+  def list_match_file_name(self, dir, pattern):
+    cmd_args = self._get_list_match_file_name_cmd_args(dir, pattern)
+
     try:
       return filter(
           lambda x: x.is_file(),
-          map(lambda x: dir / Path(x.strip()),
-              StringIO(self.__run_cmd(cmd_args, dir)).readlines()))
+          map(
+              lambda x: dir / Path(x.strip())
+              if not Path(x.strip()).is_absolute() else Path(x.strip()),
+              StringIO(self._run_cmd(cmd_args, dir)).readlines()))
     except:
       return []
 
-  def list_match_files(self, dir, pattern):
+  def _get_list_match_files_cmd_args(dir, pattern):
     cmd_args = [
         'ag', '--ackmate', '--nocolor', pattern,
         dir.resolve().as_posix()
     ]
 
+    return cmd_args
+
+  def list_match_files(self, dir, pattern):
+    cmd_args = self._get_list_match_files_cmd_args(dir, pattern)
+
     try:
       lines = map(lambda x: x.strip(),
-                  StringIO(self.__run_cmd(cmd_args, dir)).readlines())
+                  StringIO(self._run_cmd(cmd_args, dir)).readlines())
 
       matches = []
       file = None
@@ -85,14 +98,16 @@ class AgTool(object):
 
             col_lengths.append((column, length))
 
-          logging.debug(
-              f'file:{file}, line:{line}, col_len:{col_lengths}')
+          logging.debug(f'file:{file}, line:{line}, col_len:{col_lengths}')
 
-          matches.append((dir / Path(file), line, col_lengths, parts[1]))
+          matches.append(
+              (dir /
+               Path(file) if not Path(file).is_absolute() else Path(file),
+               line, col_lengths, parts[1]))
 
       return matches
     except:
-      logging.exception('fail to agrep')
+      logging.exception('fail to list matched files')
       return []
 
 
