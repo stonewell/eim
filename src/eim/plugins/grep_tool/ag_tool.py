@@ -52,7 +52,7 @@ class AgTool(object):
     except:
       return []
 
-  def _get_list_match_files_cmd_args(dir, pattern):
+  def _get_list_match_files_cmd_args(self, dir, pattern):
     cmd_args = [
         'ag', '--ackmate', '--nocolor', pattern,
         dir.resolve().as_posix()

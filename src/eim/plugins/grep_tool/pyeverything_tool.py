@@ -3,6 +3,12 @@ from io import StringIO
 from pathlib import Path
 import re
 
+try:
+  from pyeverything.frontend.cmd.run import run_with_args as pyeverything_run_with_args
+  NO_PYEVERYTHING = False
+except:
+  NO_PYEVERYTHING = True
+
 from .ag_tool import AgTool
 
 
@@ -12,12 +18,7 @@ class PyEverythingTool(AgTool):
     super().__init__(ctx)
 
   def is_working(self):
-    cmd_args = ['pyeverything', '--help']
-
-    try:
-      return len(self._run_cmd(cmd_args)) > 0
-    except:
-      return False
+    return not NO_PYEVERYTHING
 
   def _get_list_match_file_name_cmd_args(self, dir, pattern):
     if not self.__has_pyeverything_index(dir):
@@ -49,6 +50,19 @@ class PyEverythingTool(AgTool):
 
     return cmd_args
 
+  def _run_cmd(self, cmd_args, dir=None):
+    if not self.__has_pyeverything_index(dir):
+      return super()._run_cmd(cmd_args, dir)
+
+    try:
+      output = StringIO()
+
+      pyeverything_run_with_args(cmd_args, True, output)
+
+      return output.getvalue()
+    except:
+      logging.exception('run pyeverything failed')
+
   @staticmethod
   def __find_pyeverything(path: Path) -> Path:
     found = list(path.glob('.pyeverything'))
@@ -67,7 +81,7 @@ class PyEverythingTool(AgTool):
     if dir is not None:
       everything_path = PyEverythingTool.__find_pyeverything(dir)
 
-    cmd_args = ['pyeverything']
+    cmd_args = []
     if everything_path is not None:
       loc = everything_path.read_text(encoding='utf-8').strip('\n').strip('\r')
       if len(loc) > 0:
@@ -81,9 +95,11 @@ class PyEverythingTool(AgTool):
 
     cmd_args.append('list')
 
-    lines = StringIO(self._run_cmd(cmd_args, dir)).readlines()
+    lines = StringIO()
 
-    for line in lines:
+    pyeverything_run_with_args(cmd_args, True, lines)
+
+    for line in StringIO(lines.getvalue()).readlines():
       if dir is None:
         return True
 
