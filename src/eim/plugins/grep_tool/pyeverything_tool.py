@@ -25,7 +25,7 @@ class PyEverythingTool(AgTool):
 
     cmd_args = self.__prepare_everything_cmds(dir)
 
-    cmd_args.extend(['query', '--no_color', '-p'])
+    cmd_args.extend(['query', '--no_color', '--limit', '50', '-p'])
 
     if len(pattern) > 0:
       cmd_args.append(f'{dir.resolve().as_posix()}/.*{pattern}')
@@ -40,7 +40,7 @@ class PyEverythingTool(AgTool):
 
     cmd_args = self.__prepare_everything_cmds(dir)
 
-    cmd_args.extend(['query', '--ackmate', '--no_color'])
+    cmd_args.extend(['query', '--ackmate', '--no_color', '--limit', '50'])
 
     cmd_args.extend(['-c', pattern])
 
