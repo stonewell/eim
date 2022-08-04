@@ -1,3 +1,7 @@
+import threading
+import logging
+from functools import partial
+
 from yapsy.IPlugin import IPlugin
 from PySide6.QtCore import Qt
 
@@ -20,6 +24,42 @@ class PathWrapper(object):
     return getattr(self.path_, n)
 
 
+class GrepToolAsyncRunner(object):
+
+  def __init__(self, path_iter, path_handler):
+    self.stop_ = False
+    self.path_iter_ = path_iter
+    self.path_handler_ = path_handler
+
+    self.runner_ = None
+
+  def run(self):
+    if self.runner_ is not None:
+      return
+
+    self.stop_ = False
+    self.runner_ = threading.Thread(target=self.__run)
+    self.runner_.start()
+
+  def stop(self):
+    if self.runner_ is None:
+      return
+
+    self.stop_ = True
+    self.runner_.join()
+
+    self.path_handler_(None)
+
+  def __run(self):
+    for p in self.path_iter_:
+      if self.stop_:
+        break
+
+      self.path_handler_(p)
+
+    self.path_handler_(None)
+
+
 class Plugin(IPlugin):
 
   def __init__(self):
@@ -36,6 +76,7 @@ class Plugin(IPlugin):
     self.editor_ = editor
 
     self.grep_tool_ = get_grep_tool(self.ctx)
+    self.grep_tool_runner_ = None
 
     if self.grep_tool_ is None:
       logging.warning('you need an ag(the silver searcher) to make grep work')
@@ -61,11 +102,16 @@ class Plugin(IPlugin):
 
     list_helper.clear_items()
 
-    for p in self.grep_tool_.list_match_file_name(self.project_root_, txt):
-      l_item = list_helper.create_list_item_for_path(p)
-      l_item.setText(f'{p.relative_to(self.project_root_).as_posix()}')
+    if self.grep_tool_runner_ is not None:
+      self.grep_tool_runner_.stop()
 
-    list_helper.sort_and_select_first_item()
+    def __run(ctx, c, p):
+      ctx.run_in_ui_thread(partial(c, list_helper, p))
+
+    self.grep_tool_runner_ = GrepToolAsyncRunner(
+        self.grep_tool_.list_match_file_name(self.project_root_, txt),
+        partial(__run, self.ctx, self.__on_grep_tool_new_path))
+    self.grep_tool_runner_.run()
 
     return True
 
@@ -110,3 +156,11 @@ class Plugin(IPlugin):
       self.ctx.run_command(BuiltinCommands.GOTO_LINE, None, False, p.line_)
     except:
       pass
+
+  def __on_grep_tool_new_path(self, list_helper, p):
+    if p is None:
+      list_helper.sort_and_select_first_item()
+      return
+
+    l_item = list_helper.create_list_item_for_path(p)
+    l_item.setText(f'{p.relative_to(self.project_root_).as_posix()}')
