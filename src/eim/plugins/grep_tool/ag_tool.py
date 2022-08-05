@@ -44,7 +44,7 @@ class AgTool(object):
 
     try:
       return filter(
-          lambda x: x.is_file(),
+          lambda x: x.is_file() and x.is_relative_to(dir),
           map(
               lambda x: dir / Path(x.strip())
               if not Path(x.strip()).is_absolute() else Path(x.strip()),

@@ -29,7 +29,7 @@ class PyEverythingTool(AgTool):
     cmd_args.extend(['query', '--no_color', '--limit', '50', '-p'])
 
     if len(pattern) > 0:
-      cmd_args.append(f'{dir.resolve().as_posix()}/.*{pattern}')
+      cmd_args.append(f'{pattern}')
     else:
       cmd_args.append(f'{dir.resolve().as_posix()}/.*')
 

@@ -51,7 +51,7 @@ class GrepToolAsyncRunner(object):
     self.path_handler_(None)
 
   def __run(self):
-    for p in self.path_iter_:
+    for p in self.path_iter_():
       if self.stop_:
         break
 
@@ -109,7 +109,7 @@ class Plugin(IPlugin):
       ctx.run_in_ui_thread(partial(c, list_helper, p))
 
     self.grep_tool_runner_ = GrepToolAsyncRunner(
-        self.grep_tool_.list_match_file_name(self.project_root_, txt),
+        partial(self.grep_tool_.list_match_file_name, self.project_root_, txt),
         partial(__run, self.ctx, self.__on_grep_tool_new_path))
     self.grep_tool_runner_.run()
 

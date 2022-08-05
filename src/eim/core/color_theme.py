@@ -96,6 +96,7 @@ class ColorTheme(object):
         'type.super': 'type',
         'constructor': 'type',
         'variable': 'variable-name',
+        'field': 'variable-name',
         'variable.parameter': 'variable',
         'variable.builtin': {
             "name": 'keyword',
