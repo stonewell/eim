@@ -39,6 +39,12 @@ class AgTool(object):
 
     return cmd_args
 
+  def get_cmd_output(self, result):
+    if isinstance(result, str):
+      return StringIO(result).readlines()
+
+    return result
+
   def list_match_file_name(self, dir, pattern):
     cmd_args = self._get_list_match_file_name_cmd_args(dir, pattern)
 
@@ -48,7 +54,7 @@ class AgTool(object):
           map(
               lambda x: dir / Path(x.strip())
               if not Path(x.strip()).is_absolute() else Path(x.strip()),
-              StringIO(self._run_cmd(cmd_args, dir)).readlines()))
+              self.get_cmd_output(self._run_cmd(cmd_args, dir))))
     except:
       return []
 
@@ -65,9 +71,8 @@ class AgTool(object):
 
     try:
       lines = map(lambda x: x.strip(),
-                  StringIO(self._run_cmd(cmd_args, dir)).readlines())
+                  self.get_cmd_output(self._run_cmd(cmd_args, dir)))
 
-      matches = []
       file = None
       for line in lines:
         if len(line) == 0:
@@ -100,12 +105,10 @@ class AgTool(object):
 
           logging.debug(f'file:{file}, line:{line}, col_len:{col_lengths}')
 
-          matches.append(
-              (dir /
-               Path(file) if not Path(file).is_absolute() else Path(file),
-               line, col_lengths, parts[1]))
+          yield (dir /
+                 Path(file) if not Path(file).is_absolute() else Path(file),
+                 line, col_lengths, parts[1])
 
-      return matches
     except:
       logging.exception('fail to list matched files')
       return []

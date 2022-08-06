@@ -4,9 +4,11 @@ from pathlib import Path
 import re
 
 try:
-  from pyeverything.frontend.cmd.run import run_with_args as pyeverything_run_with_args
+  from pyeverything.frontend.cmd.run import run_with_args_iter as pyeverything_run_with_args
   NO_PYEVERYTHING = False
+  logging.info('using pyeverything tool for grep')
 except:
+  logging.info('using ag tool for grep')
   NO_PYEVERYTHING = True
 
 from .ag_tool import AgTool
@@ -55,11 +57,7 @@ class PyEverythingTool(AgTool):
       return super()._run_cmd(cmd_args, dir)
 
     try:
-      output = StringIO()
-
-      pyeverything_run_with_args(cmd_args, True, output)
-
-      return output.getvalue()
+      return pyeverything_run_with_args(cmd_args, True)
     except:
       logging.exception('run pyeverything failed')
 
@@ -95,11 +93,9 @@ class PyEverythingTool(AgTool):
 
     cmd_args.append('list')
 
-    lines = StringIO()
+    pyeverything_run_with_args(cmd_args, True)
 
-    pyeverything_run_with_args(cmd_args, True, lines)
-
-    for line in StringIO(lines.getvalue()).readlines():
+    for line in pyeverything_run_with_args(cmd_args, True):
       if dir is None:
         return True
 
@@ -111,4 +107,5 @@ class PyEverythingTool(AgTool):
         if dir.resolve().as_posix().startswith(matches[1]):
           return True
 
+    logging.info('using ag tool for grep')
     return False
