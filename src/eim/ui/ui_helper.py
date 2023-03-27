@@ -168,12 +168,12 @@ class UIHelper(QObject):
 
     self.update_editor_viwe_port(None, None)
 
-  def bind_key(self, keyseq, callable, binding_widget=None):
+  def bind_key(self, keyseq, _callable, binding_widget=None):
     logging.debug('bind keyseq:{}, {}'.format(keyseq, self.editor_))
     seq = QKeySequence(keyseq)
     sc = QShortcut(seq,
                    self.editor_ if binding_widget is None else binding_widget)
-    sc.activated.connect(callable)
+    sc.activated.connect(_callable)
     sc.activatedAmbiguously.connect(
         lambda: self.__activated_ambiguously(keyseq))
 
