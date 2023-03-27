@@ -2,7 +2,7 @@ import logging
 
 from pubsub import pub
 
-from PySide6.QtCore import QSize, Qt, QRect,Slot
+from PySide6.QtCore import QSize, Qt, QRect, Slot, QEvent
 from PySide6.QtGui import QTextCursor, QPalette, QKeySequence
 from PySide6.QtWidgets import QPlainTextEdit, QApplication
 from PySide6.QtWidgets import QAbstractSlider
@@ -28,14 +28,15 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
     self.__clear_scroll_bar()
 
-    self.updateRequest[QRect,
-                       int].connect(self.__update_request)
+    self.updateRequest[QRect, int].connect(self.__update_request)
     pub.subscribe(self.__on_buffer_changed, 'buffer_changed')
 
     self.__apply_theme()
 
     self.register_commands()
     self.bind_keys()
+
+    self.installEventFilter(self)
 
   def __on_buffer_changed(self, buf, ctx):
     pass
@@ -61,6 +62,14 @@ class Editor(QPlainTextEdit, TextEditMixin):
 
     self.ctx_.switch_behavior_context('editor')
 
+  def eventFilter(self, obj, evt):
+    # Ignore all shortcut in editor
+    if evt.type() in [QEvent.ShortcutOverride]:
+      evt.ignore()
+      return True
+
+    return super().eventFilter(obj, evt)
+
   def keyPressEvent(self, evt):
     if not self.__pre_key_press_event(evt):
       super().keyPressEvent(evt)
@@ -76,8 +85,7 @@ class Editor(QPlainTextEdit, TextEditMixin):
       self.__handle_tab_indent(evt)
 
       return True
-    elif ((key_combined == Qt.Key_Backspace)
-          or (key_combined == (Qt.Key.Key_Backtab | Qt.SHIFT))):
+    if key_combined in [Qt.Key_Backspace, Qt.Key.Key_Backtab | Qt.SHIFT]:
       line_start, line_indents_end, empty_line = self.ctx_.run_command(
           'calculate_line_indent_info', None, False, self)
 
@@ -86,8 +94,8 @@ class Editor(QPlainTextEdit, TextEditMixin):
         return False
 
       if empty_line or tc.positionInBlock() <= line_indents_end:
-        indent_char, indent_size = \
-          self.ctx_.current_buffer_.get_indent_options()
+        indent_char, indent_size = self.ctx_.current_buffer_.get_indent_options(
+        )
 
         del_char_count = (tc.positionInBlock() - line_start) % indent_size
 
@@ -101,8 +109,9 @@ class Editor(QPlainTextEdit, TextEditMixin):
         tc.endEditBlock()
 
         return True
-    elif (evt == QKeySequence.InsertLineSeparator
-          or evt == QKeySequence.InsertParagraphSeparator):
+    if evt in [
+        QKeySequence.InsertLineSeparator, QKeySequence.InsertParagraphSeparator
+    ]:
       if self.is_marker_active() or self.textCursor().hasSelection():
         self.active_marker(False)
 
@@ -121,8 +130,9 @@ class Editor(QPlainTextEdit, TextEditMixin):
       self.textCursor().insertText(indent_char * indent_size)
 
   def __post_key_press_event(self, evt):
-    if (evt == QKeySequence.InsertLineSeparator
-        or evt == QKeySequence.InsertParagraphSeparator):
+    if evt in [
+        QKeySequence.InsertLineSeparator, QKeySequence.InsertParagraphSeparator
+    ]:
       soft_line_break = evt == QKeySequence.InsertLineSeparator
 
       self.ctx_.run_command('calculate_indent', None, False, self)

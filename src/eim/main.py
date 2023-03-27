@@ -1,9 +1,3 @@
-import os
-
-os.environ['QT_QPA_PLATFORMTHEME'] = 'eim'
-os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = os.path.join(
-    os.path.dirname(__file__), 'plugins', 'qpa')
-
 from .eim import EIM
 
 
