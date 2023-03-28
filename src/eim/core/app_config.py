@@ -65,5 +65,8 @@ def default_config():
           "keys": default_key_bindings(),
           "color-theme": "zenburn",
           "editor": default_editor_config(),
+          "tree-sitter": {
+              "use-nvim-data": True,
+          },
       }
   })

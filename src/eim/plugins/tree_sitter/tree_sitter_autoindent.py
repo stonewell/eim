@@ -188,11 +188,26 @@ class TreeSitterAutoIndent(object):
 
     return (1, indent)
 
+  def __norm_indent_key(self, key):
+    map = {
+      "indent.begin": 'indent',
+      "indent.end": 'indent_end',
+      "indent.align": 'aligned_indent',
+      "indent.auto": 'auto',
+      "indent.branch": 'branch',
+    }
+
+    try:
+      return map[key]
+    except KeyError:
+      return key
+
   def __get_indents(self, buffer, editor):
     captures, state = buffer.tree_sitter_tree_.indent_query(
         0, buffer.document_.characterCount())
 
     if captures is None or len(captures) == 0:
+      logging.debug('no indent captures found')
       return None
 
     indents = {
@@ -207,12 +222,15 @@ class TreeSitterAutoIndent(object):
     }
 
     for capture in captures:
-      try:
-        indents[capture[1]][capture[0].id] = {}
-      except (KeyError):
-        indents[capture[1]] = {}
-        indents[capture[1]][capture[0].id] = {}
+      key = self.__norm_indent_key(capture[1])
 
+      try:
+        indents[key][capture[0].id] = {}
+      except (KeyError):
+        indents[key] = {}
+        indents[key][capture[0].id] = {}
+
+    logging.debug(f'indents:{list(indents)}')
     return indents
 
   def __find_last_non_empty_line(self, current_block, l):

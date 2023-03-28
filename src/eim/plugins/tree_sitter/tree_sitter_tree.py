@@ -62,9 +62,11 @@ class TreeSitterLangTree(object):
     self.tree_ = self.parser_.parse(
         self.buffer_.document_.toPlainText().encode('utf-8'))
 
+    use_nvimdata_ = self.ctx_.config.get('app/tree-sitter/use-nvim-data') or False
+
     # highlight
     self.highlight_ = None
-    if neovim_langs_data_query_file.exists():
+    if neovim_langs_data_query_file.exists() and use_nvimdata_:
       try:
         self.highlight_ = self.lang_.query(
             neovim_query_convert(neovim_langs_data_query_file.read_text()))
@@ -91,7 +93,7 @@ class TreeSitterLangTree(object):
 
     # indents
     self.indent_ = None
-    if neovim_langs_data_indent_file.exists():
+    if neovim_langs_data_indent_file.exists() and use_nvimdata_:
       try:
         self.indent_ = self.lang_.query(
             neovim_query_convert(neovim_langs_data_indent_file.read_text()))

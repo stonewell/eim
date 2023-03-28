@@ -16,6 +16,9 @@ class Plugin(IPlugin):
   def __init__(self):
     IPlugin.__init__(self)
 
+    self.indent_ = None
+    self.content_window_ = None
+
   def activate(self):
     IPlugin.activate(self)
 
@@ -45,8 +48,8 @@ class Plugin(IPlugin):
       buf.highlighter_ = TreeSitterSyntaxHighlighter(self.ctx, buf,
                                                      self.editor_)
       logging.debug(
-          'install tree and syntax highlighter, auto indent to buffer:{}'.
-          format(buf.name()))
+          'install tree and syntax highlighter, auto indent to buffer:%s',
+          buf.name())
 
   def show_language_list(self, ctx):
     lang_names = self.selected_langs_[:]
