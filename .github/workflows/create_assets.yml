@@ -56,7 +56,6 @@ jobs:
       - name: Install and prepare Neovim
         env:
           NVIM_TAG: ${{ matrix.nvim_tag }}
-          NVIM_TREE_SITTER_PATH: nvim-treesitter
         run: |
           bash ./scripts/ci-install-${{ matrix.os }}.sh
 
@@ -65,5 +64,5 @@ jobs:
 
       - name: Post compile Windows
         if: matrix.os == 'windows-2022'
-        run: cp -r ~/AppData/Local/nvim/pack/nvim-treesitter/start/nvim-treesitter/parser/* nvim-treesitter/parser
+        run: cp -r ~/AppData/Local/nvim-data/site/pack/packer/start/nvim-treesitter/parser/* parser
 
