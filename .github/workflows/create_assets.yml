@@ -20,6 +20,9 @@ jobs:
             cc: clang
             nvim_tag: stable
 
+          - os: windows-2022
+            cc: gcc
+            nvim_tag: stable
         include:
           - os: windows-2022
             cc: cl
