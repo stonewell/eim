@@ -51,7 +51,7 @@ jobs:
           bash ./scripts/ci-install-${{ matrix.os }}.sh
 
       - name: Compile parsers
-        run: $NVIM --headless -c "lua require'nvim-treesitter.install'.prefer_git=false" -c "TSInstallSync all" -c "q"
+        run: $NVIM --headless -c "lua require'nvim-treesitter.install'.prefer_git=false" -c "TSInstallSync python" -c "q"
 
       - name: Post compile Windows
         if: matrix.os == 'windows-2022'
