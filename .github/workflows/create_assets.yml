@@ -98,12 +98,12 @@ jobs:
         uses: ihiroky/archive-action@v1
         with:
           root_dir: archive
-          file_path: /tmp/nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz
+          file_path: nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz
 
       - uses: actions/upload-artifact@v3
         with:
           name: nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}
-          path: /tmp/nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz
+          path: nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz
 
   release_assets:
     name: Release Parsers
