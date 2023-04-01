@@ -55,5 +55,5 @@ jobs:
 
       - name: Post compile Windows
         if: matrix.os == 'windows-2022'
-        run: cp -r ~/AppData/Local/nvim-data/site/pack/packer/start/nvim-treesitter/parser/* parser
+        run: find ~/AppData/Local/nvim-data/
 
