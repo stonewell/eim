@@ -111,7 +111,7 @@ class Editor(QPlainTextEdit, TextEditMixin):
         return True
     if evt in [
         QKeySequence.InsertLineSeparator, QKeySequence.InsertParagraphSeparator
-    ]:
+    ] or key_combined in [Qt.Key_Return, Qt.Key_Enter]:
       if self.is_marker_active() or self.textCursor().hasSelection():
         self.active_marker(False)
 
@@ -130,9 +130,11 @@ class Editor(QPlainTextEdit, TextEditMixin):
       self.textCursor().insertText(indent_char * indent_size)
 
   def __post_key_press_event(self, evt):
+    key_combined = evt.keyCombination().toCombined()
+
     if evt in [
         QKeySequence.InsertLineSeparator, QKeySequence.InsertParagraphSeparator
-    ]:
+    ] or key_combined in [Qt.Key_Return, Qt.Key_Enter]:
       soft_line_break = evt == QKeySequence.InsertLineSeparator
 
       self.ctx_.run_command('calculate_indent', None, False, self)

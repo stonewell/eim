@@ -26,7 +26,8 @@ def ensure_tree_sitter_langs(ctx):
         return
 
     langs_data_dir = langs_dir / 'data'
-    shutil.rmtree(langs_data_dir)
+    if langs_data_dir.exists():
+      shutil.rmtree(langs_data_dir)
     langs_data_dir.mkdir(parents=True, exist_ok=True)
 
     langs_data_url = NVIM_TREESITTER_PARSER_QUERIES_FILE.format(
