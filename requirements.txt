@@ -4,7 +4,7 @@ pluggy
 appdirs
 fuzzywuzzy
 python-Levenshtein
-git+https://github.com/tree-sitter/py-tree-sitter#egg=tree_sitter
+git+https://github.com/stonewell/py-tree-sitter#egg=tree_sitter
 GitPython
 PyPubSub
 editorconfig
