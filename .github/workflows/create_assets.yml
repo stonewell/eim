@@ -1,5 +1,8 @@
 name: Create Assets
 
+on:
+  workflow_dispatch:
+
 defaults:
   run:
     shell: bash
