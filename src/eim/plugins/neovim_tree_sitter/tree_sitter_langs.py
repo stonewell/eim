@@ -1,13 +1,12 @@
-import os
-import sys
 import logging
 import pathlib
 import tarfile
 import platform
 import datetime
+import shutil
 
-TREE_SITTER_GRAMMAS_GIT_URL = r'https://github.com/nvim-treesitter/nvim-treesitter.git'
-SEVEN_DAYS_SECONDS = (3600 * 24 * 7)
+SEVEN_DAYS_SECONDS = 3600 * 24 * 7
+NVIM_TREESITTER_PARSER_QUERIES_FILE = r'https://github.com/stonewell/eim/releases/download/latest/nvim-treesitter-query-parsers-{platform}-nightly.tar.gz'
 
 
 def ensure_tree_sitter_langs(ctx):
@@ -21,47 +20,51 @@ def ensure_tree_sitter_langs(ctx):
     if ver_file.exists():
       mtime = ver_file.stat().st_mtime + SEVEN_DAYS_SECONDS
 
-      if (mtime > datetime.datetime.now().timestamp()):
-        logging.info('tree sitter next update check will be on:{}'.format(
-            datetime.datetime.fromtimestamp(mtime)))
+      if mtime > datetime.datetime.now().timestamp():
+        logging.info('tree sitter next update check will be on:%s',
+                     datetime.datetime.fromtimestamp(mtime))
         return
 
     langs_data_dir = langs_dir / 'data'
+    shutil.rmtree(langs_data_dir)
+    langs_data_dir.mkdir(parents=True, exist_ok=True)
 
-    if (langs_data_dir / '.git').is_dir():
-      update_grammas(langs_data_dir)
-    else:
-      langs_data_dir.mkdir(parents=True, exist_ok=True)
-      clone_grammas(langs_data_dir)
+    langs_data_url = NVIM_TREESITTER_PARSER_QUERIES_FILE.format(
+        platform=get_platform())
+    langs_data_file = langs_data_dir / 'data.tar.gz'
+
+    logging.info('download neovim tree sitter data:%s', langs_data_url)
+    with ctx.open_url(langs_data_url) as response:
+      langs_data_file.write_bytes(response.read())
+
+    tarfile.open(langs_data_file).extractall(langs_data_dir)
 
     ver_file.write_text(f'{datetime.datetime.now().timestamp()}')
   except:
     logging.exception('failed ensure neovim tree sitter langs')
 
 
-def clone_grammas(langs_data_path):
-  from git import Repo
-  try:
-    repo = Repo.init(langs_data_path)
-    origin = repo.create_remote('origin', TREE_SITTER_GRAMMAS_GIT_URL)
-    origin.fetch()
-    repo.create_head('master', origin.refs.master)
-    repo.heads.master.set_tracking_branch(origin.refs.master)
-    repo.heads.master.checkout()
-    origin.pull()
+def get_platform():
+  if platform.system() == 'Linux':
+    return 'ubuntu-latest'
+  if platform.system() == 'Windows':
+    return 'windows-2022'
+  if platform.system() == 'Darwin':
+    return 'macos-latest'
 
-    logging.info('neovim tree sitter grammer clone from:{}, to:{}'.format(
-        TREE_SITTER_GRAMMAS_GIT_URL, langs_data_path.resolve()))
-  except:
-    logging.exception('neovim tree sitter grammer clone repo failed')
+  raise ValueError(f'unspported platform:{platform.system()}')
 
 
-def update_grammas(langs_data_dir):
-  from git import Repo
+def get_lang_names(ctx):
+  langs_bin_dir = pathlib.Path(
+      ctx.appdirs_.user_config_dir) / 'neovim_tree_sitter' / 'data' / 'parser'
 
-  try:
-    repo = Repo(langs_data_dir)
-    repo.remotes.origin.pull()
-    logging.info('neovim tree sitter grammars pulled latest version')
-  except:
-    clone_grammas(langs_data_dir)
+  if not langs_bin_dir.exists():
+    return []
+
+  lang_names = []
+  for lang in langs_bin_dir.iterdir():
+    if lang.is_file() and lang.suffix.lower() == '.so':
+      lang_names.append(lang.stem)
+
+  return lang_names

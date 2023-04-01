@@ -11,7 +11,7 @@ TREE_SITTER_LANGS_LATEST_TAG_PREFIX = r'https://github.com/emacs-tree-sitter/tre
 TREE_SITTER_LANGS_FILE_NAME = r'tree-sitter-grammars{platform}{latest_tag}.tar.gz'
 TREE_SITTER_LANGS_URL = r'https://github.com/emacs-tree-sitter/tree-sitter-langs/releases/download/{latest_tag}/{langs_file_name}'
 TREE_SITTER_GRAMMAS_GIT_URL = r'https://github.com/emacs-tree-sitter/tree-sitter-langs.git'
-SEVEN_DAYS_SECONDS = (3600 * 24 * 7)
+SEVEN_DAYS_SECONDS = 3600 * 24 * 7
 
 
 def ensure_tree_sitter_langs(ctx):

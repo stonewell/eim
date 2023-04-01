@@ -29,40 +29,55 @@ class TreeSitterLangTree(object):
     lang = self.buffer_.get_lang()
 
     if lang is None:
-      logging.warn('buffer languange is not detected')
+      logging.warning('buffer languange is not detected')
       return
 
     langs_dir = pathlib.Path(
         self.ctx_.appdirs_.user_config_dir) / 'tree_sitter_langs'
     neovim_langs_dir = pathlib.Path(
         self.ctx_.appdirs_.user_config_dir) / 'neovim_tree_sitter'
+
     langs_data_dir = langs_dir / 'data'
     neovim_langs_data_dir = neovim_langs_dir / 'data'
+
     langs_data_bin_dir = langs_data_dir / 'bin'
+    neovim_langs_data_bin_dir = neovim_langs_data_dir / 'parser'
+
     langs_data_query_file = langs_data_dir / 'queries' / lang.replace(
         '-', '_') / 'highlights.scm'
     neovim_langs_data_query_file = neovim_langs_data_dir / 'queries' / lang.replace(
         '-', '_') / 'highlights.scm'
+
     langs_data_indent_file = langs_data_dir / 'queries' / lang.replace(
         '-', '_') / 'indents.scm'
     neovim_langs_data_indent_file = neovim_langs_data_dir / 'queries' / lang.replace(
         '-', '_') / 'indents.scm'
 
-    lang_binary = langs_data_bin_dir / '{}.{}'.format(lang, suffix())
+    lang_binary = langs_data_bin_dir / f'{lang}.{suffix()}'
+    neovim_lang_binary = neovim_langs_data_bin_dir / f'{lang}.so'
 
-    if not lang_binary.exists():
-      logging.warn('buffer language:{} is not supported'.format(lang))
+    use_nvimdata_ = self.ctx_.config.get(
+        'app/tree-sitter/use-nvim-data') or False
+
+    _lang_binary = None
+
+    if neovim_lang_binary.exists() and use_nvimdata_:
+      _lang_binary = neovim_lang_binary
+    elif lang_binary.exists():
+      _lang_binary = lang_binary
+    else:
+      logging.warning('buffer language:%s is not supported', lang)
       self.buffer_.invalid_lang()
       return
 
-    self.lang_ = Language(lang_binary.as_posix(), lang.replace('-', '_'))
+    logging.debug('use lang parser:%s', _lang_binary.as_posix())
+
+    self.lang_ = Language(_lang_binary.as_posix(), lang.replace('-', '_'))
     self.parser_ = Parser()
     self.parser_.set_language(self.lang_)
 
     self.tree_ = self.parser_.parse(
         self.buffer_.document_.toPlainText().encode('utf-8'))
-
-    use_nvimdata_ = self.ctx_.config.get('app/tree-sitter/use-nvim-data') or False
 
     # highlight
     self.highlight_ = None
