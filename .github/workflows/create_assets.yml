@@ -57,10 +57,16 @@ jobs:
         if: matrix.os == 'windows-2022'
         run: cp -r ~/AppData/Local/nvim/pack/nvim-treesitter/start/eim/parser/* parser
 
+      - name: Post Prepare for Archive
+        run: |
+          mkdir archive
+          cp -r parser archive
+          cp -r queries archive
+
       - name: Archive
         uses: ihiroky/archive-action@v1
         with:
-          root_dir: .
+          root_dir: archive
           file_path: /tmp/nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz
       - uses: actions/upload-artifact@v3
         with:
