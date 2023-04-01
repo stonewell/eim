@@ -55,7 +55,7 @@ jobs:
 
       - name: Post compile Windows
         if: matrix.os == 'windows-2022'
-        run: cp -r ~/AppData/Local/nvim-data/site/pack/packer/start/eim/parser/* parser
+        run: cp -r ~/AppData/Local/nvim/site/pack/packer/start/eim/parser/* parser
 
       - name: Archive
         run: tar zcf /tmp/nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz *
