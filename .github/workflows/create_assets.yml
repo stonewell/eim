@@ -3,7 +3,7 @@ name: Create Assets
 on:
   workflow_dispatch:
   schedule:
-    - cron: '* * 1 * *'
+    - cron: '1 1 1 * *'
 
 defaults:
   run:
