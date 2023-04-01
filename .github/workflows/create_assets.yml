@@ -8,11 +8,11 @@ defaults:
     shell: bash
 
 jobs:
-  check_compilation:
+  parser_compilation:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022]
+        os: [windows-2022, ubuntu-latest]
         cc: [gcc, clang]
         nvim_tag: [stable]
         exclude:
@@ -23,6 +23,11 @@ jobs:
           - os: windows-2022
             cc: gcc
             nvim_tag: stable
+
+          - os: ubuntu-latest
+            cc: clang
+            nvim_tag: stable
+
         include:
           - os: windows-2022
             cc: cl
@@ -50,7 +55,17 @@ jobs:
         run: |
           bash ./scripts/ci-install-${{ matrix.os }}.sh
 
+      - name: Setup Parsers Cache
+        id: parsers-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./parser/
+            ~/AppData/Local/nvim/pack/nvim-treesitter/start/eim/parser/
+          key: ${{ matrix.os }}-${{ matrix.cc }}-${{ matrix.nvim_tag }}-parsers-v1-${{ hashFiles('./lockfile.json', './lua/nvim-treesitter/parsers.lua', './lua/nvim-treesitter/install.lua', './lua/nvim-treesitter/shell_command_selectors.lua') }}
+
       - name: Compile parsers
+        if: {{ steps.parsers-cache.outputs.cache-hit != 'true' }}
         run: $NVIM --headless -c "lua require'nvim-treesitter.install'.prefer_git=false" -c "TSInstallSync python" -c "q"
 
       - name: Post compile Windows
@@ -68,7 +83,30 @@ jobs:
         with:
           root_dir: archive
           file_path: /tmp/nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz
+
       - uses: actions/upload-artifact@v3
         with:
           name: nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}
           path: /tmp/nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz
+
+  release_assets:
+    name: Release Parsers
+    needs: parser_compilation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+
+      - name: Collect all files
+        run: |
+          mkdir archive
+          find . -type f -name "*.tar.gz" -exec cp {} archive \;
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "nvim-treesitter parsers and queries"
+          files: |
+            archive/*.tar.gz
