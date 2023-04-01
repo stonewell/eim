@@ -58,7 +58,7 @@ jobs:
         run: cp -r ~/AppData/Local/nvim/pack/nvim-treesitter/start/eim/parser/* parser
 
       - name: Archive
-        run: tar zcf /tmp/nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.tar.gz *
+        run: zip /tmp/nvim-treesitter-${{ matrix.os }}-${{ matrix.nvim_tag }}.zip *
 
       - uses: actions/upload-artifact@v3
         with:
