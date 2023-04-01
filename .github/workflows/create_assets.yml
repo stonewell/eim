@@ -55,5 +55,5 @@ jobs:
 
       - name: Post compile Windows
         if: matrix.os == 'windows-2022'
-        run: find ~/AppData/Local/nvim-data/
+        run: find ~/AppData/Local/nvim-data/ && find ~/AppData/Local/nvim
 
