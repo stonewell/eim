@@ -60,7 +60,7 @@ pip install git+https://github.com/stonewell/eim.git
 - [X] detect language using file suffix, then use guesslang
 - [X] force buffer lang
 - [ ] recent files
-- [ ] guess indention of file
+- [X] guess indention of file
 - [ ] guess new line style of file
 - [ ] message buffer
 - [X] quit should check all buffer status
