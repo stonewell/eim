@@ -9,3 +9,4 @@ GitPython
 PyPubSub
 editorconfig
 git+https://github.com/stonewell/pyEverything#egg=pyeverything-stonewell
+git+https://github.com/stonewell/detect-indent-py#egg=detect-indent-py

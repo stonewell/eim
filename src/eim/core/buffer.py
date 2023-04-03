@@ -1,5 +1,6 @@
 import os
 import logging
+from io import StringIO
 
 try:
   from guesslang import Guess
@@ -20,6 +21,7 @@ except:
 from pubsub import pub
 from pathlib import Path
 from editorconfig import get_properties as ec_get_properties
+import detect_indent
 
 lang_name_mapping = {
     'c++': 'c',
@@ -256,9 +258,16 @@ class EditorBuffer(object):
   def get_indent_options(self):
     options = self.__get_editor_options()
 
-    # TODO detect indent of file
     indent_style = options.get('indent_style', 'space').lower()
     indent_size = int(options.get('indent_size', '2'))
+
+    detected_indent = detect_indent.detect_indent(StringIO(self.document_.toPlainText()))
+
+    if detected_indent:
+      indent_size, indent_style = detected_indent
+      if indent_style == ' ':
+        indent_style = 'space'
+      logging.info('detected indent:%d %s', indent_size, indent_style)
 
     return (' ', indent_size) if indent_style == 'space' else ('\t', 1)
 
