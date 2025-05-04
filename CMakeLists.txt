@@ -72,18 +72,33 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   endif()
 endif()
 
+FIND_PACKAGE(Threads REQUIRED)
+
 include(FetchContent)
 
 FetchContent_Declare(
   yaml-cpp
   GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
 )
-FetchContent_MakeAvailable(yaml-cpp)
 
 FetchContent_Declare(
   platform_folders
   GIT_REPOSITORY https://github.com/sago007/PlatformFolders.git
 )
-FetchContent_MakeAvailable(platform_folders)
+
+FetchContent_Declare(
+  spdlog
+  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+  GIT_TAG v1.x
+)
+
+SET(SPDLOG_USE_STD_FORMAT ON)
+SET(SPDLOG_BUILD_PIC ON)
+
+FetchContent_MakeAvailable(
+  platform_folders
+  yaml-cpp
+  spdlog
+)
 
 ADD_SUBDIRECTORY(src)

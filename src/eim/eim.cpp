@@ -1,6 +1,8 @@
-#include <platform_folders.h>
 #include <iostream>
 #include <string>
+
+#include "platform_folders.h"
+#include "spdlog/spdlog.h"
 
 int main()
 {
@@ -16,5 +18,8 @@ int main()
   std::cout << "Download: " << sago::getDownloadFolder() << "\n";
   std::cout << "Save Games 1: " << sago::getSaveGamesFolder1() << "\n";
   std::cout << "Save Games 2: " << sago::getSaveGamesFolder2() << "\n";
-  return 0;
+
+  spdlog::info("Welcome to spdlog!");
+  spdlog::error("Some error message with arg: {}", sago::getConfigHome());
+return 0;
 }
