@@ -1,11 +1,29 @@
 #include <iostream>
 #include <string>
 
+#include "CLI/CLI.hpp"
 #include "platform_folders.h"
 #include "spdlog/spdlog.h"
+#include "toml++/toml.hpp"
 
-int main()
-{
+#include <sstream>
+
+template <typename T> std::string to_string(T v) {
+  std::stringstream ss;
+  ss << v;
+
+  return ss.str();
+}
+
+int main(int argc, char **argv) {
+  CLI::App app{"App description"};
+  argv = app.ensure_utf8(argv);
+
+  std::string filename = "default";
+  app.add_option("-f,--file", filename, "A help string");
+
+  CLI11_PARSE(app, argc, argv);
+
   std::cout << "Config: " << sago::getConfigHome() << "\n";
   std::cout << "Data: " << sago::getDataHome() << "\n";
   std::cout << "State: " << sago::getStateDir() << "\n";
@@ -21,5 +39,21 @@ int main()
 
   spdlog::info("Welcome to spdlog!");
   spdlog::error("Some error message with arg: {}", sago::getConfigHome());
-return 0;
+
+  auto v = R"([a]
+        b = [
+        {c = 42},
+        {c = 54}
+        ])";
+
+  const auto toml_v = toml::parse(v);
+
+  const auto a = toml_v["a"]["b"];
+  spdlog::info("{}", to_string(a));
+
+  spdlog::info("option f={},{}", filename,
+               to_string(toml::json_formatter(*a.node())));
+  spdlog::info("option f={},{}", filename,
+               to_string(toml::yaml_formatter(*a.node())));
+  return 0;
 }

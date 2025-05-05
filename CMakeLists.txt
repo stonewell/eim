@@ -77,11 +77,6 @@ FIND_PACKAGE(Threads REQUIRED)
 include(FetchContent)
 
 FetchContent_Declare(
-  yaml-cpp
-  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-)
-
-FetchContent_Declare(
   platform_folders
   GIT_REPOSITORY https://github.com/sago007/PlatformFolders.git
 )
@@ -92,13 +87,27 @@ FetchContent_Declare(
   GIT_TAG v1.x
 )
 
+FetchContent_Declare(
+    cli11
+    QUIET
+    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+    GIT_TAG v2.5.0
+)
+
+FetchContent_Declare(
+    tomlplusplus
+    GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+    GIT_TAG        v3.4.0
+)
+
 SET(SPDLOG_USE_STD_FORMAT ON)
 SET(SPDLOG_BUILD_PIC ON)
 
 FetchContent_MakeAvailable(
   platform_folders
-  yaml-cpp
   spdlog
+  cli11
+  tomlplusplus
 )
 
 ADD_SUBDIRECTORY(src)
