@@ -1,5 +1,6 @@
 SET(EIM_SOURCES eim.cpp
-                command_line_options.h command_line_options.cpp)
+                command_line_options.h command_line_options.cpp
+                context.h context.cpp)
 
 ADD_EXECUTABLE(eim ${EIM_SOURCES})
 
