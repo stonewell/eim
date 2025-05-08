@@ -1,20 +1,6 @@
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include "platform_folders.h"
-#include "spdlog/spdlog.h"
-#include "toml++/toml.hpp"
-
 #include "context.h"
 #include "command_line_options.h"
-
-template <typename T> std::string to_string(T v) {
-    std::stringstream ss;
-    ss << v;
-
-    return ss.str();
-}
+#include "spdlog/spdlog.h"
 
 int main(int argc, char **argv) {
     Context::Ptr spContext = Context::Create();
@@ -25,5 +11,6 @@ int main(int argc, char **argv) {
         return r;
     }
 
+    spdlog::info("eim started");
     return 0;
 }
