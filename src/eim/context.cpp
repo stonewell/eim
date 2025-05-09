@@ -5,9 +5,10 @@
 #include "context.h"
 #include "platform_folders.h"
 #include "spdlog/spdlog.h"
-#include "toml++/toml.hpp"
+#include "helper_macros.h"
 
 namespace fs = std::filesystem;
+using namespace std::string_view_literals;
 
 namespace
 {
@@ -20,14 +21,12 @@ constexpr char DEFAULT_CONFIG[] = R"(
     [plugins]
 
     [plugins.buffer]
-    name="buffer"
     path="/opt/eim/plugins/libbuffer.so"
 
     [plugins.buffer.config]
     use_mmap = true
 
     [plugins.ui]
-    name="ui"
 
     [plugins.ui.config]
     use_opengl = true
@@ -66,9 +65,9 @@ int Context::load_config(const fs::path & config_file)
 {
     try
     {
-        const auto config = toml::parse_file(config_file.string());
+        config_ = toml::parse_file(config_file.string());
 
-        std::cout << toml::json_formatter(config) << std::endl;
+        std::cout << toml::json_formatter(config_) << std::endl;
     }
     catch (const toml::parse_error& err)
     {
@@ -105,6 +104,25 @@ int Context::create_default_config(const std::filesystem::path & config_file)
     }
 
     ofs << DEFAULT_CONFIG;
+
+    return 0;
+}
+
+int Context::initialize()
+{
+    RETURN_ON_ERROR(init_logging());
+
+    return 0;
+}
+
+int Context::init_logging()
+{
+    std::string level {config_.at_path("logging.level").value_or("info"sv)};
+
+    auto spdLevel = spdlog::level::from_str(level);
+
+    spdlog::set_level(spdlog::level::from_str(level));
+    spdlog::debug("log level:{}, parsed:{}, {}", level, (int)spdLevel, spdlog::level::to_string_view(spdLevel));
 
     return 0;
 }

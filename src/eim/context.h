@@ -4,6 +4,8 @@
 #include <string>
 #include <filesystem>
 
+#include "toml++/toml.hpp"
+
 std::filesystem::path get_default_config_path();
 
 class Context
@@ -20,7 +22,11 @@ public:
 public:
     int load_config(const std::filesystem::path & config_file);
     int load_default_config();
+    int initialize();
 
 protected:
     int create_default_config(const std::filesystem::path & config_file);
+    int init_logging();
+
+    toml::table config_{};
 };
