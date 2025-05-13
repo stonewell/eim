@@ -2,10 +2,14 @@
 #include <fstream>
 #include <iostream>
 
-#include "context.h"
 #include "platform_folders.h"
 #include "spdlog/spdlog.h"
+
 #include "helper_macros.h"
+
+#include "context.h"
+#include "plugin_manager.h"
+
 
 namespace fs = std::filesystem;
 using namespace std::string_view_literals;
@@ -40,7 +44,7 @@ fs::path get_default_config_path()
     return default_config / "eim" / "eim.toml";
 }
 
-Context::Ptr Context::Create()
+Context::Ptr Context::create()
 {
     return std::make_shared<Context>();
 }
@@ -111,6 +115,7 @@ int Context::create_default_config(const std::filesystem::path & config_file)
 int Context::initialize()
 {
     RETURN_ON_ERROR(init_logging());
+    RETURN_ON_ERROR(init_plugin_manager());
 
     return 0;
 }
@@ -125,4 +130,11 @@ int Context::init_logging()
     spdlog::debug("log level:{}, parsed:{}, {}", level, (int)spdLevel, spdlog::level::to_string_view(spdLevel));
 
     return 0;
+}
+
+int Context::init_plugin_manager()
+{
+    plugin_manager_ = PluginManager::create();
+
+    return plugin_manager_->initialize(shared_from_this());
 }

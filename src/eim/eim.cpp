@@ -4,7 +4,7 @@
 #include "helper_macros.h"
 
 int main(int argc, char **argv) {
-    Context::Ptr spContext = Context::Create();
+    Context::Ptr spContext = Context::create();
 
     RETURN_ON_ERROR(process_command_line(argc, argv, spContext));
 
