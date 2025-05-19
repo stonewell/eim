@@ -35,29 +35,27 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(warnings "-Wall -Wextra -Werror -Wno-cast-function-type -Wno-ignored-qualifiers")
-  set(no_undefined "-Wl,--no-undefined")
+  set(warnings -Wall -Wextra -Werror -Wno-cast-function-type -Wno-ignored-qualifiers)
+  set(no_undefined -Wl,--no-undefined)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(warnings "-Wall -Wextra -Werror -Wno-inconsistent-missing-override")
-  set(no_undefined "-Wl,-undefined,error")
+  set(warnings -Wall -Wextra -Werror -Wno-inconsistent-missing-override)
+  set(no_undefined -Wl,-undefined,error)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  set(warnings "/W4 /WX /EHsc")
+  set(warnings /W4 /WX /EHsc)
   set(no_undefined "")
 endif()
 
 SET(CXX_STANDARD_REQUIRED ON)
 SET(CXX_EXTENSION NO)
 
-if (NOT CONFIGURED_ONCE)
-  set(CMAKE_C_FLAGS "-fPIC ${warnings}"
+SET(PROJECT_C_FLAGS -fPIC ${warnings}
     CACHE STRING "Flags used by the compiler during all build types." FORCE)
-  set(CMAKE_CXX_FLAGS "-fPIC ${warnings} -std=c++20"
+SET(PROJECT_CXX_FLAGS -fPIC ${warnings} -std=c++20
     CACHE STRING "Flags used by the compiler during all build types." FORCE)
-  set(CMAKE_LINK_FLAGS "${no_undefined}"
+SET(PROJECT_LINK_FLAGS ${no_undefined}
     CACHE STRING "Flags used by the linker during all build types." FORCE)
-endif()
 
-find_package(Git QUIET)
+FIND_PACKAGE(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   # Update submodules as needed
   option(GIT_SUBMODULE "Check submodules during build" ON)
@@ -74,7 +72,7 @@ endif()
 
 FIND_PACKAGE(Threads REQUIRED)
 
-include(FetchContent)
+INCLUDE(FetchContent)
 
 FetchContent_Declare(
   platform_folders
@@ -100,6 +98,12 @@ FetchContent_Declare(
     GIT_TAG        v3.4.0
 )
 
+FetchContent_Declare(
+  boost
+  GIT_REPOSITORY https://github.com/boostorg/boost.git
+  GIT_TAG boost-1.88.0
+)
+
 SET(SPDLOG_USE_STD_FORMAT ON)
 SET(SPDLOG_BUILD_PIC ON)
 
@@ -108,6 +112,7 @@ FetchContent_MakeAvailable(
   spdlog
   cli11
   tomlplusplus
+  boost
 )
 
 ADD_SUBDIRECTORY(src)

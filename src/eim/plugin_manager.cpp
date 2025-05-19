@@ -1,12 +1,15 @@
 #include "plugin_manager.h"
 #include "context.h"
 
+#include <boost/dll/import.hpp>
 #include <iostream>
 
 #include "spdlog/spdlog.h"
 #include "helper_macros.h"
 
 namespace fs = std::filesystem;
+namespace dll = boost::dll;
+
 using namespace std::string_view_literals;
 
 
@@ -71,5 +74,15 @@ int PluginManager::load_plugin(std::string_view name, const toml::table & plugin
 std::string PluginManager::find_plugin_path(std::string_view name)
 {
     (void)name;
+    dll::fs::path lib_path{name};
+
+    auto plugin = dll::import_symbol<int()>(
+        lib_path / "my_plugin_sum",
+        "plugin",
+        dll::load_mode::append_decorations
+    );
+
+    std::cout << plugin() << std::endl;
+
     return std::string{name};
 }
