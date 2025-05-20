@@ -72,47 +72,38 @@ endif()
 
 FIND_PACKAGE(Threads REQUIRED)
 
+# download CPM.cmake
+FILE(
+  DOWNLOAD
+  https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.40.8/CPM.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake
+  EXPECTED_HASH SHA256=78ba32abdf798bc616bab7c73aac32a17bbd7b06ad9e26a6add69de8f3ae4791
+)
+INCLUDE(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
+
 INCLUDE(FetchContent)
 
-FetchContent_Declare(
-  platform_folders
-  GIT_REPOSITORY https://github.com/sago007/PlatformFolders.git
+# Add boost dependency
+SET(AddBoost.cmake_VERSION 3.7.3)
+CPMAddPackage(
+  NAME AddBoost.cmake
+  VERSION "${AddBoost.cmake_VERSION}"
+  URL "https://github.com/Arniiiii/AddBoost.cmake/archive/refs/tags/${AddBoost.cmake_VERSION}.tar.gz"
 )
 
-FetchContent_Declare(
-  spdlog
+SET(TRY_BOOST_VERSION "1.88.0")
+
+CPMAddPackage("gh:sago007/PlatformFolders#4.2.0")
+CPMAddPackage("gh:CLIUtils/CLI11@2.5.0")
+CPMAddPackage("gh:marzer/tomlplusplus@3.4.0")
+
+CPMAddPackage(
+  NAME spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
   GIT_TAG v1.x
-)
-
-FetchContent_Declare(
-    cli11
-    QUIET
-    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
-    GIT_TAG v2.5.0
-)
-
-FetchContent_Declare(
-    tomlplusplus
-    GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
-    GIT_TAG        v3.4.0
-)
-
-FetchContent_Declare(
-  boost
-  GIT_REPOSITORY https://github.com/boostorg/boost.git
-  GIT_TAG boost-1.88.0
-)
-
-SET(SPDLOG_USE_STD_FORMAT ON)
-SET(SPDLOG_BUILD_PIC ON)
-
-FetchContent_MakeAvailable(
-  platform_folders
-  spdlog
-  cli11
-  tomlplusplus
-  boost
+  OPTIONS
+    "SPDLOG_USE_STD_FORMAT ON"
+    "SPDLOG_BUILD_PIC ON"
 )
 
 ADD_SUBDIRECTORY(src)
